@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/create-group.dto'
-import { ParseMongoIdPipe } from './pipes/mongoId.pipe'
+import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 
 @Controller()
@@ -17,5 +26,10 @@ export class GroupController {
   @Get('get/:facultyId/dropdown')
   getFacultyGroupsForDropdown(@Param('facultyId', ParseMongoIdPipe) facultyId: Types.ObjectId) {
     return this.groupService.getByFacultyIdForDropdown(facultyId)
+  }
+
+  @Delete('/delete/:groupId')
+  delete(@Param('groupId', ParseMongoIdPipe) groupId: Types.ObjectId) {
+    return this.groupService.delete(groupId)
   }
 }

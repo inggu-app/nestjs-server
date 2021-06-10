@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common'
 import { Types } from 'mongoose'
-import { INVALID_MONGO_ID } from '../group.constants'
+import { INVALID_MONGO_ID } from '../../modules/group/group.constants'
 
 @Injectable()
 export class ParseMongoIdPipe implements PipeTransform<any, Types.ObjectId> {

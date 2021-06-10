@@ -3,6 +3,7 @@ import { FacultyController } from './faculty.controller'
 import { FacultyService } from './faculty.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
+import { GroupModule } from '../group/group.module'
 
 @Module({
   controllers: [FacultyController],
@@ -16,6 +17,7 @@ import { FacultyModel } from './faculty.model'
         },
       },
     ]),
+    GroupModule,
   ],
 })
 export class FacultyModule {}

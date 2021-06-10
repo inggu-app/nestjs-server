@@ -3,7 +3,8 @@ import { CreateFacultyDto } from './dto/create-faculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FACULTY_EXISTS } from './faculty.constants'
+import { FACULTY_EXISTS, FACULTY_NOT_FOUND } from './faculty.constants'
+import { Types } from 'mongoose'
 
 @Injectable()
 export class FacultyService {
@@ -21,5 +22,13 @@ export class FacultyService {
 
   getAllForDropdown() {
     return this.facultyModel.find({}, { title: 1 })
+  }
+
+  async delete(facultyId: Types.ObjectId) {
+    const deletedDoc = await this.facultyModel.findByIdAndDelete(facultyId)
+
+    if (!deletedDoc) {
+      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
   }
 }

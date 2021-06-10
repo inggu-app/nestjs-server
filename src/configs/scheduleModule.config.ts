@@ -1,7 +1,7 @@
 import { Routes } from 'nest-router'
-import { ScheduleModule } from '../schedule/schedule.module'
-import { GroupModule } from '../group/group.module'
-import { FacultyModule } from '../faculty/faculty.module'
+import { ScheduleModule } from '../modules/schedule/schedule.module'
+import { GroupModule } from '../modules/group/group.module'
+import { FacultyModule } from '../modules/faculty/faculty.module'
 
 export const scheduleModuleConfig: Routes = [
   {

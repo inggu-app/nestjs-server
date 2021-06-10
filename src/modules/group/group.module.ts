@@ -17,5 +17,6 @@ import { GroupModel } from './group.model'
       },
     ]),
   ],
+  exports: [GroupService],
 })
 export class GroupModule {}
