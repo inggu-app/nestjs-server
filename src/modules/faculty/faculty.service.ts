@@ -20,6 +20,10 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
+  getById(facultyId: Types.ObjectId) {
+    return this.facultyModel.findById(facultyId)
+  }
+
   getAllForDropdown() {
     return this.facultyModel.find({}, { title: 1 })
   }

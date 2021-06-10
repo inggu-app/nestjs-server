@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { FacultyController } from './faculty.controller'
 import { FacultyService } from './faculty.service'
 import { TypegooseModule } from 'nestjs-typegoose'
@@ -17,7 +17,8 @@ import { GroupModule } from '../group/group.module'
         },
       },
     ]),
-    GroupModule,
+    forwardRef(() => GroupModule),
   ],
+  exports: [FacultyService],
 })
 export class FacultyModule {}

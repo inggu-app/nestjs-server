@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   UsePipes,
@@ -12,14 +14,25 @@ import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/create-group.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
+import { FacultyService } from '../faculty/faculty.service'
+import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
 
 @Controller()
 export class GroupController {
-  constructor(private readonly groupService: GroupService) {}
+  constructor(
+    private readonly groupService: GroupService,
+    private readonly facultyService: FacultyService
+  ) {}
 
   @UsePipes(new ValidationPipe())
   @Post('/create')
-  create(@Body() dto: CreateGroupDto) {
+  async create(@Body() dto: CreateGroupDto) {
+    const facultyCandidate = await this.facultyService.getById(Types.ObjectId(dto.faculty))
+
+    if (!facultyCandidate) {
+      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
     return this.groupService.create(dto)
   }
 
