@@ -17,6 +17,6 @@ export class ScheduleService {
   }
 
   get(groupId: Types.ObjectId) {
-    return this.lessonModel.find({ group: groupId })
+    return this.lessonModel.find({ group: groupId }, { createdAt: 0, updatedAt: 0, group: 0 })
   }
 }
