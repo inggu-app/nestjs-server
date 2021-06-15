@@ -19,6 +19,10 @@ export class GroupService {
     return this.groupModel.create(dto)
   }
 
+  getById(groupId: Types.ObjectId) {
+    return this.groupModel.findOne({ _id: groupId })
+  }
+
   getByFacultyIdForDropdown(facultyId: Types.ObjectId) {
     return this.groupModel.find({ faculty: facultyId }, { title: 1 })
   }
