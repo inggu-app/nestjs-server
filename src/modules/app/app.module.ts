@@ -7,10 +7,12 @@ import { getMongoConfig } from '../../configs/mongo.config'
 import { RouterModule } from 'nest-router'
 import { scheduleModuleConfig } from '../../configs/scheduleModule.config'
 import { ScheduleModule } from '../schedule/schedule.module'
+import { SettingsModule } from '../settings/settings.module'
 
 @Module({
   imports: [
     ScheduleModule,
+    SettingsModule,
     RouterModule.forRoutes(scheduleModuleConfig),
     ConfigModule.forRoot(),
     TypegooseModule.forRootAsync({

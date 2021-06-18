@@ -1,13 +1,12 @@
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
-import { GroupModel } from '../group/group.model'
 import { FacultyModel } from '../faculty/faculty.model'
-import { Types } from 'mongoose'
+import { Schema, Types } from 'mongoose'
 
 export interface LessonModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<GroupModel>(),
+  schemaOptions: getModelDefaultOptions<LessonModel>(),
 })
 export class LessonModel extends TimeStamps {
   @prop()
@@ -25,7 +24,7 @@ export class LessonModel extends TimeStamps {
   @prop({ enum: [1, 2, 3, 4, 5, 6, 7] })
   weekDay: number
 
-  @prop()
+  @prop({ type: [Number] })
   weeks: number[]
 
   @prop()
