@@ -11,13 +11,15 @@ export class SecretLabelService {
     @InjectModel(SecretLabelModel) private readonly secretLabelModel: ModelType<SecretLabelModel>
   ) {}
 
-  async getActiveSecretLabel() {
-    const secretLabelDoc = await this.secretLabelModel.findOne({
-      isActive: true,
-      settingType: SECRET_LABEL_TYPE,
-    })
-
-    return secretLabelDoc?.label
+  getActiveSecretLabel(updatedAt: Date) {
+    return this.secretLabelModel.findOne(
+      {
+        isActive: true,
+        settingType: SECRET_LABEL_TYPE,
+        updatedAt: { $gt: updatedAt },
+      },
+      { label: 1, updatedAt: 1, _id: 0 }
+    )
   }
 
   deleteActiveSecretLabel() {

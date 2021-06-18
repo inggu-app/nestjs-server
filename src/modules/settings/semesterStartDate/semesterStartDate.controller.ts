@@ -1,14 +1,15 @@
-import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { SemesterStartDateService } from './semesterStartDate.service'
 import { CreateSemesterStartDateDto } from './dto/createSemesterStartDate.dto'
+import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 
 @Controller()
 export class SemesterStartDateController {
   constructor(private readonly semesterStartDateService: SemesterStartDateService) {}
 
   @Get('/get')
-  getSemesterStartTime() {
-    return this.semesterStartDateService.getActiveSemesterStartDate()
+  getSemesterStartTime(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
+    return this.semesterStartDateService.getActiveSemesterStartDate(updatedAt)
   }
 
   @UsePipes(new ValidationPipe())

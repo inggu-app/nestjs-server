@@ -12,13 +12,15 @@ export class SemesterStartDateService {
     private readonly semesterStartDateModel: ModelType<SemesterStartDateModel>
   ) {}
 
-  async getActiveSemesterStartDate() {
-    const semesterStartDateDoc = await this.semesterStartDateModel.findOne({
-      isActive: true,
-      settingType: SEMESTER_START_TIME_TYPE,
-    })
-
-    return semesterStartDateDoc?.date
+  getActiveSemesterStartDate(updatedAt: Date) {
+    return this.semesterStartDateModel.findOne(
+      {
+        isActive: true,
+        settingType: SEMESTER_START_TIME_TYPE,
+        updatedAt: { $gt: updatedAt },
+      },
+      { date: 1, updatedAt: 1, _id: 0 }
+    )
   }
 
   deleteActiveSemesterStartDate() {

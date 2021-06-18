@@ -1,14 +1,15 @@
-import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { WeeksCountService } from './weeksCount.service'
 import { CreateWeeksCountDto } from './dto/createWeeksCount.dto'
+import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 
 @Controller()
 export class WeeksCountController {
   constructor(private readonly weeksCountService: WeeksCountService) {}
 
   @Get('/get')
-  getWeeksCount() {
-    return this.weeksCountService.getActiveWeeksCount()
+  getWeeksCount(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
+    return this.weeksCountService.getActiveWeeksCount(updatedAt)
   }
 
   @UsePipes(new ValidationPipe())
