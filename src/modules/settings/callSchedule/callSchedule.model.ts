@@ -8,7 +8,15 @@ import {
   WEEKS_COUNT_TYPE,
 } from '../settings.constants'
 import { IsDateString, IsNumber } from 'class-validator'
+import { Schema, Types } from 'mongoose'
 
+interface Lesson {
+  lessonNumber: number
+
+  start: Date
+
+  end: Date
+}
 export class LessonCallSchedule {
   @IsNumber()
   lessonNumber: number
@@ -30,9 +38,9 @@ export class CallScheduleModel extends TimeStamps {
   })
   settingType: string
 
-  @prop({ type: [LessonCallSchedule] })
+  @prop()
   schedule: LessonCallSchedule[]
 
-  @prop()
+  @prop({ default: true })
   isActive: boolean
 }

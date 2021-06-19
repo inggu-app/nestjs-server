@@ -22,7 +22,6 @@ export class CallScheduleService {
     return this.callScheduleModel.create({
       settingType: CALL_SCHEDULE_TYPE,
       schedule: dto.schedule,
-      isActive: true,
     })
   }
 

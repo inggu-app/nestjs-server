@@ -2,7 +2,7 @@ import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { FacultyModel } from '../faculty/faculty.model'
-import { Schema, Types } from 'mongoose'
+import { Types } from 'mongoose'
 
 export interface LessonModel extends Base {}
 @modelOptions({

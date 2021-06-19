@@ -17,5 +17,6 @@ import { CallScheduleModel } from './callSchedule.model'
       },
     ]),
   ],
+  exports: [CallScheduleService],
 })
 export class CallScheduleModule {}
