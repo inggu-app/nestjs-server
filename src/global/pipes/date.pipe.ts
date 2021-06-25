@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common'
-import { isDateString } from 'class-validator'
+import { isISO8601 } from 'class-validator'
 import { INVALID_DATE } from '../constants/errors.constants'
 
 @Injectable()
 export class ParseDatePipe implements PipeTransform<any, Date> {
   transform(value: any): Date {
-    if (!isDateString(value) && value !== undefined) {
+    if (!isISO8601(value) && value !== undefined) {
       throw new BadRequestException(INVALID_DATE)
     }
 

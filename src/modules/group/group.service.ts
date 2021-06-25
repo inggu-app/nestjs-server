@@ -38,4 +38,8 @@ export class GroupService {
   async deleteAllByFacultyId(facultyId: Types.ObjectId) {
     return this.groupModel.deleteMany({ faculty: facultyId })
   }
+
+  updateLastScheduleUpdate(group: Types.ObjectId, date: Date) {
+    return this.groupModel.findByIdAndUpdate(group, { $set: { lastScheduleUpdate: date } })
+  }
 }

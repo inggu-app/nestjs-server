@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Patch,
   Query,
   UsePipes,
   ValidationPipe,
@@ -55,7 +56,7 @@ export class ScheduleController {
     const lessonsSchedule = await this.scheduleService.get(group)
     const callSchedule = await this.callScheduleService.getActiveCallSchedule(new Date(0))
 
-    return lessonsSchedule.map(lesson => {
+    const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
       const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
       return {
         id: lesson.id,
@@ -70,5 +71,22 @@ export class ScheduleController {
         startTime: call?.start || new Date(0),
       }
     })
+
+    return {
+      schedule: lessonsScheduleWithStartEnd,
+      updatedAt: candidate.lastScheduleUpdate,
+    }
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Patch('/update')
+  async update(@Body() dto: CreateScheduleDto) {
+    const candidate = await this.groupService.updateLastScheduleUpdate(dto.group, new Date())
+
+    if (!candidate) {
+      throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
+    await this.scheduleService.create(dto)
   }
 }
