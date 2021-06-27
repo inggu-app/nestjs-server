@@ -5,7 +5,7 @@ import { matches } from 'class-validator'
 @Injectable()
 export class AppVersionPipe implements PipeTransform<any, Date> {
   transform(value: any): Date {
-    if (!matches(value, /\d+.\d+.\d+/g)) {
+    if (!matches(value, /\d+.\d+.\d+/)) {
       throw new BadRequestException(INVALID_APP_VERSION)
     }
 
