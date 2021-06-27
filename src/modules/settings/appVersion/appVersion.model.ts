@@ -3,19 +3,22 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../../configs/modelDefaultOptions.config'
 import { ALL_SETTINGS_TYPES } from '../settings.constants'
 
-export interface SemesterStartDateModel extends Base {}
+export interface AppVersionModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<SemesterStartDateModel>(),
+  schemaOptions: getModelDefaultOptions<AppVersionModel>(),
 })
-export class SemesterStartDateModel extends TimeStamps {
+export class AppVersionModel extends TimeStamps {
   @prop({
     enum: ALL_SETTINGS_TYPES,
   })
   settingType: string
 
   @prop()
-  date: Date
+  iosVersion: string
 
   @prop()
+  androidVersion: string
+
+  @prop({ default: true })
   isActive: boolean
 }

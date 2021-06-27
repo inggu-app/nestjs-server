@@ -7,6 +7,7 @@ import { CallScheduleModule } from '../modules/settings/callSchedule/callSchedul
 import { SecretLabelModule } from '../modules/settings/secretLabel/secretLabel.module'
 import { SemesterStartDateModule } from '../modules/settings/semesterStartDate/semesterStartDate.module'
 import { WeeksCountModule } from '../modules/settings/weeksCount/weeksCount.module'
+import { AppVersionModule } from '../modules/settings/appVersion/appVersion.module'
 
 export const scheduleModuleConfig: Routes = [
   {
@@ -42,6 +43,10 @@ export const scheduleModuleConfig: Routes = [
       {
         path: '/weeks-count',
         module: WeeksCountModule,
+      },
+      {
+        path: '/app-version',
+        module: AppVersionModule,
       },
     ],
   },
