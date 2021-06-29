@@ -1,6 +1,7 @@
-import { IsDateString } from 'class-validator'
+import { Matches } from 'class-validator'
+import { dateRegExp } from '../../../../global/regex'
 
 export class CreateSemesterStartDateDto {
-  @IsDateString()
+  @Matches(dateRegExp)
   date: Date
 }
