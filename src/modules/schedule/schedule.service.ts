@@ -10,13 +10,15 @@ export class ScheduleService {
   constructor(@InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel>) {}
 
   async create(dto: CreateScheduleDto) {
-    await this.lessonModel.deleteMany({ group: dto.group })
-
     const lessons = dto.schedule.map(lesson => ({ ...lesson, group: dto.group }))
     return this.lessonModel.create(lessons)
   }
 
   get(groupId: Types.ObjectId) {
     return this.lessonModel.find({ group: groupId }, { createdAt: 0, updatedAt: 0, group: 0 })
+  }
+
+  async delete(group: Types.ObjectId) {
+    await this.lessonModel.deleteMany({ group })
   }
 }
