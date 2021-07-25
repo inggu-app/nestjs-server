@@ -37,6 +37,7 @@ export class ScheduleController {
       throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
+    await this.scheduleService.delete(candidate.id)
     await this.scheduleService.create(dto)
   }
 

@@ -6,6 +6,7 @@ import { dateRegExp } from '../regex'
 @Injectable()
 export class ParseDatePipe implements PipeTransform<any, Date> {
   transform(value: any): Date {
+    if (typeof value === 'string') value = value.replace(/"/g, '')
     if (!matches(value, dateRegExp) && value !== undefined) {
       throw new BadRequestException(INVALID_DATE)
     }
