@@ -8,8 +8,9 @@ export class WeeksCountController {
   constructor(private readonly weeksCountService: WeeksCountService) {}
 
   @Get('/get')
-  getWeeksCount(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
-    return this.weeksCountService.getActiveWeeksCount(updatedAt)
+  async getWeeksCount(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
+    const weeksCount = await this.weeksCountService.getActiveWeeksCount(updatedAt)
+    return weeksCount || {}
   }
 
   @UsePipes(new ValidationPipe())

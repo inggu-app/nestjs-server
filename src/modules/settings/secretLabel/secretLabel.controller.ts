@@ -8,8 +8,9 @@ export class SecretLabelController {
   constructor(private readonly secretLabelService: SecretLabelService) {}
 
   @Get('/get')
-  getSecretLabel(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
-    return this.secretLabelService.getActiveSecretLabel(updatedAt)
+  async getSecretLabel(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
+    const secretLabel = await this.secretLabelService.getActiveSecretLabel(updatedAt)
+    return secretLabel || {}
   }
 
   @UsePipes(new ValidationPipe())

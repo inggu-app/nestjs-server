@@ -8,8 +8,11 @@ export class SemesterStartDateController {
   constructor(private readonly semesterStartDateService: SemesterStartDateService) {}
 
   @Get('/get')
-  getSemesterStartTime(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
-    return this.semesterStartDateService.getActiveSemesterStartDate(updatedAt)
+  async getSemesterStartTime(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
+    const semesterStartTime = await this.semesterStartDateService.getActiveSemesterStartDate(
+      updatedAt
+    )
+    return semesterStartTime || {}
   }
 
   @UsePipes(new ValidationPipe())

@@ -8,8 +8,10 @@ export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}
 
   @Get('/get')
-  getCallSchedule(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
-    return this.callScheduleService.getActiveCallSchedule(updatedAt)
+  async getCallSchedule(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
+    const callSchedule = await this.callScheduleService.getActiveCallSchedule(updatedAt)
+
+    return callSchedule || {}
   }
 
   @UsePipes(new ValidationPipe())
