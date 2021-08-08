@@ -8,11 +8,13 @@ import { RouterModule } from 'nest-router'
 import { scheduleModuleConfig } from '../../configs/scheduleModule.config'
 import { ScheduleModule } from '../schedule/schedule.module'
 import { SettingsModule } from '../settings/settings.module'
+import { ResponsibleModule } from '../responsible/responsible.module'
 
 @Module({
   imports: [
     ScheduleModule,
     SettingsModule,
+    ResponsibleModule,
     RouterModule.forRoutes(scheduleModuleConfig),
     ConfigModule.forRoot(),
     TypegooseModule.forRootAsync({

@@ -8,6 +8,7 @@ import { SecretLabelModule } from '../modules/settings/secretLabel/secretLabel.m
 import { SemesterStartDateModule } from '../modules/settings/semesterStartDate/semesterStartDate.module'
 import { WeeksCountModule } from '../modules/settings/weeksCount/weeksCount.module'
 import { AppVersionModule } from '../modules/settings/appVersion/appVersion.module'
+import { ResponsibleModule } from '../modules/responsible/responsible.module'
 
 export const scheduleModuleConfig: Routes = [
   {
@@ -49,5 +50,9 @@ export const scheduleModuleConfig: Routes = [
         module: AppVersionModule,
       },
     ],
+  },
+  {
+    path: '/responsible',
+    module: ResponsibleModule,
   },
 ]
