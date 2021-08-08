@@ -127,7 +127,7 @@ export class ResponsibleService {
     )
 
     if (!candidate) {
-      throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.BAD_REQUEST)
+      throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.BAD_REQUEST)
     }
 
     const isRightPassword = await bcrypt.compare(dto.password, candidate.hashedPassword)
