@@ -7,7 +7,7 @@ import getJWTConfig from '../../configs/jwt.config'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ResponsibleController } from './responsible.controller'
 import { GroupModule } from '../group/group.module'
-import { JwtStrategy } from './jwt.strategy'
+import { ResponsibleJwtStrategy } from '../../global/strategies/responsibleJwt.strategy'
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { JwtStrategy } from './jwt.strategy'
       },
     ]),
   ],
-  providers: [ResponsibleService, JwtStrategy],
+  providers: [ResponsibleService, ResponsibleJwtStrategy],
   controllers: [ResponsibleController],
   exports: [ResponsibleService],
 })

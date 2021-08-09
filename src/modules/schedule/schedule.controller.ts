@@ -20,16 +20,14 @@ import { GroupService } from '../group/group.service'
 import { GROUP_NOT_FOUND } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
-import { ResponsibleService } from '../responsible/responsible.service'
-import { JwtAuthGuard } from '../responsible/jwt-auth.guard'
+import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.guard'
 
 @Controller()
 export class ScheduleController {
   constructor(
     private readonly scheduleService: ScheduleService,
     private readonly groupService: GroupService,
-    private readonly callScheduleService: CallScheduleService,
-    private readonly responsibleService: ResponsibleService
+    private readonly callScheduleService: CallScheduleService
   ) {}
 
   @UsePipes(new ValidationPipe())
@@ -83,7 +81,7 @@ export class ScheduleController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ResponsibleJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Patch('/update')
   async update(@Body() dto: CreateScheduleDto) {
