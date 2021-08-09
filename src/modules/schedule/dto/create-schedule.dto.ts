@@ -11,7 +11,22 @@ import {
 import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
 
-export class CreateScheduleDto {
+export interface ICreateScheduleDto {
+  group: Types.ObjectId
+  schedule: ILesson[]
+}
+
+interface ILesson {
+  title: string
+  teacher: string
+  number: number
+  classroom: string
+  weekDay: 1 | 2 | 3 | 4 | 5 | 6 | 7
+  weeks: number[]
+  type: string
+}
+
+export class CreateScheduleDto implements ICreateScheduleDto {
   @IsMongoId()
   group: Types.ObjectId
 
@@ -21,7 +36,7 @@ export class CreateScheduleDto {
   schedule: Lesson[]
 }
 
-class Lesson {
+class Lesson implements ILesson {
   @IsString()
   title: string
 
@@ -36,7 +51,7 @@ class Lesson {
   classroom: string
 
   @IsIn([1, 2, 3, 4, 5, 6, 7])
-  weekDay: number
+  weekDay: 1 | 2 | 3 | 4 | 5 | 6 | 7
 
   @IsNumber({}, { each: true })
   @ArrayMinSize(1)

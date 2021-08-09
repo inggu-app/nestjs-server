@@ -6,6 +6,7 @@ import { ScheduleService } from './schedule.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
 import { CallScheduleModule } from '../settings/callSchedule/callSchedule.module'
+import { ResponsibleModule } from '../responsible/responsible.module'
 
 @Module({
   controllers: [ScheduleController],
@@ -22,6 +23,7 @@ import { CallScheduleModule } from '../settings/callSchedule/callSchedule.module
     FacultyModule,
     GroupModule,
     CallScheduleModule,
+    ResponsibleModule,
   ],
 })
 export class ScheduleModule {}

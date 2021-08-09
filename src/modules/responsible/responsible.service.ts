@@ -17,6 +17,13 @@ import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
 
+export interface AccessTokenData {
+  login: string
+  name: string
+  groups: Types.ObjectId[]
+  uniqueKey: string
+}
+
 @Injectable()
 export class ResponsibleService {
   constructor(
@@ -135,14 +142,21 @@ export class ResponsibleService {
     if (!isRightPassword) {
       throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.UNAUTHORIZED)
     } else {
+      const accessTokenData: AccessTokenData = {
+        login: candidate.login,
+        name: candidate.name,
+        groups: candidate.groups.map(group => group._id),
+        uniqueKey: generatedUniqueKey,
+      }
       return {
-        accessToken: this.jwtService.sign({
-          login: candidate.login,
-          name: candidate.name,
-          groups: candidate.groups,
-          uniqueKey: generatedUniqueKey,
-        }),
+        accessToken: this.jwtService.sign(accessTokenData),
       }
     }
+  }
+
+  validateResponsible(accessToken: string, group: Types.ObjectId) {
+    const accessTokenData = this.jwtService.verify<AccessTokenData>(accessToken)
+
+    return accessTokenData.groups.includes(group)
   }
 }

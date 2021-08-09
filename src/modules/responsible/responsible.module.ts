@@ -7,10 +7,12 @@ import getJWTConfig from '../../configs/jwt.config'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ResponsibleController } from './responsible.controller'
 import { GroupModule } from '../group/group.module'
+import { JwtStrategy } from './jwt.strategy'
 
 @Module({
   imports: [
     GroupModule,
+    ConfigModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -25,7 +27,8 @@ import { GroupModule } from '../group/group.module'
       },
     ]),
   ],
-  providers: [ResponsibleService],
+  providers: [ResponsibleService, JwtStrategy],
   controllers: [ResponsibleController],
+  exports: [ResponsibleService],
 })
 export class ResponsibleModule {}
