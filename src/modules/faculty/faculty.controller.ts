@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
@@ -13,6 +14,7 @@ import { CreateFacultyDto } from './dto/create-faculty.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
+import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 
 @Controller()
 export class FacultyController {
@@ -21,6 +23,7 @@ export class FacultyController {
     private readonly groupService: GroupService
   ) {}
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   create(@Body() dto: CreateFacultyDto) {

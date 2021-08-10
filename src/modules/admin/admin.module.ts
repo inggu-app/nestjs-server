@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { OwnerJwtStrategy } from '../../global/strategies/ownerJwt.strategy'
 import { JwtModule } from '@nestjs/jwt'
 import getJWTConfig from '../../configs/jwt.config'
+import { AdminJwtStrategy } from '../../global/strategies/adminJwt.strategy'
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import getJWTConfig from '../../configs/jwt.config'
       },
     ]),
   ],
-  providers: [AdminService, OwnerJwtStrategy],
+  providers: [AdminService, AdminJwtStrategy, OwnerJwtStrategy],
   controllers: [AdminController],
 })
 export class AdminModule {}

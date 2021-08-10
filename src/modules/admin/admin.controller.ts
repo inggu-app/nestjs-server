@@ -16,6 +16,7 @@ import { CreateAdminDto } from './dto/createAdmin.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { UpdateAdminDto } from './dto/updateAdmin.dto'
+import { LoginAdminDto } from './dto/loginAdmin.dto'
 
 @Controller()
 export class AdminController {
@@ -23,7 +24,7 @@ export class AdminController {
 
   @UseGuards(OwnerJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post()
+  @Post('/')
   create(@Body() dto: CreateAdminDto) {
     return this.adminService.create(dto)
   }
@@ -51,5 +52,11 @@ export class AdminController {
   @Delete('/:id')
   delete(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.adminService.delete(id)
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('/login')
+  login(@Body() dto: LoginAdminDto) {
+    return this.adminService.login(dto)
   }
 }

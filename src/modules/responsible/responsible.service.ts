@@ -4,11 +4,7 @@ import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateResponsibleDto } from './dto/createResponsible.dto'
-import {
-  INCORRECT_CREDENTIALS,
-  RESPONSIBLE_EXISTS,
-  RESPONSIBLE_NOT_FOUND,
-} from './responsible.constants'
+import { RESPONSIBLE_EXISTS, RESPONSIBLE_NOT_FOUND } from './responsible.constants'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
 import generatePassword from '../../global/utils/generatePassword'
@@ -16,6 +12,7 @@ import { Types } from 'mongoose'
 import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
+import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 
 export interface AccessTokenData {
   login: string
