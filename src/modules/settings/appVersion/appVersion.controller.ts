@@ -1,10 +1,20 @@
-import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common'
 import { AppVersionService } from './appVersion.service'
 import { CreateAppVersionDto } from './dto/createAppVersion.dto'
 import { OSs } from '../../../global/constants/other.constants'
 import { OsPipe } from '../../../global/pipes/os.pipe'
 import { AppVersionPipe } from '../../../global/pipes/appVersion.pipe'
 import { checkAppVersion } from './appVersion.utils'
+import { AdminJwtAuthGuard } from '../../../global/guards/adminJwtAuth.guard'
 
 @Controller()
 export class AppVersionController {
@@ -37,6 +47,7 @@ export class AppVersionController {
     }
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async createAppVersion(@Body() dto: CreateAppVersionDto) {

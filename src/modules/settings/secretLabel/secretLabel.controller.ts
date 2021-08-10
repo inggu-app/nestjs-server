@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common'
 import { CreateSecretLabelDto } from './dto/createSecretLabel.dto'
 import { SecretLabelService } from './secretLabel.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
+import { AdminJwtAuthGuard } from '../../../global/guards/adminJwtAuth.guard'
 
 @Controller()
 export class SecretLabelController {
@@ -13,6 +23,7 @@ export class SecretLabelController {
     return secretLabel || {}
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async createSecretLabel(@Body() dto: CreateSecretLabelDto) {

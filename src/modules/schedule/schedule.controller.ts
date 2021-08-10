@@ -21,6 +21,7 @@ import { GROUP_NOT_FOUND } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.guard'
+import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 
 @Controller()
 export class ScheduleController {
@@ -30,6 +31,7 @@ export class ScheduleController {
     private readonly callScheduleService: CallScheduleService
   ) {}
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async create(@Body() dto: CreateScheduleDto) {

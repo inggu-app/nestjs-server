@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
@@ -19,6 +20,7 @@ import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { GroupService } from '../group/group.service'
 import { GROUP_WITH_ID_NOT_FOUND } from '../group/group.constants'
+import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 
 @Controller()
 export class ResponsibleController {
@@ -27,6 +29,7 @@ export class ResponsibleController {
     private readonly groupService: GroupService
   ) {}
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async create(@Body() dto: CreateResponsibleDto) {
@@ -53,17 +56,20 @@ export class ResponsibleController {
     return this.responsibleService.getById(id)
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Patch('/reset-password/:id')
   async resetPassword(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.responsibleService.resetPassword(id)
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Patch()
   async update(@Body() dto: UpdateResponsibleDto) {
     return this.responsibleService.update(dto)
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Delete('/:id')
   async delete(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.responsibleService.delete(id)

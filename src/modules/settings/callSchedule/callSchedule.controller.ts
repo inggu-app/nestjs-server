@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
+import { AdminJwtAuthGuard } from '../../../global/guards/adminJwtAuth.guard'
 
 @Controller()
 export class CallScheduleController {
@@ -14,6 +24,7 @@ export class CallScheduleController {
     return callSchedule || {}
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async createCallSchedule(@Body() dto: CreateCallScheduleDto) {

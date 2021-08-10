@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
@@ -16,6 +17,7 @@ import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
 import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
+import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 
 @Controller()
 export class GroupController {
@@ -24,6 +26,7 @@ export class GroupController {
     private readonly facultyService: FacultyService
   ) {}
 
+  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async create(@Body() dto: CreateGroupDto) {
@@ -41,6 +44,7 @@ export class GroupController {
     return this.groupService.getByFacultyIdForDropdown(facultyId)
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Delete('/delete/:groupId')
   delete(@Param('groupId', ParseMongoIdPipe) groupId: Types.ObjectId) {
     return this.groupService.delete(groupId)

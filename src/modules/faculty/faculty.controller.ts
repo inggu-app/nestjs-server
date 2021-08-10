@@ -35,6 +35,7 @@ export class FacultyController {
     return this.facultyService.getAllForDropdown()
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Delete('/delete/:facultyId')
   async delete(@Param('facultyId', ParseMongoIdPipe) facultyId: Types.ObjectId) {
     await this.facultyService.delete(facultyId)
