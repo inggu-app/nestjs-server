@@ -9,6 +9,7 @@ import { SemesterStartDateModule } from '../modules/settings/semesterStartDate/s
 import { WeeksCountModule } from '../modules/settings/weeksCount/weeksCount.module'
 import { AppVersionModule } from '../modules/settings/appVersion/appVersion.module'
 import { ResponsibleModule } from '../modules/responsible/responsible.module'
+import { AdminModule } from '../modules/admin/admin.module'
 
 export const scheduleModuleConfig: Routes = [
   {
@@ -54,5 +55,9 @@ export const scheduleModuleConfig: Routes = [
   {
     path: '/responsible',
     module: ResponsibleModule,
+  },
+  {
+    path: '/admin',
+    module: AdminModule,
   },
 ]

@@ -9,12 +9,14 @@ import { scheduleModuleConfig } from '../../configs/scheduleModule.config'
 import { ScheduleModule } from '../schedule/schedule.module'
 import { SettingsModule } from '../settings/settings.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
+import { AdminModule } from '../admin/admin.module'
 
 @Module({
   imports: [
     ScheduleModule,
     SettingsModule,
     ResponsibleModule,
+    AdminModule,
     RouterModule.forRoutes(scheduleModuleConfig),
     ConfigModule.forRoot(),
     TypegooseModule.forRootAsync({

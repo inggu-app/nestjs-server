@@ -5,10 +5,10 @@ import { ConfigService } from '@nestjs/config'
 import { Request } from 'express'
 import { ICreateScheduleDto } from '../../modules/schedule/dto/create-schedule.dto'
 import { AccessTokenData } from '../../modules/responsible/responsible.service'
-import { RESPONSIBLE_STRATEGY_NAME } from '../constants/strategies.constants'
+import { ADMIN_STRATEGY_NAME } from '../constants/strategies.constants'
 
 @Injectable()
-export class ResponsibleJwtStrategy extends PassportStrategy(Strategy, RESPONSIBLE_STRATEGY_NAME) {
+export class AdminJwtStrategy extends PassportStrategy(Strategy, ADMIN_STRATEGY_NAME) {
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

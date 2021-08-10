@@ -1,0 +1,93 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { InjectModel } from 'nestjs-typegoose'
+import * as bcrypt from 'bcrypt'
+import { AdminModel } from './admin.model'
+import { ModelType } from '@typegoose/typegoose/lib/types'
+import { CreateAdminDto } from './dto/createAdmin.dto'
+import generateUniqueKey from '../../global/utils/generateUniqueKey'
+import generatePassword from '../../global/utils/generatePassword'
+import { hashSalt } from '../../global/constants/other.constants'
+import { Types } from 'mongoose'
+import { ADMIN_EXISTS, ADMIN_NOT_FOUND } from './admin.constants'
+import { UpdateAdminDto } from './dto/updateAdmin.dto'
+
+@Injectable()
+export class AdminService {
+  constructor(@InjectModel(AdminModel) private readonly adminModel: ModelType<AdminModel>) {}
+
+  async create(dto: CreateAdminDto) {
+    const candidate = await this.adminModel.findOne({ login: dto.login })
+
+    if (candidate) {
+      throw new HttpException(ADMIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
+    }
+
+    const generatedUniqueKey = generateUniqueKey()
+    const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
+    const generatedPassword = generatePassword(20)
+    const hashedPassword = await bcrypt.hash(generatedPassword, hashSalt)
+
+    const admin = await this.adminModel.create({
+      name: dto.name,
+      login: dto.login,
+      hashedUniqueKey,
+      hashedPassword,
+    })
+
+    return {
+      id: admin.id,
+      name: admin.name,
+      login: admin.login,
+      password: generatedPassword,
+      uniqueKey: generatedUniqueKey,
+    }
+  }
+
+  async resetPassword(id: Types.ObjectId) {
+    const generatedPassword = generatePassword(20)
+    const hashedPassword = await bcrypt.hash(generatedPassword, hashSalt)
+    const candidate = await this.adminModel.findByIdAndUpdate(id, { $set: { hashedPassword } })
+
+    if (!candidate) {
+      throw new HttpException(ADMIN_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+    }
+
+    return {
+      password: generatedPassword,
+    }
+  }
+
+  async getById(id: Types.ObjectId) {
+    const candidate = await this.adminModel.findById(id, { hashedUniqueKey: 0, hashedPassword: 0 })
+
+    if (!candidate) {
+      throw new HttpException(ADMIN_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+    }
+
+    return candidate
+  }
+
+  async update(dto: UpdateAdminDto) {
+    const candidate = await this.adminModel.findByIdAndUpdate(dto.id, {
+      $set: { name: dto.name, login: dto.login },
+    })
+
+    if (!candidate) {
+      throw new HttpException(ADMIN_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
+    }
+
+    return this.adminModel.findById(dto.id, { hashedUniqueKey: 0, hashedPassword: 0 })
+  }
+
+  async delete(id: Types.ObjectId) {
+    const candidate = await this.adminModel.findByIdAndDelete(id, {
+      projection: { hashedUniqueKey: 0, hashedPassword: 0 },
+    })
+
+    if (!candidate) {
+      throw new HttpException(ADMIN_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+    }
+
+    return candidate
+  }
+}

@@ -1,5 +1,5 @@
 import * as crypto from 'crypto'
 
-export default function generatePassword() {
-  return crypto.randomBytes(15).toString('hex')
+export default function generatePassword(length?: number) {
+  return crypto.randomBytes(length || 15).toString('hex')
 }
