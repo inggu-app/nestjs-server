@@ -14,7 +14,7 @@ import { OSs } from '../../../global/constants/other.constants'
 import { OsPipe } from '../../../global/pipes/os.pipe'
 import { AppVersionPipe } from '../../../global/pipes/appVersion.pipe'
 import { checkAppVersion } from './appVersion.utils'
-import { AdminJwtAuthGuard } from '../../../global/guards/adminJwtAuth.guard'
+import { OwnerJwtAuthGuard } from '../../../global/guards/ownerJwtAuth.guard'
 
 @Controller()
 export class AppVersionController {
@@ -47,7 +47,7 @@ export class AppVersionController {
     }
   }
 
-  @UseGuards(AdminJwtAuthGuard)
+  @UseGuards(OwnerJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async createAppVersion(@Body() dto: CreateAppVersionDto) {
