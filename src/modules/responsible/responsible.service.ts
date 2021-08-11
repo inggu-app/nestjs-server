@@ -13,14 +13,14 @@ import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
 import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
+import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
 
-export interface ResponsibleAccessTokenData {
+export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
+  tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
   login: string
   name: string
   groups: Types.ObjectId[]
   uniqueKey: string
-  iat?: number
-  exp?: number
 }
 
 @Injectable()
@@ -142,6 +142,7 @@ export class ResponsibleService {
       throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.UNAUTHORIZED)
     } else {
       const accessTokenData: ResponsibleAccessTokenData = {
+        tokenType: RESPONSIBLE_ACCESS_TOKEN_DATA,
         login: candidate.login,
         name: candidate.name,
         groups: candidate.groups.map(group => group._id),

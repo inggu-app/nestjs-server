@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
 import { ConfigService } from '@nestjs/config'
 import { ADMIN_STRATEGY_NAME } from '../constants/strategies.constants'
 import { AdminAccessTokenData } from '../../modules/admin/admin.service'
+import { adminExampleAccessTokenData, checkJwtType } from '../utils/checkJwtType'
 
 @Injectable()
 export class AdminJwtStrategy extends PassportStrategy(Strategy, ADMIN_STRATEGY_NAME) {
@@ -16,6 +17,7 @@ export class AdminJwtStrategy extends PassportStrategy(Strategy, ADMIN_STRATEGY_
   }
 
   async validate(accessTokenData: AdminAccessTokenData) {
+    checkJwtType(accessTokenData, adminExampleAccessTokenData)
     if (accessTokenData.type === 'ADMIN') {
       return true
     }

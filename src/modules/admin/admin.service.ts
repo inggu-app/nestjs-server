@@ -17,8 +17,10 @@ import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
 import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { JwtService } from '@nestjs/jwt'
+import { ADMIN_ACCESS_TOKEN_DATA, JwtType } from '../../global/utils/checkJwtType'
 
-export interface AdminAccessTokenData {
+export interface AdminAccessTokenData extends JwtType<typeof ADMIN_ACCESS_TOKEN_DATA> {
+  tokenType: typeof ADMIN_ACCESS_TOKEN_DATA
   type: 'ADMIN'
   login: string
   name: string
@@ -136,6 +138,7 @@ export class AdminService {
       throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.UNAUTHORIZED)
     } else {
       const accessTokenData: AdminAccessTokenData = {
+        tokenType: ADMIN_ACCESS_TOKEN_DATA,
         type: 'ADMIN',
         login: candidate.login,
         name: candidate.name,

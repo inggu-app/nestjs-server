@@ -1,10 +1,20 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { ConfigService } from '@nestjs/config'
 import * as bcrypt from 'bcrypt'
 import { Credentials } from '../../modules/admin/dto/createAdmin.dto'
 import { OWNER_STRATEGY_NAME } from '../constants/strategies.constants'
+import {
+  checkJwtType,
+  JwtType,
+  OWNER_ACCESS_TOKEN_DATA,
+  ownerExampleAccessTokenData,
+} from '../utils/checkJwtType'
+
+export interface OwnerAccessTokenData
+  extends JwtType<typeof OWNER_ACCESS_TOKEN_DATA>,
+    Credentials {}
 
 @Injectable()
 export class OwnerJwtStrategy extends PassportStrategy(Strategy, OWNER_STRATEGY_NAME) {
@@ -16,7 +26,9 @@ export class OwnerJwtStrategy extends PassportStrategy(Strategy, OWNER_STRATEGY_
     })
   }
 
-  async validate(accessTokenData: Credentials) {
+  async validate(accessTokenData: OwnerAccessTokenData) {
+    checkJwtType(accessTokenData, ownerExampleAccessTokenData)
+
     const ownerLogin = this.configService.get('OWNER_LOGIN')
     const ownerPassword = this.configService.get('OWNER_PASSWORD')
 
