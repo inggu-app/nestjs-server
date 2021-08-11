@@ -17,7 +17,7 @@ import { ScheduleService } from './schedule.service'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
-import { GROUP_NOT_FOUND } from './schedule.constants'
+import { GROUP_NOT_FOUND, SCHEDULE_EXISTS } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.guard'
@@ -35,13 +35,22 @@ export class ScheduleController {
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async create(@Body() dto: CreateScheduleDto) {
-    const candidate = await this.groupService.getById(dto.group)
+    const groupCandidate = await this.groupService.getById(dto.group)
 
-    if (!candidate) {
+    if (!groupCandidate) {
       throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
-    await this.scheduleService.delete(candidate.id)
+    const scheduleCandidate = await this.scheduleService.get(dto.group)
+
+    if (scheduleCandidate.length) {
+      throw new HttpException(SCHEDULE_EXISTS, HttpStatus.BAD_REQUEST)
+    }
+
+    groupCandidate.isHaveSchedule = true
+    await groupCandidate.save()
+
+    await this.scheduleService.delete(groupCandidate.id)
     await this.scheduleService.create(dto)
   }
 
