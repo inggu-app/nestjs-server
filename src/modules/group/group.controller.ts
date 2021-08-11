@@ -40,7 +40,15 @@ export class GroupController {
   }
 
   @Get('get/:facultyId/dropdown')
-  getFacultyGroupsForDropdown(@Param('facultyId', ParseMongoIdPipe) facultyId: Types.ObjectId) {
+  async getFacultyGroupsForDropdown(
+    @Param('facultyId', ParseMongoIdPipe) facultyId: Types.ObjectId
+  ) {
+    const facultyCandidate = await this.facultyService.getById(facultyId)
+
+    if (!facultyCandidate) {
+      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
     return this.groupService.getByFacultyIdForDropdown(facultyId)
   }
 
