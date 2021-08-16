@@ -124,6 +124,10 @@ export class ResponsibleService {
     return candidate
   }
 
+  getAll() {
+    return this.responsibleModel.find({}, { hashedUniqueKey: 0, hashedPassword: 0 })
+  }
+
   async login(dto: LoginResponsibleDto) {
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)

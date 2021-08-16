@@ -86,6 +86,10 @@ export class AdminService {
     return candidate
   }
 
+  getAll() {
+    return this.adminModel.find({}, { hashedUniqueKey: 0, hashedPassword: 0 })
+  }
+
   async getByLogin(login: string) {
     const candidate = await this.adminModel.findOne({ login })
 

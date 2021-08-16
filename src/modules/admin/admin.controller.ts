@@ -31,8 +31,14 @@ export class AdminController {
 
   @UseGuards(OwnerJwtAuthGuard)
   @Get('/:id')
-  get(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+  getById(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.adminService.getById(id)
+  }
+
+  @UseGuards(OwnerJwtAuthGuard)
+  @Get('/')
+  getAll() {
+    return this.adminService.getAll()
   }
 
   @UseGuards(OwnerJwtAuthGuard)

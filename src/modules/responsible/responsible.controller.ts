@@ -57,6 +57,12 @@ export class ResponsibleController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
+  @Get('/')
+  async getAll() {
+    return this.responsibleService.getAll()
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
   @Patch('/reset-password/:id')
   async resetPassword(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.responsibleService.resetPassword(id)
