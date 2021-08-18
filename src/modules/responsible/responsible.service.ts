@@ -75,6 +75,10 @@ export class ResponsibleService {
     return candidate
   }
 
+  async deleteGroupFromAllResponsibles(id: Types.ObjectId) {
+    await this.responsibleModel.updateMany({ groups: { $in: [id] } }, { $pull: { groups: id } })
+  }
+
   async update(dto: UpdateResponsibleDto) {
     const candidate = await this.responsibleModel.findByIdAndUpdate(
       dto.id,

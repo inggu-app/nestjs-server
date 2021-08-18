@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { ResponsibleModel } from './responsible.model'
 import { ResponsibleService } from './responsible.service'
@@ -11,7 +11,6 @@ import { ResponsibleJwtStrategy } from '../../global/strategies/responsibleJwt.s
 
 @Module({
   imports: [
-    GroupModule,
     ConfigModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -26,6 +25,7 @@ import { ResponsibleJwtStrategy } from '../../global/strategies/responsibleJwt.s
         },
       },
     ]),
+    forwardRef(() => GroupModule),
   ],
   providers: [ResponsibleService, ResponsibleJwtStrategy],
   controllers: [ResponsibleController],

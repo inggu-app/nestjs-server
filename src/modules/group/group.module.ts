@@ -4,6 +4,7 @@ import { GroupService } from './group.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { FacultyModule } from '../faculty/faculty.module'
+import { ResponsibleModule } from '../responsible/responsible.module'
 
 @Module({
   controllers: [GroupController],
@@ -18,6 +19,7 @@ import { FacultyModule } from '../faculty/faculty.module'
       },
     ]),
     forwardRef(() => FacultyModule),
+    forwardRef(() => ResponsibleModule),
   ],
   exports: [GroupService],
 })

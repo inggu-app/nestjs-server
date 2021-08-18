@@ -18,12 +18,14 @@ import { Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
 import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
+import { ResponsibleService } from '../responsible/responsible.service'
 
 @Controller()
 export class GroupController {
   constructor(
     private readonly groupService: GroupService,
-    private readonly facultyService: FacultyService
+    private readonly facultyService: FacultyService,
+    private readonly responsibleService: ResponsibleService
   ) {}
 
   @UseGuards(AdminJwtAuthGuard)
@@ -64,7 +66,9 @@ export class GroupController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete('/delete/:groupId')
-  delete(@Param('groupId', ParseMongoIdPipe) groupId: Types.ObjectId) {
+  async delete(@Param('groupId', ParseMongoIdPipe) groupId: Types.ObjectId) {
+    await this.responsibleService.deleteGroupFromAllResponsibles(groupId)
+
     return this.groupService.delete(groupId)
   }
 }
