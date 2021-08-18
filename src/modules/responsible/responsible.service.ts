@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
@@ -30,7 +30,7 @@ export class ResponsibleService {
   constructor(
     @InjectModel(ResponsibleModel) private readonly responsibleModel: ModelType<ResponsibleModel>,
     private readonly jwtService: JwtService,
-    private readonly groupService: GroupService
+    @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService
   ) {}
 
   async create(dto: CreateResponsibleDto) {
@@ -75,8 +75,11 @@ export class ResponsibleService {
     return candidate
   }
 
-  async deleteGroupFromAllResponsibles(id: Types.ObjectId) {
-    await this.responsibleModel.updateMany({ groups: { $in: [id] } }, { $pull: { groups: id } })
+  async deleteGroupsFromAllResponsibles(ids: Types.ObjectId[]) {
+    await this.responsibleModel.updateMany(
+      { groups: { $in: ids } },
+      { $pull: { groups: { $in: ids } } }
+    )
   }
 
   async update(dto: UpdateResponsibleDto) {
