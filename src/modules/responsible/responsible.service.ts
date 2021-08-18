@@ -15,7 +15,7 @@ import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
 import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
 import { GroupService } from '../group/group.service'
-import { GROUP_NOT_FOUND } from '../group/group.constants'
+import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from '../group/group.constants'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
@@ -83,6 +83,14 @@ export class ResponsibleService {
   }
 
   async update(dto: UpdateResponsibleDto) {
+    for await (const groupId of dto.groups) {
+      const groupCandidate = await this.groupService.getById(groupId)
+
+      if (!groupCandidate) {
+        throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
+      }
+    }
+
     const candidate = await this.responsibleModel.findByIdAndUpdate(
       dto.id,
       {
