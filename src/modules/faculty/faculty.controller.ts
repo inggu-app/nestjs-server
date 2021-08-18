@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -28,6 +29,16 @@ export class FacultyController {
   @Post('/create')
   create(@Body() dto: CreateFacultyDto) {
     return this.facultyService.create(dto)
+  }
+
+  @Get('/all')
+  getAll() {
+    return this.facultyService.getAll()
+  }
+
+  @Get('/by-id')
+  getById(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
+    return this.facultyService.getById(id)
   }
 
   @Get('/get/dropdown')

@@ -24,6 +24,10 @@ export class FacultyService {
     return this.facultyModel.findById(facultyId)
   }
 
+  getAll() {
+    return this.facultyModel.find()
+  }
+
   getAllForDropdown() {
     return this.facultyModel.find({}, { title: 1 })
   }

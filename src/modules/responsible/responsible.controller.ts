@@ -64,7 +64,7 @@ export class ResponsibleController {
   }
 
   @Get('/by-group')
-  async getAllByGroup(@Query('group', ParseMongoIdPipe) id: Types.ObjectId) {
+  async getAllByGroup(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.responsibleService.getAllByGroup(id)
   }
 
