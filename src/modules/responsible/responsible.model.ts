@@ -18,7 +18,7 @@ export class ResponsibleModel extends TimeStamps {
   @prop()
   hashedUniqueKey: string
 
-  @prop()
+  @prop({ unique: true })
   login: string
 
   @prop()

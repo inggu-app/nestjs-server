@@ -83,6 +83,12 @@ export class ResponsibleService {
   }
 
   async update(dto: UpdateResponsibleDto) {
+    const loginCandidate = await this.responsibleModel.findOne({ login: dto.login })
+
+    if (loginCandidate && loginCandidate?.id !== dto.id) {
+      throw new HttpException(RESPONSIBLE_EXISTS, HttpStatus.BAD_REQUEST)
+    }
+
     for await (const groupId of dto.groups) {
       const groupCandidate = await this.groupService.getById(groupId)
 
