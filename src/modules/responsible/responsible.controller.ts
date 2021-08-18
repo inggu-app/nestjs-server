@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -51,15 +52,20 @@ export class ResponsibleController {
     return this.responsibleService.create(dto)
   }
 
-  @Get('/:id')
-  async getById(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+  @Get('/by-id')
+  async getById(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.responsibleService.getById(id)
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Get('/')
+  @Get('/all')
   async getAll() {
     return this.responsibleService.getAll()
+  }
+
+  @Get('/by-group')
+  async getAllByGroup(@Query('group', ParseMongoIdPipe) id: Types.ObjectId) {
+    return this.responsibleService.getAllByGroup(id)
   }
 
   @UseGuards(AdminJwtAuthGuard)

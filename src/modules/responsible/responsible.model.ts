@@ -2,6 +2,7 @@ import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { GroupModel } from '../group/group.model'
+import { Types } from 'mongoose'
 
 export interface FacultyModel extends Base {}
 @modelOptions({
@@ -9,7 +10,7 @@ export interface FacultyModel extends Base {}
 })
 export class ResponsibleModel extends TimeStamps {
   @prop({ ref: () => GroupModel })
-  groups: GroupModel[]
+  groups: Types.ObjectId[]
 
   @prop()
   name: string

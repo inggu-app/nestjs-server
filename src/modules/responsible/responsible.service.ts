@@ -14,6 +14,8 @@ import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
 import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
+import { GroupService } from '../group/group.service'
+import { GROUP_NOT_FOUND } from '../group/group.constants'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
@@ -27,7 +29,8 @@ export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_A
 export class ResponsibleService {
   constructor(
     @InjectModel(ResponsibleModel) private readonly responsibleModel: ModelType<ResponsibleModel>,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly groupService: GroupService
   ) {}
 
   async create(dto: CreateResponsibleDto) {
@@ -128,6 +131,19 @@ export class ResponsibleService {
     return this.responsibleModel.find({}, { hashedUniqueKey: 0, hashedPassword: 0 })
   }
 
+  async getAllByGroup(id: Types.ObjectId) {
+    const candidate = await this.groupService.getById(id)
+
+    if (!candidate) {
+      throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
+    return this.responsibleModel.find(
+      { groups: { $in: [id] } },
+      { hashedPassword: 0, hashedUniqueKey: 0 }
+    )
+  }
+
   async login(dto: LoginResponsibleDto) {
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
@@ -149,7 +165,7 @@ export class ResponsibleService {
         tokenType: RESPONSIBLE_ACCESS_TOKEN_DATA,
         login: candidate.login,
         name: candidate.name,
-        groups: candidate.groups.map(group => group._id),
+        groups: candidate.groups,
         uniqueKey: generatedUniqueKey,
       }
       return {

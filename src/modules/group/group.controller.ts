@@ -39,6 +39,16 @@ export class GroupController {
     return this.groupService.create(dto)
   }
 
+  @Get('/:id')
+  async getById(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+    return this.groupService.getById(id)
+  }
+
+  @Get()
+  async getAll() {
+    return this.groupService.getAll()
+  }
+
   @Get('get/:facultyId/dropdown')
   async getFacultyGroupsForDropdown(
     @Param('facultyId', ParseMongoIdPipe) facultyId: Types.ObjectId
