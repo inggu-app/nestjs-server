@@ -165,6 +165,16 @@ export class ResponsibleService {
     )
   }
 
+  async getAllGroupsByResponsible(id: Types.ObjectId) {
+    const candidate = await this.responsibleModel.findById(id).populate('groups')
+
+    if (!candidate) {
+      throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
+    return candidate.groups
+  }
+
   async login(dto: LoginResponsibleDto) {
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)

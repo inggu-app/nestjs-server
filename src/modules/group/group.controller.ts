@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -18,12 +19,14 @@ import { Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
 import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
+import { ResponsibleService } from '../responsible/responsible.service'
 
 @Controller()
 export class GroupController {
   constructor(
     private readonly groupService: GroupService,
-    private readonly facultyService: FacultyService
+    private readonly facultyService: FacultyService,
+    private readonly responsibleService: ResponsibleService
   ) {}
 
   @UseGuards(AdminJwtAuthGuard)
@@ -39,14 +42,19 @@ export class GroupController {
     return this.groupService.create(dto)
   }
 
-  @Get('/:id')
-  async getById(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+  @Get('/by-id')
+  async getById(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
     return this.groupService.getById(id)
   }
 
-  @Get()
+  @Get('/all')
   async getAll() {
     return this.groupService.getAll()
+  }
+
+  @Get('/by-responsible')
+  async getAllByResponsible(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
+    return this.responsibleService.getAllGroupsByResponsible(id)
   }
 
   @Get('get/:facultyId/dropdown')
