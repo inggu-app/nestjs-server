@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -32,8 +33,15 @@ export class FacultyController {
   }
 
   @Get('/all')
-  getAll() {
-    return this.facultyService.getAll()
+  async getAll(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('count', ParseIntPipe) count: number,
+    @Query('title') title?: string
+  ) {
+    return {
+      faculties: await this.facultyService.getAll(page, count, title || ''),
+      count: await this.facultyService.countAll(title || ''),
+    }
   }
 
   @Get('/by-id')

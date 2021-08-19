@@ -12,7 +12,10 @@ import { Types } from 'mongoose'
 import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
-import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
+import {
+  INCORRECT_CREDENTIALS,
+  INCORRECT_PAGE_COUNT_QUERIES,
+} from '../../global/constants/errors.constants'
 import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
 import { GroupService } from '../group/group.service'
 import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from '../group/group.constants'
@@ -148,8 +151,24 @@ export class ResponsibleService {
     return candidate
   }
 
-  getAll() {
-    return this.responsibleModel.find({}, { hashedUniqueKey: 0, hashedPassword: 0 })
+  getAll(page: number, count: number, name: string) {
+    if (page === -1 && count === -1) {
+      return this.responsibleModel.find(
+        { name: { $regex: name, $options: 'i' } },
+        { hashedUniqueKey: 0, hashedPassword: 0 }
+      )
+    } else if (page === -1 || count === -1) {
+      throw new HttpException(INCORRECT_PAGE_COUNT_QUERIES, HttpStatus.BAD_REQUEST)
+    } else {
+      return this.responsibleModel
+        .find({ name: { $regex: name, $options: 'i' } }, { hashedUniqueKey: 0, hashedPassword: 0 })
+        .skip((page - 1) * count)
+        .limit(count)
+    }
+  }
+
+  countAll(name: string) {
+    return this.responsibleModel.countDocuments({ name: { $regex: name, $options: 'i' } })
   }
 
   async getAllByGroup(id: Types.ObjectId) {

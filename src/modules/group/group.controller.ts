@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -47,9 +48,17 @@ export class GroupController {
     return this.groupService.getById(id)
   }
 
+  @UsePipes(new ValidationPipe())
   @Get('/all')
-  async getAll() {
-    return this.groupService.getAll()
+  async getAll(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('count', ParseIntPipe) count: number,
+    @Query('title') title?: string
+  ) {
+    return {
+      groups: await this.groupService.getAll(page, count, title || ''),
+      count: await this.groupService.countAll(title || ''),
+    }
   }
 
   @Get('/by-responsible')

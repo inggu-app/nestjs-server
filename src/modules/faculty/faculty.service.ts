@@ -5,6 +5,7 @@ import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { FACULTY_EXISTS, FACULTY_NOT_FOUND } from './faculty.constants'
 import { Types } from 'mongoose'
+import { INCORRECT_PAGE_COUNT_QUERIES } from '../../global/constants/errors.constants'
 
 @Injectable()
 export class FacultyService {
@@ -24,8 +25,21 @@ export class FacultyService {
     return this.facultyModel.findById(facultyId)
   }
 
-  getAll() {
-    return this.facultyModel.find()
+  getAll(page: number, count: number, title: string) {
+    if (page === -1 && count === -1) {
+      return this.facultyModel.find({ title: { $regex: title, $options: 'i' } })
+    } else if (page === -1 || count === -1) {
+      throw new HttpException(INCORRECT_PAGE_COUNT_QUERIES, HttpStatus.BAD_REQUEST)
+    } else {
+      return this.facultyModel
+        .find({ title: { $regex: title, $options: 'i' } })
+        .skip((page - 1) * count)
+        .limit(count)
+    }
+  }
+
+  countAll(title: string) {
+    return this.facultyModel.countDocuments({ title: { $regex: title, $options: 'i' } })
   }
 
   getAllForDropdown() {

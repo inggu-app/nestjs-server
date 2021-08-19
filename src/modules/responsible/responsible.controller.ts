@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -59,8 +60,15 @@ export class ResponsibleController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Get('/all')
-  async getAll() {
-    return this.responsibleService.getAll()
+  async getAll(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('count', ParseIntPipe) count: number,
+    @Query('name') name?: string
+  ) {
+    return {
+      responsibles: await this.responsibleService.getAll(page, count, name || ''),
+      count: await this.responsibleService.countAll(name || ''),
+    }
   }
 
   @Get('/by-group')
