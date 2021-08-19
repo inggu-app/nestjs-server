@@ -96,7 +96,7 @@ export class ScheduleController {
   @UsePipes(new ValidationPipe())
   @Patch('/update')
   async update(@Body() dto: CreateScheduleDto) {
-    const candidate = await this.groupService.updateLastScheduleUpdate(dto.group, new Date())
+    const candidate = await this.groupService.updateLastScheduleUpdate(dto, new Date())
 
     if (!candidate) {
       throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)

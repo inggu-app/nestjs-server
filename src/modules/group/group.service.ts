@@ -7,6 +7,7 @@ import { Types } from 'mongoose'
 import { GROUP_EXISTS, GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { INCORRECT_PAGE_COUNT_QUERIES } from '../../global/constants/errors.constants'
+import { CreateScheduleDto } from '../schedule/dto/create-schedule.dto'
 
 @Injectable()
 export class GroupService {
@@ -74,7 +75,9 @@ export class GroupService {
     return this.groupModel.deleteMany({ faculty: facultyId })
   }
 
-  updateLastScheduleUpdate(group: Types.ObjectId, date: Date) {
-    return this.groupModel.findByIdAndUpdate(group, { $set: { lastScheduleUpdate: date } })
+  updateLastScheduleUpdate(dto: CreateScheduleDto, date: Date) {
+    return this.groupModel.findByIdAndUpdate(dto.group, {
+      $set: { lastScheduleUpdate: date, isHaveSchedule: !!dto.schedule.length },
+    })
   }
 }
