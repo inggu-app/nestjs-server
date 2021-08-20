@@ -19,9 +19,7 @@ export class CallScheduleController {
 
   @Get('/get')
   async getCallSchedule(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
-    const callSchedule = await this.callScheduleService.getActiveCallSchedule(updatedAt)
-
-    return callSchedule || {}
+    return this.callScheduleService.getActiveCallSchedule(updatedAt)
   }
 
   @UseGuards(AdminJwtAuthGuard)
