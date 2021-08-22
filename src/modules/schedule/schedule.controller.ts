@@ -64,7 +64,7 @@ export class ScheduleController {
     if (!candidate) {
       throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
     } else if (!(updatedAt < candidate.lastScheduleUpdate)) {
-      return null
+      return {}
     }
 
     const lessonsSchedule = await this.scheduleService.get(group)
