@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -21,6 +22,7 @@ import { FacultyService } from '../faculty/faculty.service'
 import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ResponsibleService } from '../responsible/responsible.service'
+import { UpdateGroupDto } from './dto/updateGroup.dto'
 
 @Controller()
 export class GroupController {
@@ -77,6 +79,13 @@ export class GroupController {
     }
 
     return this.groupService.getByFacultyIdForDropdown(facultyId)
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Patch('/')
+  async update(@Body() dto: UpdateGroupDto) {
+    return this.groupService.update(dto)
   }
 
   @UseGuards(AdminJwtAuthGuard)

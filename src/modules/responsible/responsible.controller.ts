@@ -58,7 +58,6 @@ export class ResponsibleController {
     return this.responsibleService.getById(id)
   }
 
-  @UseGuards(AdminJwtAuthGuard)
   @Get('/all')
   async getAll(
     @Query('page', ParseIntPipe) page: number,

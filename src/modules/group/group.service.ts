@@ -8,6 +8,7 @@ import { GROUP_EXISTS, GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from './group.
 import { ResponsibleService } from '../responsible/responsible.service'
 import { INCORRECT_PAGE_COUNT_QUERIES } from '../../global/constants/errors.constants'
 import { CreateScheduleDto } from '../schedule/dto/create-schedule.dto'
+import { UpdateGroupDto } from './dto/updateGroup.dto'
 
 @Injectable()
 export class GroupService {
@@ -79,5 +80,17 @@ export class GroupService {
     return this.groupModel.findByIdAndUpdate(dto.group, {
       $set: { lastScheduleUpdate: date, isHaveSchedule: !!dto.schedule.length },
     })
+  }
+
+  async update(dto: UpdateGroupDto) {
+    const candidate = await this.groupModel.findByIdAndUpdate(dto.id, {
+      $set: { title: dto.title, faculty: dto.faculty },
+    })
+
+    if (!candidate) {
+      throw new HttpException(GROUP_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
+    }
+
+    return this.groupModel.findById(dto.id)
   }
 }
