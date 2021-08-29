@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { getMongoConfig } from '../../configs/mongo.config'
 import { RouterModule } from 'nest-router'
-import { scheduleModuleConfig } from '../../configs/scheduleModule.config'
+import { routesConfig } from '../../configs/routes.config'
 import { ScheduleModule } from '../schedule/schedule.module'
 import { SettingsModule } from '../settings/settings.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
@@ -17,7 +17,7 @@ import { AdminModule } from '../admin/admin.module'
     SettingsModule,
     ResponsibleModule,
     AdminModule,
-    RouterModule.forRoutes(scheduleModuleConfig),
+    RouterModule.forRoutes(routesConfig),
     ConfigModule.forRoot(),
     TypegooseModule.forRootAsync({
       imports: [ConfigModule],

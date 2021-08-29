@@ -11,20 +11,26 @@ import { AppVersionModule } from '../modules/settings/appVersion/appVersion.modu
 import { ResponsibleModule } from '../modules/responsible/responsible.module'
 import { AdminModule } from '../modules/admin/admin.module'
 
-export const scheduleModuleConfig: Routes = [
+export const routesConfig: Routes = [
   {
     path: '/schedule',
     module: ScheduleModule,
-    children: [
-      {
-        path: '/group',
-        module: GroupModule,
-      },
-      {
-        path: '/faculty',
-        module: FacultyModule,
-      },
-    ],
+  },
+  {
+    path: '/groups',
+    module: GroupModule,
+  },
+  {
+    path: '/faculties',
+    module: FacultyModule,
+  },
+  {
+    path: '/responsibles',
+    module: ResponsibleModule,
+  },
+  {
+    path: '/admins',
+    module: AdminModule,
   },
   {
     path: '/settings',
@@ -51,13 +57,5 @@ export const scheduleModuleConfig: Routes = [
         module: AppVersionModule,
       },
     ],
-  },
-  {
-    path: '/responsible',
-    module: ResponsibleModule,
-  },
-  {
-    path: '/admin',
-    module: AdminModule,
   },
 ]
