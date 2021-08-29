@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -17,6 +18,7 @@ import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
+import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 
 @Controller()
 export class FacultyController {
@@ -52,6 +54,13 @@ export class FacultyController {
   @Get('/get/dropdown')
   getAllForDropdown() {
     return this.facultyService.getAllForDropdown()
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Patch('/')
+  update(@Body() dto: UpdateFacultyDto) {
+    return this.facultyService.update(dto)
   }
 
   @UseGuards(AdminJwtAuthGuard)

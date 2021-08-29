@@ -6,6 +6,7 @@ import { ModelType } from '@typegoose/typegoose/lib/types'
 import { FACULTY_EXISTS, FACULTY_NOT_FOUND } from './faculty.constants'
 import { Types } from 'mongoose'
 import { INCORRECT_PAGE_COUNT_QUERIES } from '../../global/constants/errors.constants'
+import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 
 @Injectable()
 export class FacultyService {
@@ -44,6 +45,18 @@ export class FacultyService {
 
   getAllForDropdown() {
     return this.facultyModel.find({}, { title: 1 })
+  }
+
+  async update(dto: UpdateFacultyDto) {
+    const candidate = await this.facultyModel.findByIdAndUpdate(dto.id, {
+      $set: { title: dto.title },
+    })
+
+    if (!candidate) {
+      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
+    return this.facultyModel.findById(dto.id)
   }
 
   async delete(facultyId: Types.ObjectId) {
