@@ -1,6 +1,6 @@
 {
   "name": "nestjs-server",
-  "version": "0.0.1",
+  "version": "2.0.0",
   "description": "Сервер на NestJS для приложения для ИнгГУ",
   "author": "Movsar Khalakhoev <movsar.kh.128@gmail.com>",
   "private": true,
