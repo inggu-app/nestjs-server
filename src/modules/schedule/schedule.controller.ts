@@ -41,7 +41,7 @@ export class ScheduleController {
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/create')
+  @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
     const groupCandidate = await this.groupService.getById(dto.group)
 
@@ -99,7 +99,7 @@ export class ScheduleController {
 
   @UseGuards(ResponsibleJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Patch('/update')
+  @Patch('/')
   async update(@Body() dto: CreateScheduleDto) {
     const candidate = await this.groupService.updateLastScheduleUpdate(dto, new Date())
 
