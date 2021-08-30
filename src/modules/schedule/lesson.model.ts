@@ -3,12 +3,17 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { FacultyModel } from '../faculty/faculty.model'
 import { Types } from 'mongoose'
+import { ScheduleFieldsEnum } from './schedule.constants'
+
+type Test = {
+  [key in ScheduleFieldsEnum]: any
+}
 
 export interface LessonModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<LessonModel>(),
 })
-export class LessonModel extends TimeStamps {
+export class LessonModel extends TimeStamps implements Test {
   @prop()
   title: string
 

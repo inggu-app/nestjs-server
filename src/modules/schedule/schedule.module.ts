@@ -7,6 +7,7 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
 import { CallScheduleModule } from '../settings/callSchedule/callSchedule.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
+import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 
 @Module({
   controllers: [ScheduleController],
@@ -15,9 +16,7 @@ import { ResponsibleModule } from '../responsible/responsible.module'
     TypegooseModule.forFeature([
       {
         typegooseClass: LessonModel,
-        schemaOptions: {
-          collection: 'Lesson',
-        },
+        schemaOptions: getModelDefaultOptions('Lesson'),
       },
     ]),
     FacultyModule,
