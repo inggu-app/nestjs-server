@@ -53,7 +53,7 @@ export class FacultyController {
 
   @Get('/get/dropdown')
   getAllForDropdown() {
-    return this.facultyService.getAllForDropdown()
+    return this.facultyService.getAllForDropdown().sort({ title: 1 })
   }
 
   @UseGuards(AdminJwtAuthGuard)
