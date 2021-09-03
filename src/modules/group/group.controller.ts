@@ -23,6 +23,8 @@ import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
+import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
+import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
 @Controller()
 export class GroupController {
@@ -43,6 +45,31 @@ export class GroupController {
     }
 
     return this.groupService.create(dto)
+  }
+
+  @Get('/')
+  async get(
+    @Query('groupId', ParseMongoIdPipe) groupId?: Types.ObjectId,
+    @Query('responsibleId', ParseMongoIdPipe) responsibleId?: Types.ObjectId,
+    @Query('facultyId', ParseMongoIdPipe) facultyId?: Types.ObjectId,
+    @Query('page', CustomParseIntPipe) page?: number,
+    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('title') title?: string
+  ) {
+    checkAlternativeQueryParameters(
+      { groupId },
+      { responsibleId, page, count, title },
+      { facultyId, page, count, title },
+      { page, count, title }
+    )
+    console.log(groupId)
+    console.log(responsibleId)
+    console.log(facultyId)
+    console.log(page)
+    console.log(count)
+    console.log(title)
+
+    return null
   }
 
   @Get('/by-id')
