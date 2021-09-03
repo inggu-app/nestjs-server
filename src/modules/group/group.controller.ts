@@ -78,7 +78,7 @@ export class GroupController {
       throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
-    return this.groupService.getByFacultyIdForDropdown(facultyId)
+    return this.groupService.getByFacultyIdForDropdown(facultyId).sort({ title: 1 })
   }
 
   @UseGuards(AdminJwtAuthGuard)
