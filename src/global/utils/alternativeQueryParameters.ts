@@ -1,58 +1,68 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
 
-export default function checkAlternativeQueryParameters(
-  ...parameterObjects: { [key: string]: any; required?: { [key: string]: any } }[]
-) {
-  const isNotEmptyKeys = new Set()
-  let isEmpty = true
-  parameterObjects.map(parameterObject => {
-    let isFounded = false
-    Object.keys(parameterObject).map(parameterKey => {
-      const parameter = parameterObject[parameterKey]
+type ParameterObjectsType<T> = {
+  [key: string]: any
+  required?: { [key: string]: any }
+  enum: T
+}[]
 
-      if (parameter != undefined) {
-        if (!isEmpty && !isNotEmptyKeys.has(parameterKey)) {
-          throw new HttpException('Несовместимые параметры', HttpStatus.BAD_REQUEST)
-        }
+export default function checkAlternativeQueryParameters<T>(
+  ...parameterObjects: ParameterObjectsType<T>
+): T {
+  const allNotEmptyKeys = getAllNotEmptyKeys<T>(parameterObjects)
+  const isCorrectParameterObjectEnums: T[] = []
 
-        isNotEmptyKeys.add(parameterKey)
+  parameterObjects.forEach(parameterObject => {
+    const parameterObjectsNotEmptyKeys = getAllNotEmptyKeys([parameterObject])
 
-        isFounded = true
+    let isIn = true
+    allNotEmptyKeys.forEach(key => {
+      if (!parameterObjectsNotEmptyKeys.has(key)) {
+        isIn = false
       }
     })
 
-    if (isFounded) isEmpty = false
+    if (parameterObject.required) {
+      Object.keys(parameterObject.required).forEach(key => {
+        if (!allNotEmptyKeys.has(key)) {
+          isIn = false
+        }
+      })
+    }
+
+    if (isIn) {
+      isCorrectParameterObjectEnums.push(parameterObject.enum)
+    }
   })
-  // parameterObjects.map(parameterObject =>
-  //   Object.keys(parameterObject).map(parameterKey => {
-  //     if (parameterObject[parameterKey] != undefined) isNotEmptyKeys.add(parameterKey)
-  //   })
-  // )
-  //
-  // parameterObjects.map(parameterObject => {})
-  // const permittedKeys = parameterObjects
-  //   .reduce<string[]>((acc, parameterObject) => [...acc, ...Object.keys(parameterObject)], [])
-  //   .filter((key, index, keys) => keys.filter(k => k === key).length > 1)
-  //   .filter((key, index, keys) => keys.findIndex(k => k === key) === index)
-  // console.log(permittedKeys)
-  //
-  // let isEmpty = true
-  // parameterObjects.forEach(parameterObject => {
-  //   let isFounded = false
-  //   Object.keys(parameterObject).forEach(parameterKey => {
-  //     const parameter = parameterObject[parameterKey]
-  //
-  //     if (parameter != undefined) {
-  //       if (!isEmpty && !permittedKeys.includes(parameterKey)) {
-  //         console.log(permittedKeys, parameterKey)
-  //         throw new HttpException('Несовместимые параметры', HttpStatus.BAD_REQUEST)
-  //       }
-  //       if (!permittedKeys.includes(parameterKey)) {
-  //         isFounded = true
-  //       }
-  //     }
-  //   })
-  //
-  //   if (isFounded) isEmpty = false
-  // })
+
+  if (isCorrectParameterObjectEnums.length != 1) {
+    throw new HttpException(
+      'Набор таких параметров не найден. Проверьте документацию',
+      HttpStatus.BAD_REQUEST
+    )
+  } else {
+    return isCorrectParameterObjectEnums[0]
+  }
+}
+
+function getAllNotEmptyKeys<T>(parameterObjects: ParameterObjectsType<T>) {
+  const isNotEmptyKeys = new Set()
+  parameterObjects.map(parameterObject => {
+    Object.keys(parameterObject).map(parameterKey => {
+      if (parameterKey === 'required' && parameterObject.required) {
+        Object.keys(parameterObject.required).map(requiredParameterKey => {
+          if (
+            parameterObject.required &&
+            parameterObject.required[requiredParameterKey] != undefined
+          ) {
+            isNotEmptyKeys.add(requiredParameterKey)
+          }
+        })
+      } else if (parameterObject[parameterKey] != undefined) {
+        isNotEmptyKeys.add(parameterKey)
+      }
+    })
+  })
+
+  return isNotEmptyKeys
 }

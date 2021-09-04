@@ -25,6 +25,7 @@ import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import { GetGroupsEnum } from './group.constants'
 
 @Controller()
 export class GroupController {
@@ -56,20 +57,23 @@ export class GroupController {
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('title') title?: string
   ) {
-    checkAlternativeQueryParameters(
-      { groupId },
-      { responsibleId, page, count, title },
-      { facultyId, page, count, title },
-      { page, count, title }
+    const requestType = checkAlternativeQueryParameters<GetGroupsEnum>(
+      { required: { groupId }, enum: GetGroupsEnum.groupId },
+      { required: { responsibleId }, page, count, title, enum: GetGroupsEnum.responsibleId },
+      { required: { facultyId }, page, count, title, enum: GetGroupsEnum.facultyId },
+      { page, count, title, enum: GetGroupsEnum.all }
     )
-    console.log(groupId)
-    console.log(responsibleId)
-    console.log(facultyId)
-    console.log(page)
-    console.log(count)
-    console.log(title)
 
-    return null
+    switch (requestType) {
+      case GetGroupsEnum.groupId:
+        return this.groupService.getById(groupId!)
+      case GetGroupsEnum.responsibleId:
+        return this.responsibleService.getAllGroupsByResponsible(responsibleId!)
+      case GetGroupsEnum.facultyId:
+        break
+      case GetGroupsEnum.all:
+        break
+    }
   }
 
   @Get('/by-id')
