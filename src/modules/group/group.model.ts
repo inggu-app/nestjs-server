@@ -9,7 +9,7 @@ export interface GroupModel extends Base {}
   schemaOptions: getModelDefaultOptions<GroupModel>(),
 })
 export class GroupModel extends TimeStamps {
-  @prop({ unique: true })
+  @prop()
   title: string
 
   @prop({ ref: () => FacultyModel, type: Types.ObjectId })
