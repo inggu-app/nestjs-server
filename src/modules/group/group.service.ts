@@ -6,16 +6,18 @@ import { CreateGroupDto } from './dto/create-group.dto'
 import { Types } from 'mongoose'
 import { GROUP_EXISTS, GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
-import { INCORRECT_PAGE_COUNT_QUERIES } from '../../global/constants/errors.constants'
 import { CreateScheduleDto } from '../schedule/dto/create-schedule.dto'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
+import { FacultyService } from '../faculty/faculty.service'
+import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
 
 @Injectable()
 export class GroupService {
   constructor(
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
     @Inject(forwardRef(() => ResponsibleService))
-    private readonly responsibleService: ResponsibleService
+    private readonly responsibleService: ResponsibleService,
+    private readonly facultyService: FacultyService
   ) {}
 
   async create(dto: CreateGroupDto) {
@@ -37,24 +39,28 @@ export class GroupService {
     return candidate
   }
 
-  getAll(page: number, count: number, title: string) {
-    if (page === -1 && count === -1) {
-      return this.groupModel.find({ title: { $regex: title, $options: 'i' } })
-    } else if (page === -1 || count === -1) {
-      throw new HttpException(INCORRECT_PAGE_COUNT_QUERIES, HttpStatus.BAD_REQUEST)
-    } else {
+  getAll(page: number, count: number, title?: string) {
+    if (page != undefined && count != undefined) {
       return this.groupModel
-        .find({ title: { $regex: title, $options: 'i' } })
+        .find(title ? { title: { $regex: title, $options: 'i' } } : {})
         .skip((page - 1) * count)
         .limit(count)
+    } else {
+      return this.groupModel.find(title ? { title: { $regex: title, $options: 'i' } } : {})
     }
   }
 
-  countAll(title: string) {
-    return this.groupModel.countDocuments({ title: { $regex: title, $options: 'i' } })
+  countAll(title?: string) {
+    return this.groupModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
   }
 
-  getByFacultyIdForDropdown(facultyId: Types.ObjectId) {
+  async getByFacultyIdForDropdown(facultyId: Types.ObjectId) {
+    const faculty = await this.facultyService.getById(facultyId)
+
+    if (!faculty) {
+      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
     return this.groupModel.find({ faculty: facultyId }, { title: 1 })
   }
 

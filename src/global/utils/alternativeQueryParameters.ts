@@ -1,16 +1,19 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
 
-type ParameterObjectsType<T> = {
+type ParameterObjectType<T> = {
   [key: string]: any
-  required?: { [key: string]: any }
   enum: T
-}[]
+}
+
+interface ParameterObjectWithRequiredType<T> extends ParameterObjectType<T> {
+  required?: { [key: string]: any }
+}
 
 export default function checkAlternativeQueryParameters<T>(
-  ...parameterObjects: ParameterObjectsType<T>
-): T {
+  ...parameterObjects: ParameterObjectWithRequiredType<T>[]
+): ParameterObjectType<T> {
   const allNotEmptyKeys = getAllNotEmptyKeys<T>(parameterObjects)
-  const isCorrectParameterObjectEnums: T[] = []
+  const isCorrectParameterObject: ParameterObjectType<T>[] = []
 
   parameterObjects.forEach(parameterObject => {
     const parameterObjectsNotEmptyKeys = getAllNotEmptyKeys([parameterObject])
@@ -31,21 +34,22 @@ export default function checkAlternativeQueryParameters<T>(
     }
 
     if (isIn) {
-      isCorrectParameterObjectEnums.push(parameterObject.enum)
+      const { required, enum: requiredEnum, ...otherParameters } = parameterObject
+      isCorrectParameterObject.push({ enum: requiredEnum, ...otherParameters, ...required })
     }
   })
 
-  if (isCorrectParameterObjectEnums.length != 1) {
+  if (isCorrectParameterObject.length != 1) {
     throw new HttpException(
       'Набор таких параметров не найден. Проверьте документацию',
       HttpStatus.BAD_REQUEST
     )
   } else {
-    return isCorrectParameterObjectEnums[0]
+    return isCorrectParameterObject[0]
   }
 }
 
-function getAllNotEmptyKeys<T>(parameterObjects: ParameterObjectsType<T>) {
+function getAllNotEmptyKeys<T>(parameterObjects: ParameterObjectWithRequiredType<T>[]) {
   const isNotEmptyKeys = new Set()
   parameterObjects.map(parameterObject => {
     Object.keys(parameterObject).map(parameterKey => {

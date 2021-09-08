@@ -6,7 +6,6 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -57,59 +56,26 @@ export class GroupController {
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('title') title?: string
   ) {
-    const requestType = checkAlternativeQueryParameters<GetGroupsEnum>(
+    const request = checkAlternativeQueryParameters<GetGroupsEnum>(
       { required: { groupId }, enum: GetGroupsEnum.groupId },
       { required: { responsibleId }, page, count, title, enum: GetGroupsEnum.responsibleId },
       { required: { facultyId }, page, count, title, enum: GetGroupsEnum.facultyId },
-      { page, count, title, enum: GetGroupsEnum.all }
+      { required: { page, count }, title, enum: GetGroupsEnum.all }
     )
 
-    switch (requestType) {
+    switch (request.enum) {
       case GetGroupsEnum.groupId:
-        return this.groupService.getById(groupId!)
+        return this.groupService.getById(request.groupId)
       case GetGroupsEnum.responsibleId:
-        return this.responsibleService.getAllGroupsByResponsible(responsibleId!)
+        return this.responsibleService.getAllGroupsByResponsible(request.responsibleId)
       case GetGroupsEnum.facultyId:
-        break
+        return this.groupService.getByFacultyIdForDropdown(request.facultyId)
       case GetGroupsEnum.all:
-        break
+        return {
+          groups: await this.groupService.getAll(request.page, request.count, request.title),
+          count: await this.groupService.countAll(request.title),
+        }
     }
-  }
-
-  @Get('/by-id')
-  async getById(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
-    return this.groupService.getById(id)
-  }
-
-  @UsePipes(new ValidationPipe())
-  @Get('/all')
-  async getAll(
-    @Query('page', ParseIntPipe) page: number,
-    @Query('count', ParseIntPipe) count: number,
-    @Query('title') title?: string
-  ) {
-    return {
-      groups: await this.groupService.getAll(page, count, title || ''),
-      count: await this.groupService.countAll(title || ''),
-    }
-  }
-
-  @Get('/by-responsible')
-  async getAllByResponsible(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
-    return this.responsibleService.getAllGroupsByResponsible(id)
-  }
-
-  @Get('get/:facultyId/dropdown')
-  async getFacultyGroupsForDropdown(
-    @Param('facultyId', ParseMongoIdPipe) facultyId: Types.ObjectId
-  ) {
-    const facultyCandidate = await this.facultyService.getById(facultyId)
-
-    if (!facultyCandidate) {
-      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
-    }
-
-    return this.groupService.getByFacultyIdForDropdown(facultyId).sort({ title: 1 })
   }
 
   @UseGuards(AdminJwtAuthGuard)
