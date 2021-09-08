@@ -19,7 +19,7 @@ export class GroupService {
   ) {}
 
   async create(dto: CreateGroupDto) {
-    const candidate = await this.groupModel.findOne({ title: dto.title })
+    const candidate = await this.groupModel.findOne({ title: dto.title, faculty: dto.faculty })
 
     if (candidate) {
       throw new HttpException(GROUP_EXISTS, HttpStatus.BAD_REQUEST)
