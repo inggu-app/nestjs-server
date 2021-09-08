@@ -3,12 +3,17 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { Types } from 'mongoose'
 import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
+import { GroupFieldsEnum } from './group.constants'
+
+type Group = {
+  [key in GroupFieldsEnum]: any
+}
 
 export interface GroupModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<GroupModel>(),
 })
-export class GroupModel extends TimeStamps {
+export class GroupModel extends TimeStamps implements Group {
   @prop()
   title: string
 

@@ -18,7 +18,7 @@ export class ScheduleService {
     return this.lessonModel.create(lessons)
   }
 
-  get(groupId: Types.ObjectId, fields: ScheduleField[]) {
+  get(groupId: Types.ObjectId, fields?: ScheduleField[]) {
     return this.lessonModel.find({ group: groupId }, fieldsArrayToProjection(fields, ['number']))
   }
 

@@ -4,12 +4,18 @@ import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateGroupDto } from './dto/create-group.dto'
 import { Types } from 'mongoose'
-import { GROUP_EXISTS, GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from './group.constants'
+import {
+  GROUP_EXISTS,
+  GROUP_NOT_FOUND,
+  GROUP_WITH_ID_NOT_FOUND,
+  GroupField,
+} from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { CreateScheduleDto } from '../schedule/dto/create-schedule.dto'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
+import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 
 @Injectable()
 export class GroupService {
@@ -29,8 +35,11 @@ export class GroupService {
     return this.groupModel.create(dto)
   }
 
-  async getById(groupId: Types.ObjectId) {
-    const candidate = await this.groupModel.findOne({ _id: groupId })
+  async getById(groupId: Types.ObjectId, fields?: GroupField[]) {
+    const candidate = await this.groupModel.findOne(
+      { _id: groupId },
+      fieldsArrayToProjection(fields)
+    )
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
@@ -39,14 +48,20 @@ export class GroupService {
     return candidate
   }
 
-  getAll(page: number, count: number, title?: string) {
+  getAll(page: number, count: number, title?: string, fields?: GroupField[]) {
     if (page != undefined && count != undefined) {
       return this.groupModel
-        .find(title ? { title: { $regex: title, $options: 'i' } } : {})
+        .find(
+          title ? { title: { $regex: title, $options: 'i' } } : {},
+          fieldsArrayToProjection(fields)
+        )
         .skip((page - 1) * count)
         .limit(count)
     } else {
-      return this.groupModel.find(title ? { title: { $regex: title, $options: 'i' } } : {})
+      return this.groupModel.find(
+        title ? { title: { $regex: title, $options: 'i' } } : {},
+        fieldsArrayToProjection(fields)
+      )
     }
   }
 
@@ -54,14 +69,14 @@ export class GroupService {
     return this.groupModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
   }
 
-  async getByFacultyIdForDropdown(facultyId: Types.ObjectId) {
+  async getByFacultyId(facultyId: Types.ObjectId, fields?: GroupField[]) {
     const faculty = await this.facultyService.getById(facultyId)
 
     if (!faculty) {
       throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
-    return this.groupModel.find({ faculty: facultyId }, { title: 1 })
+    return this.groupModel.find({ faculty: facultyId }, fieldsArrayToProjection(fields))
   }
 
   async delete(groupId: Types.ObjectId) {

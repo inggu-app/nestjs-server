@@ -1,7 +1,9 @@
 export default function fieldsArrayToProjection<T extends string[]>(
-  fields: T,
+  fields?: T,
   requiredFields?: T
 ): { [key: string]: 0 | 1 } {
+  if (!fields) return {}
+
   const projection: { [key: string]: 0 | 1 } = {}
 
   if (!fields.includes('id')) {

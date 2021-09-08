@@ -1,4 +1,5 @@
 import { Types } from 'mongoose'
+import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 
 export const GROUP_EXISTS = 'Группа с таким названием уже существует'
 export const GROUP_NOT_FOUND = 'Группы с таким id не существует'
@@ -10,3 +11,14 @@ export enum GetGroupsEnum {
   facultyId,
   all,
 }
+
+export enum GroupFieldsEnum {
+  title = 'title',
+  faculty = 'faculty',
+  lastScheduleUpdate = 'lastScheduleUpdate',
+  isHaveSchedule = 'isHaveSchedule',
+}
+
+export type GroupField = keyof typeof GroupFieldsEnum
+
+enumKeyValuesMatch(GroupFieldsEnum)

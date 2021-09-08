@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
 
 @Injectable()
-export class ParseFieldsPipe implements PipeTransform<any, string[]> {
+export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined> {
   private readonly fields: string[]
 
   constructor(
@@ -10,11 +10,12 @@ export class ParseFieldsPipe implements PipeTransform<any, string[]> {
   ) {
     this.fields = ['id', ...Object.keys(fieldsEnum)]
     if (additionalFieldsEnum) this.fields = [...this.fields, ...Object.keys(additionalFieldsEnum)]
+    console.log(this.fields)
   }
 
-  transform(value: any): string[] {
+  transform(value: any): string[] | undefined {
     if (typeof value != 'string') {
-      return this.fields
+      return undefined
     }
 
     const remainingCharacters = value.replace(/([a-zA-Z0-9,_])+/g, '')

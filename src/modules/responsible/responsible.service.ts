@@ -18,7 +18,8 @@ import {
 } from '../../global/constants/errors.constants'
 import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
 import { GroupService } from '../group/group.service'
-import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from '../group/group.constants'
+import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND, GroupField } from '../group/group.constants'
+import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
@@ -184,8 +185,10 @@ export class ResponsibleService {
     )
   }
 
-  async getAllGroupsByResponsible(id: Types.ObjectId) {
-    const candidate = await this.responsibleModel.findById(id).populate('groups')
+  async getAllGroupsByResponsible(id: Types.ObjectId, fields?: GroupField[]) {
+    const candidate = await this.responsibleModel
+      .findById(id)
+      .populate({ path: 'groups', select: fieldsArrayToProjection(fields) })
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.NOT_FOUND)

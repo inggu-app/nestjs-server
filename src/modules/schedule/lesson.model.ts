@@ -5,7 +5,7 @@ import { FacultyModel } from '../faculty/faculty.model'
 import { Types } from 'mongoose'
 import { ScheduleFieldsEnum } from './schedule.constants'
 
-type Test = {
+type Lesson = {
   [key in ScheduleFieldsEnum]: any
 }
 
@@ -13,7 +13,7 @@ export interface LessonModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<LessonModel>(),
 })
-export class LessonModel extends TimeStamps implements Test {
+export class LessonModel extends TimeStamps implements Lesson {
   @prop()
   title: string
 

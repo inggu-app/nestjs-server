@@ -24,7 +24,8 @@ import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
-import { GetGroupsEnum } from './group.constants'
+import { GetGroupsEnum, GroupField, GroupFieldsEnum } from './group.constants'
+import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 
 @Controller()
 export class GroupController {
@@ -33,6 +34,55 @@ export class GroupController {
     private readonly facultyService: FacultyService,
     private readonly responsibleService: ResponsibleService
   ) {}
+
+  @Get('/')
+  async get(
+    @Query('groupId', ParseMongoIdPipe) groupId?: Types.ObjectId,
+    @Query('responsibleId', ParseMongoIdPipe) responsibleId?: Types.ObjectId,
+    @Query('facultyId', ParseMongoIdPipe) facultyId?: Types.ObjectId,
+    @Query('page', CustomParseIntPipe) page?: number,
+    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('title') title?: string,
+    @Query('fields', new ParseFieldsPipe(GroupFieldsEnum)) fields?: GroupField[]
+  ) {
+    const request = checkAlternativeQueryParameters<GetGroupsEnum>(
+      { required: { groupId }, fields, enum: GetGroupsEnum.groupId },
+      {
+        required: { responsibleId },
+        page,
+        count,
+        title,
+        fields,
+        enum: GetGroupsEnum.responsibleId,
+      },
+      { required: { facultyId }, page, count, title, fields, enum: GetGroupsEnum.facultyId },
+      { required: { page, count }, title, fields, enum: GetGroupsEnum.all }
+    )
+
+    console.log(fields)
+
+    switch (request.enum) {
+      case GetGroupsEnum.groupId:
+        return this.groupService.getById(request.groupId, request.fields)
+      case GetGroupsEnum.responsibleId:
+        return this.responsibleService.getAllGroupsByResponsible(
+          request.responsibleId,
+          request.fields
+        )
+      case GetGroupsEnum.facultyId:
+        return this.groupService.getByFacultyId(request.facultyId, request.fields)
+      case GetGroupsEnum.all:
+        return {
+          groups: await this.groupService.getAll(
+            request.page,
+            request.count,
+            request.title,
+            request.fields
+          ),
+          count: await this.groupService.countAll(request.title),
+        }
+    }
+  }
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
@@ -45,37 +95,6 @@ export class GroupController {
     }
 
     return this.groupService.create(dto)
-  }
-
-  @Get('/')
-  async get(
-    @Query('groupId', ParseMongoIdPipe) groupId?: Types.ObjectId,
-    @Query('responsibleId', ParseMongoIdPipe) responsibleId?: Types.ObjectId,
-    @Query('facultyId', ParseMongoIdPipe) facultyId?: Types.ObjectId,
-    @Query('page', CustomParseIntPipe) page?: number,
-    @Query('count', CustomParseIntPipe) count?: number,
-    @Query('title') title?: string
-  ) {
-    const request = checkAlternativeQueryParameters<GetGroupsEnum>(
-      { required: { groupId }, enum: GetGroupsEnum.groupId },
-      { required: { responsibleId }, page, count, title, enum: GetGroupsEnum.responsibleId },
-      { required: { facultyId }, page, count, title, enum: GetGroupsEnum.facultyId },
-      { required: { page, count }, title, enum: GetGroupsEnum.all }
-    )
-
-    switch (request.enum) {
-      case GetGroupsEnum.groupId:
-        return this.groupService.getById(request.groupId)
-      case GetGroupsEnum.responsibleId:
-        return this.responsibleService.getAllGroupsByResponsible(request.responsibleId)
-      case GetGroupsEnum.facultyId:
-        return this.groupService.getByFacultyIdForDropdown(request.facultyId)
-      case GetGroupsEnum.all:
-        return {
-          groups: await this.groupService.getAll(request.page, request.count, request.title),
-          count: await this.groupService.countAll(request.title),
-        }
-    }
   }
 
   @UseGuards(AdminJwtAuthGuard)
