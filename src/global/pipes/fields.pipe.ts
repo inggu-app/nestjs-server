@@ -10,12 +10,13 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
   ) {
     this.fields = ['id', ...Object.keys(fieldsEnum)]
     if (additionalFieldsEnum) this.fields = [...this.fields, ...Object.keys(additionalFieldsEnum)]
-    console.log(this.fields)
   }
 
   transform(value: any): string[] | undefined {
     if (typeof value != 'string') {
       return undefined
+    } else if (value === '') {
+      throw new HttpException('Поле fields не должно быть пустым', HttpStatus.BAD_REQUEST)
     }
 
     const remainingCharacters = value.replace(/([a-zA-Z0-9,_])+/g, '')

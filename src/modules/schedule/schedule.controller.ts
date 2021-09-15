@@ -67,7 +67,7 @@ export class ScheduleController {
     @Param('group', ParseMongoIdPipe) group: Types.ObjectId,
     @Query('updatedAt', ParseDatePipe) updatedAt: Date,
     @Query('fields', new ParseFieldsPipe(ScheduleFieldsEnum, ScheduleAdditionalFieldsEnum))
-    fields: ScheduleField[]
+    fields?: ScheduleField[]
   ) {
     const candidate = await this.groupService.getById(group)
 

@@ -59,8 +59,6 @@ export class GroupController {
       { required: { page, count }, title, fields, enum: GetGroupsEnum.all }
     )
 
-    console.log(fields)
-
     switch (request.enum) {
       case GetGroupsEnum.groupId:
         return this.groupService.getById(request.groupId, request.fields)
