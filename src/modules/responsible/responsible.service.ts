@@ -4,7 +4,11 @@ import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateResponsibleDto } from './dto/createResponsible.dto'
-import { RESPONSIBLE_EXISTS, RESPONSIBLE_NOT_FOUND } from './responsible.constants'
+import {
+  RESPONSIBLE_EXISTS,
+  RESPONSIBLE_NOT_FOUND,
+  ResponsibleField,
+} from './responsible.constants'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
 import generatePassword from '../../global/utils/generatePassword'
@@ -12,14 +16,12 @@ import { Types } from 'mongoose'
 import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
-import {
-  INCORRECT_CREDENTIALS,
-  INCORRECT_PAGE_COUNT_QUERIES,
-} from '../../global/constants/errors.constants'
+import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
 import { GroupService } from '../group/group.service'
 import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND, GroupField } from '../group/group.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import checkPageCount from '../../global/utils/checkPageCount'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
@@ -139,11 +141,11 @@ export class ResponsibleService {
     }
   }
 
-  async getById(id: Types.ObjectId) {
-    const candidate = await this.responsibleModel.findById(id, {
-      hashedUniqueKey: 0,
-      hashedPassword: 0,
-    })
+  async getById(id: Types.ObjectId, fields?: ResponsibleField[]) {
+    const candidate = await this.responsibleModel.findById(
+      id,
+      fieldsArrayToProjection(fields, [], ['hashedPassword', 'hashedUniqueKey'])
+    )
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.BAD_REQUEST)
@@ -152,37 +154,58 @@ export class ResponsibleService {
     return candidate
   }
 
-  getAll(page: number, count: number, name: string) {
-    if (page === -1 && count === -1) {
-      return this.responsibleModel.find(
-        { name: { $regex: name, $options: 'i' } },
-        { hashedUniqueKey: 0, hashedPassword: 0 }
-      )
-    } else if (page === -1 || count === -1) {
-      throw new HttpException(INCORRECT_PAGE_COUNT_QUERIES, HttpStatus.BAD_REQUEST)
-    } else {
-      return this.responsibleModel
-        .find({ name: { $regex: name, $options: 'i' } }, { hashedUniqueKey: 0, hashedPassword: 0 })
-        .skip((page - 1) * count)
-        .limit(count)
+  getAll(page?: number, count?: number, name?: string, fields?: ResponsibleField[]) {
+    const checkedPageCount = checkPageCount(page, count)
+
+    const responsibles = this.responsibleModel.find(
+      name ? { name: { $regex: name, $options: 'i' } } : {},
+      fieldsArrayToProjection(fields, [], ['hashedPassword', 'hashedUniqueKey'])
+    )
+
+    if (checkedPageCount.page !== undefined) {
+      return responsibles
+        .skip((checkedPageCount.page - 1) * checkedPageCount.count)
+        .limit(checkedPageCount.count)
     }
+
+    return responsibles
   }
 
-  countAll(name: string) {
-    return this.responsibleModel.countDocuments({ name: { $regex: name, $options: 'i' } })
-  }
-
-  async getAllByGroup(id: Types.ObjectId) {
+  async getAllByGroup(
+    id: Types.ObjectId,
+    page?: number,
+    count?: number,
+    fields?: ResponsibleField[]
+  ) {
+    const checkedPageCount = checkPageCount(page, count)
     const candidate = await this.groupService.getById(id)
 
     if (!candidate) {
       throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
-    return this.responsibleModel.find(
+    const responsibles = this.responsibleModel.find(
       { groups: { $in: [id] } },
-      { hashedPassword: 0, hashedUniqueKey: 0 }
+      fieldsArrayToProjection(fields, [], ['hashedPassword', 'hashedUniqueKey'])
     )
+
+    if (checkedPageCount.page !== undefined) {
+      return responsibles
+        .skip((checkedPageCount.page - 1) * checkedPageCount.count)
+        .limit(checkedPageCount.count)
+    }
+
+    return responsibles
+  }
+
+  countByName(name?: string) {
+    return this.responsibleModel.countDocuments(
+      name ? { name: { $regex: name, $options: 'i' } } : {}
+    )
+  }
+
+  countByGroup(id: Types.ObjectId) {
+    return this.responsibleModel.countDocuments({ groups: { $in: [id] } })
   }
 
   async getAllGroupsByResponsible(id: Types.ObjectId, fields?: GroupField[]) {

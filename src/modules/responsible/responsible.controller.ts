@@ -6,7 +6,6 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -23,6 +22,11 @@ import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { GroupService } from '../group/group.service'
 import { GROUP_WITH_ID_NOT_FOUND } from '../group/group.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
+import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
+import { GetResponsibleEnum, ResponsibleFieldsEnum } from './responsible.constants'
+import { ResponsibleField } from './responsible.constants'
+import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 
 @Controller()
 export class ResponsibleController {
@@ -53,26 +57,45 @@ export class ResponsibleController {
     return this.responsibleService.create(dto)
   }
 
-  @Get('/by-id')
-  async getById(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
-    return this.responsibleService.getById(id)
-  }
-
-  @Get('/all')
-  async getAll(
-    @Query('page', ParseIntPipe) page: number,
-    @Query('count', ParseIntPipe) count: number,
-    @Query('name') name?: string
+  @Get('/')
+  async get(
+    @Query('responsibleId', ParseMongoIdPipe) responsibleId?: Types.ObjectId,
+    @Query('groupId', ParseMongoIdPipe) groupId?: Types.ObjectId,
+    @Query('page', CustomParseIntPipe) page?: number,
+    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('name') name?: string,
+    @Query('fields', new ParseFieldsPipe(ResponsibleFieldsEnum)) fields?: ResponsibleField[]
   ) {
-    return {
-      responsibles: await this.responsibleService.getAll(page, count, name || ''),
-      count: await this.responsibleService.countAll(name || ''),
-    }
-  }
+    const request = checkAlternativeQueryParameters<GetResponsibleEnum>(
+      { required: { responsibleId }, fields, enum: GetResponsibleEnum.responsibleId },
+      { required: { groupId }, page, count, name, fields, enum: GetResponsibleEnum.groupId },
+      { required: { page, count }, name, fields, enum: GetResponsibleEnum.all }
+    )
 
-  @Get('/by-group')
-  async getAllByGroup(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
-    return this.responsibleService.getAllByGroup(id)
+    switch (request.enum) {
+      case GetResponsibleEnum.responsibleId:
+        return this.responsibleService.getById(request.responsibleId, request.fields)
+      case GetResponsibleEnum.groupId:
+        return {
+          responsibles: await this.responsibleService.getAllByGroup(
+            request.groupId,
+            request.page,
+            request.count,
+            request.fields
+          ),
+          count: await this.responsibleService.countByGroup(request.groupId),
+        }
+      case GetResponsibleEnum.all:
+        return {
+          responsibles: await this.responsibleService.getAll(
+            request.page,
+            request.count,
+            request.name,
+            request.fields
+          ),
+          count: await this.responsibleService.countByName(request.name),
+        }
+    }
   }
 
   @UseGuards(AdminJwtAuthGuard)
