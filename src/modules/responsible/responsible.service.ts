@@ -18,8 +18,12 @@ import {
 } from '../../global/constants/errors.constants'
 import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
 import { GroupService } from '../group/group.service'
-import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND, GroupField } from '../group/group.constants'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND, GroupFieldsEnum } from '../group/group.constants'
+import { Projection } from '../../global/pipes/fields.pipe'
+import { ScheduleField, ScheduleFieldsEnum } from '../schedule/schedule.constants'
+import fieldsToProjection from '../../global/utils/fieldsToProjection'
+import { ModelByFields } from '../../global/types/ModelByFields'
+import { GroupModel, GroupModelType } from '../group/group.model'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
@@ -185,16 +189,26 @@ export class ResponsibleService {
     )
   }
 
-  async getAllGroupsByResponsible(id: Types.ObjectId, fields?: GroupField[]) {
-    const candidate = await this.responsibleModel
-      .findById(id)
-      .populate({ path: 'groups', select: fieldsArrayToProjection(fields) })
+  async getAllGroupsByResponsible(
+    id: Types.ObjectId,
+    fields?: Projection<ScheduleField>
+  ): Promise<ModelByFields<GroupFieldsEnum, GroupModelType[keyof GroupModelType]>> {
+    const candidate = await this.responsibleModel.findById(
+      id,
+      { groups: 1 },
+      {
+        populate: {
+          path: 'groups',
+          options: fieldsToProjection(fields).getProjection(),
+        },
+      }
+    )
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
-    return candidate.groups
+    return JSON.parse(JSON.stringify(candidate.groups))
   }
 
   async login(dto: LoginResponsibleDto) {

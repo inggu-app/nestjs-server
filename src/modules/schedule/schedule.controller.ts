@@ -28,7 +28,7 @@ import { CallScheduleService } from '../settings/callSchedule/callSchedule.servi
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.guard'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
-import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
+import { ParseFieldsPipe, Projection } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
@@ -49,7 +49,7 @@ export class ScheduleController {
       throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
-    const scheduleCandidate = await this.scheduleService.get(dto.group, [])
+    const scheduleCandidate = await this.scheduleService.get(dto.group)
 
     if (scheduleCandidate.length) {
       throw new HttpException(SCHEDULE_EXISTS, HttpStatus.BAD_REQUEST)
@@ -67,7 +67,7 @@ export class ScheduleController {
     @Param('group', ParseMongoIdPipe) group: Types.ObjectId,
     @Query('updatedAt', ParseDatePipe) updatedAt: Date,
     @Query('fields', new ParseFieldsPipe(ScheduleFieldsEnum, ScheduleAdditionalFieldsEnum))
-    fields?: ScheduleField[]
+    fields?: Projection<ScheduleField | 'id'>
   ) {
     const candidate = await this.groupService.getById(group)
 
@@ -83,12 +83,12 @@ export class ScheduleController {
     const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
       const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
 
-      return normalizeFields<ScheduleField[]>(fields, {
-        ...lesson.toObject(),
-
-        startTime: call?.start || new Date(0),
-        endTime: call?.end || new Date(0),
-      })
+      // return normalizeFields<ScheduleField[]>(fields, {
+      //   ...lesson.toObject(),
+      //
+      //   startTime: call?.start || new Date(0),
+      //   endTime: call?.end || new Date(0),
+      // })
     })
 
     return {

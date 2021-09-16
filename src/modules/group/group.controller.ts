@@ -25,7 +25,7 @@ import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import { GetGroupsEnum, GroupField, GroupFieldsEnum } from './group.constants'
-import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
+import { ParseFieldsPipe, Projection } from '../../global/pipes/fields.pipe'
 
 @Controller()
 export class GroupController {
@@ -43,7 +43,7 @@ export class GroupController {
     @Query('page', CustomParseIntPipe) page?: number,
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('title') title?: string,
-    @Query('fields', new ParseFieldsPipe(GroupFieldsEnum)) fields?: GroupField[]
+    @Query('fields', new ParseFieldsPipe(GroupFieldsEnum)) fields?: Projection<GroupField | 'id'>
   ) {
     const request = checkAlternativeQueryParameters<GetGroupsEnum>(
       { required: { groupId }, fields, enum: GetGroupsEnum.groupId },

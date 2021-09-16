@@ -15,7 +15,8 @@ import { CreateScheduleDto } from '../schedule/dto/create-schedule.dto'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import fieldsToProjection from '../../global/utils/fieldsToProjection'
+import { Projection } from '../../global/pipes/fields.pipe'
 
 @Injectable()
 export class GroupService {
@@ -35,10 +36,10 @@ export class GroupService {
     return this.groupModel.create(dto)
   }
 
-  async getById(groupId: Types.ObjectId, fields?: GroupField[]) {
+  async getById(groupId: Types.ObjectId, fields?: Projection<GroupField | 'id'>) {
     const candidate = await this.groupModel.findOne(
       { _id: groupId },
-      fieldsArrayToProjection(fields)
+      fieldsToProjection<GroupField | 'id'>(fields).getProjection()
     )
 
     if (!candidate) {
@@ -48,19 +49,19 @@ export class GroupService {
     return candidate
   }
 
-  getAll(page: number, count: number, title?: string, fields?: GroupField[]) {
+  getAll(page: number, count: number, title?: string, fields?: Projection<GroupField | 'id'>) {
     if (page != undefined && count != undefined) {
       return this.groupModel
         .find(
           title ? { title: { $regex: title, $options: 'i' } } : {},
-          fieldsArrayToProjection(fields)
+          fieldsToProjection<GroupField | 'id'>(fields).getProjection()
         )
         .skip((page - 1) * count)
         .limit(count)
     } else {
       return this.groupModel.find(
         title ? { title: { $regex: title, $options: 'i' } } : {},
-        fieldsArrayToProjection(fields)
+        fieldsToProjection(fields)
       )
     }
   }
@@ -69,14 +70,17 @@ export class GroupService {
     return this.groupModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
   }
 
-  async getByFacultyId(facultyId: Types.ObjectId, fields?: GroupField[]) {
+  async getByFacultyId(facultyId: Types.ObjectId, fields?: Projection<GroupField | 'id'>) {
     const faculty = await this.facultyService.getById(facultyId)
 
     if (!faculty) {
       throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
     }
 
-    return this.groupModel.find({ faculty: facultyId }, fieldsArrayToProjection(fields))
+    return this.groupModel.find(
+      { faculty: facultyId },
+      fieldsToProjection<GroupField | 'id'>(fields)
+    )
   }
 
   async delete(groupId: Types.ObjectId) {

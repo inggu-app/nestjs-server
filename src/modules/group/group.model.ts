@@ -5,15 +5,15 @@ import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { GroupFieldsEnum } from './group.constants'
 
-type Group = {
-  [key in GroupFieldsEnum]: any
+export type GroupModelType = {
+  [key in GroupFieldsEnum]: string | boolean | Date | Types.ObjectId
 }
 
 export interface GroupModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<GroupModel>(),
 })
-export class GroupModel extends TimeStamps implements Group {
+export class GroupModel extends TimeStamps implements GroupModelType {
   @prop()
   title: string
 

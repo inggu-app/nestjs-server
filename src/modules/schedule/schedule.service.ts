@@ -4,8 +4,9 @@ import { Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import fieldsArrayToProjection from '../../global/utils/fieldsToProjection'
 import { ScheduleField } from './schedule.constants'
+import { Projection } from '../../global/pipes/fields.pipe'
 
 @Injectable()
 export class ScheduleService {
@@ -18,7 +19,7 @@ export class ScheduleService {
     return this.lessonModel.create(lessons)
   }
 
-  get(groupId: Types.ObjectId, fields?: ScheduleField[]) {
+  get(groupId: Types.ObjectId, fields?: Projection<ScheduleField>) {
     return this.lessonModel.find({ group: groupId }, fieldsArrayToProjection(fields, ['number']))
   }
 
