@@ -62,6 +62,7 @@ export class ResponsibleController {
     return this.responsibleService.create(dto)
   }
 
+  @UsePipes(AdminJwtAuthGuard)
   @Get('/')
   async get(
     @Query('responsibleId', ParseMongoIdPipe) responsibleId?: Types.ObjectId,
