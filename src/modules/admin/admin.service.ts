@@ -14,7 +14,6 @@ import { LoginAdminDto } from './dto/loginAdmin.dto'
 import {
   ADMIN_WITH_ID_NOT_FOUND,
   ADMIN_WITH_LOGIN_EXISTS,
-  ADMIN_WITH_LOGIN_NOT_FOUND,
   INCORRECT_CREDENTIALS,
 } from '../../global/constants/errors.constants'
 import { JwtService } from '@nestjs/jwt'
@@ -99,16 +98,6 @@ export class AdminService {
       )
       .skip((page - 1) * count)
       .limit(count)
-  }
-
-  async getByLogin(login: string) {
-    const candidate = await this.adminModel.findOne({ login })
-
-    if (!candidate) {
-      throw new HttpException(ADMIN_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND)
-    }
-
-    return candidate
   }
 
   async update(dto: UpdateAdminDto) {
