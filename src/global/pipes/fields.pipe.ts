@@ -1,15 +1,25 @@
 import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
 
+interface Options {
+  fieldsEnum: { [key: string]: string }
+  additionalFieldsEnum?: { [key: string]: string }
+  forbiddenFieldsEnum?: { [key: string]: string }
+}
+
 @Injectable()
 export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined> {
   private readonly fields: string[]
 
-  constructor(
-    fieldsEnum: { [key: string]: string },
-    additionalFieldsEnum?: { [key: string]: string }
-  ) {
-    this.fields = ['id', ...Object.keys(fieldsEnum)]
-    if (additionalFieldsEnum) this.fields = [...this.fields, ...Object.keys(additionalFieldsEnum)]
+  constructor(options?: Options) {
+    if (options) {
+      this.fields = ['id', ...Object.keys(options.fieldsEnum)]
+      if (options.additionalFieldsEnum)
+        this.fields = [...this.fields, ...Object.keys(options.additionalFieldsEnum)]
+      if (options.forbiddenFieldsEnum)
+        this.fields = this.fields.filter(field =>
+          options.forbiddenFieldsEnum ? !(field in options.forbiddenFieldsEnum) : false
+        )
+    }
   }
 
   transform(value: any): string[] | undefined {

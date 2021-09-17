@@ -40,7 +40,7 @@ export class GroupController {
     @Query('page', CustomParseIntPipe) page?: number,
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('title') title?: string,
-    @Query('fields', new ParseFieldsPipe(GroupFieldsEnum)) fields?: GroupField[]
+    @Query('fields', new ParseFieldsPipe({ fieldsEnum: GroupFieldsEnum })) fields?: GroupField[]
   ) {
     const request = checkAlternativeQueryParameters<GetGroupsEnum>(
       { required: { groupId }, fields, enum: GetGroupsEnum.groupId },

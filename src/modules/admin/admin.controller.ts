@@ -20,7 +20,12 @@ import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
-import { AdminField, AdminFieldsEnum, GetAdminsEnum } from './admin.constants'
+import {
+  AdminField,
+  AdminFieldsEnum,
+  AdminForbiddenFieldsEnum,
+  GetAdminsEnum,
+} from './admin.constants'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
 @Controller()
@@ -41,7 +46,14 @@ export class AdminController {
     @Query('page', CustomParseIntPipe) page?: number,
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('name') name?: number,
-    @Query('fields', new ParseFieldsPipe(AdminFieldsEnum)) fields?: AdminField[]
+    @Query(
+      'fields',
+      new ParseFieldsPipe({
+        fieldsEnum: AdminFieldsEnum,
+        forbiddenFieldsEnum: AdminForbiddenFieldsEnum,
+      })
+    )
+    fields?: AdminField[]
   ) {
     const request = checkAlternativeQueryParameters<GetAdminsEnum>(
       { required: { adminId }, fields, enum: GetAdminsEnum.adminId },

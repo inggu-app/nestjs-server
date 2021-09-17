@@ -24,7 +24,11 @@ import { GROUP_WITH_ID_NOT_FOUND } from '../group/group.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
-import { GetResponsibleEnum, ResponsibleFieldsEnum } from './responsible.constants'
+import {
+  GetResponsibleEnum,
+  ResponsibleFieldsEnum,
+  ResponsibleForbiddenFieldsEnum,
+} from './responsible.constants'
 import { ResponsibleField } from './responsible.constants'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 
@@ -64,7 +68,14 @@ export class ResponsibleController {
     @Query('page', CustomParseIntPipe) page?: number,
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('name') name?: string,
-    @Query('fields', new ParseFieldsPipe(ResponsibleFieldsEnum)) fields?: ResponsibleField[]
+    @Query(
+      'fields',
+      new ParseFieldsPipe({
+        fieldsEnum: ResponsibleFieldsEnum,
+        forbiddenFieldsEnum: ResponsibleForbiddenFieldsEnum,
+      })
+    )
+    fields?: ResponsibleField[]
   ) {
     const request = checkAlternativeQueryParameters<GetResponsibleEnum>(
       { required: { responsibleId }, fields, enum: GetResponsibleEnum.responsibleId },

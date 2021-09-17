@@ -17,6 +17,12 @@ export enum ResponsibleFieldsEnum {
   hashedPassword = 'hashedPassword',
 }
 
+export enum ResponsibleForbiddenFieldsEnum {
+  hashedUniqueKey = 'hashedUniqueKey',
+  hashedPassword = 'hashedPassword',
+}
+
 export type ResponsibleField = keyof typeof ResponsibleFieldsEnum
 
 enumKeyValuesMatch(ResponsibleFieldsEnum)
+enumKeyValuesMatch(ResponsibleForbiddenFieldsEnum)

@@ -18,6 +18,12 @@ export enum AdminFieldsEnum {
   hashedPassword = 'hashedPassword',
 }
 
+export enum AdminForbiddenFieldsEnum {
+  hashedUniqueKey = 'hashedUniqueKey',
+  hashedPassword = 'hashedPassword',
+}
+
 export type AdminField = keyof typeof AdminFieldsEnum
 
 enumKeyValuesMatch(AdminFieldsEnum)
+enumKeyValuesMatch(AdminForbiddenFieldsEnum)

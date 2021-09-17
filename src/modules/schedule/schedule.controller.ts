@@ -67,7 +67,13 @@ export class ScheduleController {
   async get(
     @Query('groupId', ParseMongoIdPipe) groupId: Types.ObjectId,
     @Query('updatedAt', ParseDatePipe) updatedAt: Date,
-    @Query('fields', new ParseFieldsPipe(ScheduleFieldsEnum, ScheduleAdditionalFieldsEnum))
+    @Query(
+      'fields',
+      new ParseFieldsPipe({
+        fieldsEnum: ScheduleFieldsEnum,
+        additionalFieldsEnum: ScheduleAdditionalFieldsEnum,
+      })
+    )
     fields?: ScheduleField[]
   ) {
     const request = checkAlternativeQueryParameters<GetScheduleEnum>({
