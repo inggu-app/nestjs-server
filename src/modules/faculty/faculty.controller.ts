@@ -20,7 +20,12 @@ import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
-import { FacultyField, FacultyFieldsEnum, GetFacultiesEnum } from './faculty.constants'
+import {
+  FacultyAdditionalFieldsEnum,
+  FacultyField,
+  FacultyFieldsEnum,
+  GetFacultiesEnum,
+} from './faculty.constants'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 
 @Controller()
@@ -43,7 +48,14 @@ export class FacultyController {
     @Query('page', CustomParseIntPipe) page?: number,
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('title') title?: string,
-    @Query('fields', new ParseFieldsPipe({ fieldsEnum: FacultyFieldsEnum })) fields?: FacultyField[]
+    @Query(
+      'fields',
+      new ParseFieldsPipe({
+        fieldsEnum: FacultyFieldsEnum,
+        additionalFieldsEnum: FacultyAdditionalFieldsEnum,
+      })
+    )
+    fields?: FacultyField[]
   ) {
     const request = checkAlternativeQueryParameters<GetFacultiesEnum>(
       { required: { facultyId }, fields, enum: GetFacultiesEnum.facultyId },

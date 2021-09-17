@@ -1,3 +1,5 @@
+import { DefaultFields } from '../../global/enums/defaultFields'
+
 export const GROUP_NOT_FOUND = 'Группы с таким id не существует'
 export const SCHEDULE_EXISTS =
   'Расписание для этой группы уже существует. Попробуйте обновить расписание'
@@ -19,14 +21,19 @@ export enum ScheduleFieldsEnum {
   group = 'group',
 }
 
-export enum ScheduleAdditionalFieldsEnum {
+export enum _ScheduleAdditionalFieldsEnum {
   startTime = 'startTime',
   endTime = 'endTime',
 }
 
+export const ScheduleAdditionalFieldsEnum = {
+  ..._ScheduleAdditionalFieldsEnum,
+  ...DefaultFields,
+}
+
 export type ScheduleField =
   | keyof typeof ScheduleFieldsEnum
-  | keyof typeof ScheduleAdditionalFieldsEnum
+  | keyof typeof _ScheduleAdditionalFieldsEnum
 
 enumKeyValuesMatch(ScheduleFieldsEnum)
-enumKeyValuesMatch(ScheduleAdditionalFieldsEnum)
+enumKeyValuesMatch(_ScheduleAdditionalFieldsEnum)

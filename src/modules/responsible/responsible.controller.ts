@@ -26,6 +26,7 @@ import checkAlternativeQueryParameters from '../../global/utils/alternativeQuery
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import {
   GetResponsibleEnum,
+  ResponsibleAdditionalFieldsEnum,
   ResponsibleFieldsEnum,
   ResponsibleForbiddenFieldsEnum,
 } from './responsible.constants'
@@ -72,6 +73,7 @@ export class ResponsibleController {
       'fields',
       new ParseFieldsPipe({
         fieldsEnum: ResponsibleFieldsEnum,
+        additionalFieldsEnum: ResponsibleAdditionalFieldsEnum,
         forbiddenFieldsEnum: ResponsibleForbiddenFieldsEnum,
       })
     )

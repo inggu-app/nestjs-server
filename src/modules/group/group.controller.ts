@@ -21,7 +21,12 @@ import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
-import { GetGroupsEnum, GroupField, GroupFieldsEnum } from './group.constants'
+import {
+  GetGroupsEnum,
+  GroupAdditionalFieldsEnum,
+  GroupField,
+  GroupFieldsEnum,
+} from './group.constants'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 
 @Controller()
@@ -40,7 +45,14 @@ export class GroupController {
     @Query('page', CustomParseIntPipe) page?: number,
     @Query('count', CustomParseIntPipe) count?: number,
     @Query('title') title?: string,
-    @Query('fields', new ParseFieldsPipe({ fieldsEnum: GroupFieldsEnum })) fields?: GroupField[]
+    @Query(
+      'fields',
+      new ParseFieldsPipe({
+        fieldsEnum: GroupFieldsEnum,
+        additionalFieldsEnum: GroupAdditionalFieldsEnum,
+      })
+    )
+    fields?: GroupField[]
   ) {
     const request = checkAlternativeQueryParameters<GetGroupsEnum>(
       { required: { groupId }, fields, enum: GetGroupsEnum.groupId },

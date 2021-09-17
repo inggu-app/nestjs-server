@@ -21,6 +21,7 @@ import { LoginAdminDto } from './dto/loginAdmin.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import {
+  AdminAdditionalFieldsEnum,
   AdminField,
   AdminFieldsEnum,
   AdminForbiddenFieldsEnum,
@@ -50,6 +51,7 @@ export class AdminController {
       'fields',
       new ParseFieldsPipe({
         fieldsEnum: AdminFieldsEnum,
+        additionalFieldsEnum: AdminAdditionalFieldsEnum,
         forbiddenFieldsEnum: AdminForbiddenFieldsEnum,
       })
     )
