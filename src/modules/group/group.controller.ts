@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   Patch,
   Post,
@@ -18,7 +16,6 @@ import { CreateGroupDto } from './dto/create-group.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
-import { FACULTY_NOT_FOUND } from '../faculty/faculty.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
@@ -86,11 +83,7 @@ export class GroupController {
   @UsePipes(new ValidationPipe())
   @Post('/create')
   async create(@Body() dto: CreateGroupDto) {
-    const facultyCandidate = await this.facultyService.getById(Types.ObjectId(dto.faculty))
-
-    if (!facultyCandidate) {
-      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
-    }
+    await this.facultyService.getById(Types.ObjectId(dto.faculty))
 
     return this.groupService.create(dto)
   }

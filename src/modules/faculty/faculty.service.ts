@@ -22,8 +22,14 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
-  getById(facultyId: Types.ObjectId) {
-    return this.facultyModel.findById(facultyId)
+  async getById(facultyId: Types.ObjectId) {
+    const candidate = this.facultyModel.findById(facultyId)
+
+    if (!candidate) {
+      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+    }
+
+    return candidate
   }
 
   getAll(page: number, count: number, title: string) {
