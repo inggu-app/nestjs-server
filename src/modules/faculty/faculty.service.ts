@@ -3,10 +3,11 @@ import { CreateFacultyDto } from './dto/create-faculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FACULTY_EXISTS, FACULTY_NOT_FOUND } from './faculty.constants'
+import { FACULTY_EXISTS, FACULTY_NOT_FOUND, FacultyField } from './faculty.constants'
 import { Types } from 'mongoose'
-import { INCORRECT_PAGE_COUNT_QUERIES } from '../../global/constants/errors.constants'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
+import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import checkPageCount from '../../global/utils/checkPageCount'
 
 @Injectable()
 export class FacultyService {
@@ -22,8 +23,8 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
-  async getById(facultyId: Types.ObjectId) {
-    const candidate = this.facultyModel.findById(facultyId)
+  async getById(facultyId: Types.ObjectId, fields?: FacultyField[]) {
+    const candidate = this.facultyModel.findById(facultyId, fieldsArrayToProjection(fields))
 
     if (!candidate) {
       throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
@@ -32,25 +33,26 @@ export class FacultyService {
     return candidate
   }
 
-  getAll(page: number, count: number, title: string) {
-    if (page === -1 && count === -1) {
-      return this.facultyModel.find({ title: { $regex: title, $options: 'i' } })
-    } else if (page === -1 || count === -1) {
-      throw new HttpException(INCORRECT_PAGE_COUNT_QUERIES, HttpStatus.BAD_REQUEST)
-    } else {
-      return this.facultyModel
-        .find({ title: { $regex: title, $options: 'i' } })
-        .skip((page - 1) * count)
-        .limit(count)
+  async getAll(page?: number, count?: number, title?: string) {
+    const checkedPageCount = checkPageCount(page, count)
+
+    const faculties = this.facultyModel.find(
+      title ? { title: { $regex: title, $options: 'i' } } : {}
+    )
+
+    if (checkedPageCount.page !== undefined) {
+      return faculties
+        .skip((checkedPageCount.page - 1) * checkedPageCount.count)
+        .limit(checkedPageCount.count)
     }
+
+    return faculties
   }
 
-  countAll(title: string) {
-    return this.facultyModel.countDocuments({ title: { $regex: title, $options: 'i' } })
-  }
-
-  getAllForDropdown() {
-    return this.facultyModel.find({}, { title: 1 })
+  countAll(title?: string) {
+    return this.facultyModel.countDocuments(
+      title ? { title: { $regex: title, $options: 'i' } } : {}
+    )
   }
 
   async update(dto: UpdateFacultyDto) {

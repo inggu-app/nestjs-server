@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -19,6 +18,11 @@ import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
+import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
+import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import { FacultyField, GetFacultiesEnum } from './faculty.constants'
+import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
+import { GroupFieldsEnum } from '../group/group.constants'
 
 @Controller()
 export class FacultyController {
@@ -34,26 +38,28 @@ export class FacultyController {
     return this.facultyService.create(dto)
   }
 
-  @Get('/all')
-  async getAll(
-    @Query('page', ParseIntPipe) page: number,
-    @Query('count', ParseIntPipe) count: number,
-    @Query('title') title?: string
+  @Get('/')
+  async get(
+    @Query('facultyId', ParseMongoIdPipe) facultyId?: Types.ObjectId,
+    @Query('page', CustomParseIntPipe) page?: number,
+    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('title') title?: string,
+    @Query('fields', new ParseFieldsPipe(GroupFieldsEnum)) fields?: FacultyField[]
   ) {
-    return {
-      faculties: await this.facultyService.getAll(page, count, title || ''),
-      count: await this.facultyService.countAll(title || ''),
+    const request = checkAlternativeQueryParameters<GetFacultiesEnum>(
+      { required: { facultyId }, fields, enum: GetFacultiesEnum.facultyId },
+      { required: { page, count }, fields, title, enum: GetFacultiesEnum.all }
+    )
+
+    switch (request.enum) {
+      case GetFacultiesEnum.facultyId:
+        return this.facultyService.getById(request.facultyId, request.fields)
+      case GetFacultiesEnum.all:
+        return {
+          faculties: await this.facultyService.getAll(request.page, request.page, request.title),
+          count: await this.facultyService.countAll(request.title),
+        }
     }
-  }
-
-  @Get('/by-id')
-  getById(@Query('id', ParseMongoIdPipe) id: Types.ObjectId) {
-    return this.facultyService.getById(id)
-  }
-
-  @Get('/get/dropdown')
-  getAllForDropdown() {
-    return this.facultyService.getAllForDropdown().sort({ title: 1 })
   }
 
   @UseGuards(AdminJwtAuthGuard)
