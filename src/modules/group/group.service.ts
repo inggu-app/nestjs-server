@@ -36,10 +36,7 @@ export class GroupService {
   }
 
   async getById(groupId: Types.ObjectId, fields?: GroupField[]) {
-    const candidate = await this.groupModel.findOne(
-      { _id: groupId },
-      fieldsArrayToProjection(fields)
-    )
+    const candidate = await this.groupModel.findById(groupId, fieldsArrayToProjection(fields))
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)

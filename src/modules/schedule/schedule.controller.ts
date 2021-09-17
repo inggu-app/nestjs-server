@@ -4,13 +4,12 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Param,
-  Post,
   Patch,
+  Post,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
-  UseGuards,
 } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/create-schedule.dto'
 import { ScheduleService } from './schedule.service'
@@ -18,6 +17,7 @@ import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import {
+  GetScheduleEnum,
   GROUP_NOT_FOUND,
   SCHEDULE_EXISTS,
   ScheduleAdditionalFieldsEnum,
@@ -30,6 +30,7 @@ import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
+import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
 @Controller()
 export class ScheduleController {
@@ -62,38 +63,45 @@ export class ScheduleController {
     await this.scheduleService.create(dto)
   }
 
-  @Get('/:group')
+  @Get('/')
   async get(
-    @Param('group', ParseMongoIdPipe) group: Types.ObjectId,
+    @Query('groupId', ParseMongoIdPipe) groupId: Types.ObjectId,
     @Query('updatedAt', ParseDatePipe) updatedAt: Date,
     @Query('fields', new ParseFieldsPipe(ScheduleFieldsEnum, ScheduleAdditionalFieldsEnum))
     fields?: ScheduleField[]
   ) {
-    const candidate = await this.groupService.getById(group)
-
-    if (!candidate) {
-      throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
-    } else if (!(updatedAt < candidate.lastScheduleUpdate)) {
-      return {}
-    }
-
-    const lessonsSchedule = await this.scheduleService.get(group, fields)
-    const callSchedule = await this.callScheduleService.getActiveCallSchedule(new Date(0))
-
-    const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
-      const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
-
-      return normalizeFields<ScheduleField[]>(fields, {
-        ...lesson.toObject(),
-
-        startTime: call?.start || new Date(0),
-        endTime: call?.end || new Date(0),
-      })
+    const request = checkAlternativeQueryParameters<GetScheduleEnum>({
+      required: { groupId },
+      updatedAt,
+      enum: GetScheduleEnum.groupId,
     })
 
-    return {
-      schedule: lessonsScheduleWithStartEnd,
-      updatedAt: candidate.lastScheduleUpdate,
+    switch (request.enum) {
+      case GetScheduleEnum.groupId:
+        const group = await this.groupService.getById(groupId, ['lastScheduleUpdate'])
+
+        if (!(updatedAt < group.lastScheduleUpdate)) {
+          return {}
+        }
+
+        const lessonsSchedule = await this.scheduleService.get(groupId, fields)
+        const callSchedule = await this.callScheduleService.getActiveCallSchedule(new Date(0))
+
+        const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
+          const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
+
+          return normalizeFields<ScheduleField[]>(fields, {
+            ...lesson.toObject(),
+
+            startTime: call?.start || new Date(0),
+            endTime: call?.end || new Date(0),
+          })
+        })
+
+        return {
+          schedule: lessonsScheduleWithStartEnd,
+          updatedAt: group.lastScheduleUpdate,
+        }
     }
   }
 

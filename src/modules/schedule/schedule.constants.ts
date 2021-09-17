@@ -4,6 +4,10 @@ export const SCHEDULE_EXISTS =
 
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 
+export enum GetScheduleEnum {
+  groupId,
+}
+
 export enum ScheduleFieldsEnum {
   title = 'title',
   teacher = 'teacher',
