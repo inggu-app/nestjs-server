@@ -154,21 +154,14 @@ export class ResponsibleService {
     return candidate
   }
 
-  getAll(page?: number, count?: number, name?: string, fields?: ResponsibleField[]) {
-    const checkedPageCount = checkPageCount(page, count)
-
-    const responsibles = this.responsibleModel.find(
-      name ? { name: { $regex: name, $options: 'i' } } : {},
-      fieldsArrayToProjection(fields, [], ['hashedPassword', 'hashedUniqueKey'])
-    )
-
-    if (checkedPageCount.page !== undefined) {
-      return responsibles
-        .skip((checkedPageCount.page - 1) * checkedPageCount.count)
-        .limit(checkedPageCount.count)
-    }
-
-    return responsibles
+  getAll(page: number, count: number, name?: string, fields?: ResponsibleField[]) {
+    return this.responsibleModel
+      .find(
+        name ? { name: { $regex: name, $options: 'i' } } : {},
+        fieldsArrayToProjection(fields, [], ['hashedPassword', 'hashedUniqueKey'])
+      )
+      .skip((page - 1) * count)
+      .limit(count)
   }
 
   async getAllByGroup(

@@ -46,20 +46,13 @@ export class GroupService {
   }
 
   getAll(page: number, count: number, title?: string, fields?: GroupField[]) {
-    if (page != undefined && count != undefined) {
-      return this.groupModel
-        .find(
-          title ? { title: { $regex: title, $options: 'i' } } : {},
-          fieldsArrayToProjection(fields)
-        )
-        .skip((page - 1) * count)
-        .limit(count)
-    } else {
-      return this.groupModel.find(
+    return this.groupModel
+      .find(
         title ? { title: { $regex: title, $options: 'i' } } : {},
         fieldsArrayToProjection(fields)
       )
-    }
+      .skip((page - 1) * count)
+      .limit(count)
   }
 
   countAll(title?: string) {

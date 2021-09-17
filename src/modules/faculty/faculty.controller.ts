@@ -56,7 +56,12 @@ export class FacultyController {
         return this.facultyService.getById(request.facultyId, request.fields)
       case GetFacultiesEnum.all:
         return {
-          faculties: await this.facultyService.getAll(request.page, request.page, request.title),
+          faculties: await this.facultyService.getAll(
+            request.page,
+            request.count,
+            request.title,
+            request.fields
+          ),
           count: await this.facultyService.countAll(request.title),
         }
     }

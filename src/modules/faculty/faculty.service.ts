@@ -7,7 +7,6 @@ import { FACULTY_EXISTS, FACULTY_NOT_FOUND, FacultyField } from './faculty.const
 import { Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
-import checkPageCount from '../../global/utils/checkPageCount'
 
 @Injectable()
 export class FacultyService {
@@ -33,20 +32,14 @@ export class FacultyService {
     return candidate
   }
 
-  async getAll(page?: number, count?: number, title?: string) {
-    const checkedPageCount = checkPageCount(page, count)
-
-    const faculties = this.facultyModel.find(
-      title ? { title: { $regex: title, $options: 'i' } } : {}
-    )
-
-    if (checkedPageCount.page !== undefined) {
-      return faculties
-        .skip((checkedPageCount.page - 1) * checkedPageCount.count)
-        .limit(checkedPageCount.count)
-    }
-
-    return faculties
+  getAll(page: number, count: number, title?: string, fields?: FacultyField[]) {
+    return this.facultyModel
+      .find(
+        title ? { title: { $regex: title, $options: 'i' } } : {},
+        fieldsArrayToProjection(fields)
+      )
+      .skip((page - 1) * count)
+      .limit(count)
   }
 
   countAll(title?: string) {
