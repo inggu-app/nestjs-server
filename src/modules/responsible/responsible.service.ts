@@ -4,11 +4,7 @@ import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateResponsibleDto } from './dto/createResponsible.dto'
-import {
-  RESPONSIBLE_EXISTS,
-  RESPONSIBLE_NOT_FOUND,
-  ResponsibleField,
-} from './responsible.constants'
+import { ResponsibleField } from './responsible.constants'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
 import generatePassword from '../../global/utils/generatePassword'
@@ -16,10 +12,15 @@ import { Types } from 'mongoose'
 import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
-import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
+import {
+  GROUP_WITH_ID_NOT_FOUND,
+  INCORRECT_CREDENTIALS,
+  RESPONSIBLE_WITH_ID_NOT_FOUND,
+  RESPONSIBLE_WITH_LOGIN_EXISTS,
+} from '../../global/constants/errors.constants'
 import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/checkJwtType'
 import { GroupService } from '../group/group.service'
-import { GROUP_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND, GroupField } from '../group/group.constants'
+import { GroupField } from '../group/group.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import checkPageCount from '../../global/utils/checkPageCount'
 
@@ -43,7 +44,7 @@ export class ResponsibleService {
     const candidate = await this.responsibleModel.findOne({ login: dto.login })
 
     if (candidate) {
-      throw new HttpException(RESPONSIBLE_EXISTS, HttpStatus.CONFLICT)
+      throw new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.CONFLICT)
     }
 
     const generatedUniqueKey = generateUniqueKey()
@@ -75,7 +76,7 @@ export class ResponsibleService {
     })
 
     if (!candidate) {
-      throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
     }
 
     return candidate
@@ -92,7 +93,7 @@ export class ResponsibleService {
     const loginCandidate = await this.responsibleModel.findOne({ login: dto.login })
 
     if (loginCandidate && loginCandidate?.id !== dto.id) {
-      throw new HttpException(RESPONSIBLE_EXISTS, HttpStatus.BAD_REQUEST)
+      throw new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
     }
 
     for await (const groupId of dto.groups) {
@@ -116,7 +117,7 @@ export class ResponsibleService {
     )
 
     if (!candidate) {
-      throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
     }
 
     return candidate
@@ -133,7 +134,7 @@ export class ResponsibleService {
     })
 
     if (!candidate) {
-      throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
     }
 
     return {
@@ -148,7 +149,7 @@ export class ResponsibleService {
     )
 
     if (!candidate) {
-      throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.BAD_REQUEST)
+      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.BAD_REQUEST)
     }
 
     return candidate
@@ -165,20 +166,20 @@ export class ResponsibleService {
   }
 
   async getAllByGroup(
-    id: Types.ObjectId,
+    groupId: Types.ObjectId,
     page?: number,
     count?: number,
     fields?: ResponsibleField[]
   ) {
     const checkedPageCount = checkPageCount(page, count)
-    const candidate = await this.groupService.getById(id)
+    const candidate = await this.groupService.getById(groupId)
 
     if (!candidate) {
-      throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
     }
 
     const responsibles = this.responsibleModel.find(
-      { groups: { $in: [id] } },
+      { groups: { $in: [groupId] } },
       fieldsArrayToProjection(fields, [], ['hashedPassword', 'hashedUniqueKey'])
     )
 
@@ -207,7 +208,7 @@ export class ResponsibleService {
       .populate({ path: 'groups', select: fieldsArrayToProjection(fields) })
 
     if (!candidate) {
-      throw new HttpException(RESPONSIBLE_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
     }
 
     return candidate.groups

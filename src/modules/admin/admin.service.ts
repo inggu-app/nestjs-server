@@ -8,15 +8,15 @@ import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import generatePassword from '../../global/utils/generatePassword'
 import { hashSalt } from '../../global/constants/other.constants'
 import { Types } from 'mongoose'
-import {
-  ADMIN_EXISTS,
-  ADMIN_WITH_ID_NOT_FOUND,
-  ADMIN_WITH_LOGIN_NOT_FOUND,
-  AdminField,
-} from './admin.constants'
+import { AdminField } from './admin.constants'
 import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
-import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
+import {
+  ADMIN_WITH_ID_NOT_FOUND,
+  ADMIN_WITH_LOGIN_EXISTS,
+  ADMIN_WITH_LOGIN_NOT_FOUND,
+  INCORRECT_CREDENTIALS,
+} from '../../global/constants/errors.constants'
 import { JwtService } from '@nestjs/jwt'
 import { ADMIN_ACCESS_TOKEN_DATA, JwtType } from '../../global/utils/checkJwtType'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
@@ -40,7 +40,7 @@ export class AdminService {
     const candidate = await this.adminModel.findOne({ login: dto.login })
 
     if (candidate) {
-      throw new HttpException(ADMIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
+      throw new HttpException(ADMIN_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
     }
 
     const generatedUniqueKey = generateUniqueKey()

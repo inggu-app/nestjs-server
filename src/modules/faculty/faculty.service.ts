@@ -3,10 +3,14 @@ import { CreateFacultyDto } from './dto/create-faculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FACULTY_EXISTS, FACULTY_NOT_FOUND, FacultyField } from './faculty.constants'
+import { FacultyField } from './faculty.constants'
 import { Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import {
+  FACULTY_WITH_ID_NOT_FOUND,
+  FACULTY_WITH_TITLE_EXISTS,
+} from '../../global/constants/errors.constants'
 
 @Injectable()
 export class FacultyService {
@@ -16,7 +20,7 @@ export class FacultyService {
     const candidate = await this.facultyModel.findOne({ title: dto.title })
 
     if (candidate) {
-      throw new HttpException(FACULTY_EXISTS, HttpStatus.BAD_REQUEST)
+      throw new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST)
     }
 
     return this.facultyModel.create(dto)
@@ -26,7 +30,7 @@ export class FacultyService {
     const candidate = this.facultyModel.findById(facultyId, fieldsArrayToProjection(fields))
 
     if (!candidate) {
-      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
     }
 
     return candidate
@@ -54,7 +58,7 @@ export class FacultyService {
     })
 
     if (!candidate) {
-      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
     }
 
     return this.facultyModel.findById(dto.id)
@@ -64,7 +68,7 @@ export class FacultyService {
     const deletedDoc = await this.facultyModel.findByIdAndDelete(facultyId)
 
     if (!deletedDoc) {
-      throw new HttpException(FACULTY_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
     }
   }
 }

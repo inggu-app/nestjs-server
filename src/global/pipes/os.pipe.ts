@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
 import { INVALID_OS } from '../constants/errors.constants'
 import { OSs } from '../constants/other.constants'
 
@@ -6,7 +6,7 @@ import { OSs } from '../constants/other.constants'
 export class OsPipe implements PipeTransform<any, Date> {
   transform(value: any): Date {
     if (!OSs.includes(value)) {
-      throw new BadRequestException(INVALID_OS)
+      throw new HttpException(INVALID_OS, HttpStatus.BAD_REQUEST)
     }
 
     return value

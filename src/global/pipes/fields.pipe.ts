@@ -1,4 +1,9 @@
 import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
+import {
+  FIELDS_QUERY_PARAMETER_IS_EMPTY,
+  NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER,
+  UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER,
+} from '../constants/errors.constants'
 
 interface Options {
   fieldsEnum: { [key: string]: string }
@@ -26,14 +31,14 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
     if (typeof value != 'string') {
       return undefined
     } else if (value === '') {
-      throw new HttpException('Поле fields не должно быть пустым', HttpStatus.BAD_REQUEST)
+      throw new HttpException(FIELDS_QUERY_PARAMETER_IS_EMPTY, HttpStatus.BAD_REQUEST)
     }
 
-    const remainingCharacters = value.replace(/([a-zA-Z0-9,_])+/g, '')
+    const unnecessarySymbols = value.replace(/([a-zA-Z0-9,_])+/g, '')
 
-    if (remainingCharacters) {
+    if (unnecessarySymbols) {
       throw new HttpException(
-        `В значении query-параметра fields обнаружены лишние символы - ${remainingCharacters}`,
+        UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER(unnecessarySymbols),
         HttpStatus.BAD_REQUEST
       )
     }
@@ -42,7 +47,10 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
 
     receivedFields.forEach(receivedField => {
       if (!this.fields.includes(receivedField)) {
-        throw new HttpException(`Поле ${receivedField} не существует`, HttpStatus.BAD_REQUEST)
+        throw new HttpException(
+          NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER(receivedField),
+          HttpStatus.BAD_REQUEST
+        )
       }
     })
 

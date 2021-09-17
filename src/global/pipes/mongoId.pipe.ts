@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { INVALID_MONGO_ID } from '../constants/errors.constants'
 
@@ -8,7 +8,7 @@ export class ParseMongoIdPipe implements PipeTransform<any, Types.ObjectId | und
     if (value === undefined) return value
 
     if (!Types.ObjectId.isValid(value)) {
-      throw new BadRequestException(INVALID_MONGO_ID)
+      throw new HttpException(INVALID_MONGO_ID, HttpStatus.BAD_REQUEST)
     }
 
     return Types.ObjectId.createFromHexString(value)

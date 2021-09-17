@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
+import { INCORRECT_FIELDS_SET_IN_FIELDS_QUERY_PARAMETER } from '../constants/errors.constants'
 
 type ParameterObjectType<T> = {
   [key: string]: any
@@ -40,10 +41,7 @@ export default function checkAlternativeQueryParameters<T>(
   })
 
   if (isCorrectParameterObject.length != 1) {
-    throw new HttpException(
-      'Набор таких параметров не найден. Проверьте документацию',
-      HttpStatus.BAD_REQUEST
-    )
+    throw new HttpException(INCORRECT_FIELDS_SET_IN_FIELDS_QUERY_PARAMETER, HttpStatus.BAD_REQUEST)
   } else {
     return isCorrectParameterObject[0]
   }
