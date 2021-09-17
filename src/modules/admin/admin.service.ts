@@ -12,12 +12,14 @@ import {
   ADMIN_EXISTS,
   ADMIN_WITH_ID_NOT_FOUND,
   ADMIN_WITH_LOGIN_NOT_FOUND,
+  AdminField,
 } from './admin.constants'
 import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
 import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { JwtService } from '@nestjs/jwt'
 import { ADMIN_ACCESS_TOKEN_DATA, JwtType } from '../../global/utils/checkJwtType'
+import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 
 export interface AdminAccessTokenData extends JwtType<typeof ADMIN_ACCESS_TOKEN_DATA> {
   tokenType: typeof ADMIN_ACCESS_TOKEN_DATA
@@ -76,8 +78,11 @@ export class AdminService {
     }
   }
 
-  async getById(id: Types.ObjectId) {
-    const candidate = await this.adminModel.findById(id, { hashedUniqueKey: 0, hashedPassword: 0 })
+  async getById(id: Types.ObjectId, fields?: AdminField[]) {
+    const candidate = await this.adminModel.findById(
+      id,
+      fieldsArrayToProjection(fields, [], ['hashedUniqueKey', 'hashedPassword'])
+    )
 
     if (!candidate) {
       throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -86,8 +91,14 @@ export class AdminService {
     return candidate
   }
 
-  getAll() {
-    return this.adminModel.find({}, { hashedUniqueKey: 0, hashedPassword: 0 })
+  getAll(page: number, count: number, name?: string, fields?: AdminField[]) {
+    return this.adminModel
+      .find(
+        name ? { name: { $regex: name, $options: 'i' } } : {},
+        fieldsArrayToProjection(fields, [], ['hashedUniqueKey', 'hashedPassword'])
+      )
+      .skip((page - 1) * count)
+      .limit(count)
   }
 
   async getByLogin(login: string) {

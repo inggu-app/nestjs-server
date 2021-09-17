@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -17,6 +18,10 @@ import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
+import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
+import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
+import { AdminField, AdminFieldsEnum, GetAdminsEnum } from './admin.constants'
+import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
 @Controller()
 export class AdminController {
@@ -30,15 +35,25 @@ export class AdminController {
   }
 
   @UseGuards(OwnerJwtAuthGuard)
-  @Get('/:id')
-  getById(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
-    return this.adminService.getById(id)
-  }
-
-  @UseGuards(OwnerJwtAuthGuard)
   @Get('/')
-  getAll() {
-    return this.adminService.getAll()
+  get(
+    @Query('adminId', ParseMongoIdPipe) adminId?: Types.ObjectId,
+    @Query('page', CustomParseIntPipe) page?: number,
+    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('name') name?: number,
+    @Query('fields', new ParseFieldsPipe(AdminFieldsEnum)) fields?: AdminField[]
+  ) {
+    const request = checkAlternativeQueryParameters<GetAdminsEnum>(
+      { required: { adminId }, fields, enum: GetAdminsEnum.adminId },
+      { required: { page, count }, name, fields, enum: GetAdminsEnum.all }
+    )
+
+    switch (request.enum) {
+      case GetAdminsEnum.adminId:
+        return this.adminService.getById(request.adminId)
+      case GetAdminsEnum.all:
+        return this.adminService.getAll(request.page, request.count, request.name, request.fields)
+    }
   }
 
   @UseGuards(OwnerJwtAuthGuard)
