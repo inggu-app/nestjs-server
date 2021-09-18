@@ -65,10 +65,11 @@ export class ResponsibleController {
   @UsePipes(AdminJwtAuthGuard)
   @Get('/')
   async get(
-    @Query('responsibleId', ParseMongoIdPipe) responsibleId?: Types.ObjectId,
-    @Query('groupId', ParseMongoIdPipe) groupId?: Types.ObjectId,
-    @Query('page', CustomParseIntPipe) page?: number,
-    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('responsibleId', new ParseMongoIdPipe({ required: false }))
+    responsibleId?: Types.ObjectId,
+    @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
+    @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
+    @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
     @Query('name') name?: string,
     @Query(
       'fields',
@@ -114,7 +115,7 @@ export class ResponsibleController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Patch('/reset-password/:id')
-  async resetPassword(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+  async resetPassword(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.responsibleService.resetPassword(id)
   }
 
@@ -127,7 +128,7 @@ export class ResponsibleController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete('/:id')
-  async delete(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+  async delete(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.responsibleService.delete(id)
   }
 

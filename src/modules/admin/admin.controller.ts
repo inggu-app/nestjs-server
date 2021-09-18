@@ -43,9 +43,9 @@ export class AdminController {
   @UseGuards(OwnerJwtAuthGuard)
   @Get('/')
   get(
-    @Query('adminId', ParseMongoIdPipe) adminId?: Types.ObjectId,
-    @Query('page', CustomParseIntPipe) page?: number,
-    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('adminId', new ParseMongoIdPipe({ required: false })) adminId?: Types.ObjectId,
+    @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
+    @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
     @Query('name') name?: number,
     @Query(
       'fields',
@@ -72,7 +72,7 @@ export class AdminController {
 
   @UseGuards(OwnerJwtAuthGuard)
   @Patch('/reset-password/:id')
-  resetPassword(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+  resetPassword(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.adminService.resetPassword(id)
   }
 
@@ -85,7 +85,7 @@ export class AdminController {
 
   @UseGuards(OwnerJwtAuthGuard)
   @Delete('/:id')
-  delete(@Param('id', ParseMongoIdPipe) id: Types.ObjectId) {
+  delete(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.adminService.delete(id)
   }
 

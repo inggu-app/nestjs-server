@@ -20,7 +20,9 @@ export class SecretLabelController {
   constructor(private readonly secretLabelService: SecretLabelService) {}
 
   @Get('/')
-  async getSecretLabel(@Query('updatedAt', ParseDatePipe) updatedAt?: Date) {
+  async getSecretLabel(
+    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
+  ) {
     const request = checkAlternativeQueryParameters<GetSecretLabelEnum>({
       updatedAt,
       enum: GetSecretLabelEnum.get,

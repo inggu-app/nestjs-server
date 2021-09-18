@@ -39,11 +39,12 @@ export class GroupController {
 
   @Get('/')
   async get(
-    @Query('groupId', ParseMongoIdPipe) groupId?: Types.ObjectId,
-    @Query('responsibleId', ParseMongoIdPipe) responsibleId?: Types.ObjectId,
-    @Query('facultyId', ParseMongoIdPipe) facultyId?: Types.ObjectId,
-    @Query('page', CustomParseIntPipe) page?: number,
-    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
+    @Query('responsibleId', new ParseMongoIdPipe({ required: false }))
+    responsibleId?: Types.ObjectId,
+    @Query('facultyId', new ParseMongoIdPipe({ required: false })) facultyId?: Types.ObjectId,
+    @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
+    @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
     @Query('title') title?: string,
     @Query(
       'fields',
@@ -109,7 +110,7 @@ export class GroupController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete('/delete/:groupId')
-  async delete(@Param('groupId', ParseMongoIdPipe) groupId: Types.ObjectId) {
+  async delete(@Param('groupId', new ParseMongoIdPipe()) groupId: Types.ObjectId) {
     return this.groupService.delete(groupId)
   }
 }

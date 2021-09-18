@@ -24,8 +24,8 @@ export class AppVersionController {
 
   @Get('/')
   async get(
-    @Query('os', OsPipe) os?: typeof OSs[number],
-    @Query('version', AppVersionPipe) version?: string
+    @Query('os', new OsPipe({ required: false })) os?: typeof OSs[number],
+    @Query('version', new AppVersionPipe({ required: false })) version?: string
   ) {
     const request = checkAlternativeQueryParameters<GetAppVersionEnum>(
       { required: { os, version }, enum: GetAppVersionEnum.check },

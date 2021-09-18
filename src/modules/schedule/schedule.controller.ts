@@ -65,8 +65,8 @@ export class ScheduleController {
 
   @Get('/')
   async get(
-    @Query('groupId', ParseMongoIdPipe) groupId: Types.ObjectId,
-    @Query('updatedAt', ParseDatePipe) updatedAt: Date,
+    @Query('groupId', new ParseMongoIdPipe()) groupId: Types.ObjectId,
+    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date,
     @Query(
       'fields',
       new ParseFieldsPipe({
@@ -86,7 +86,7 @@ export class ScheduleController {
       case GetScheduleEnum.groupId:
         const group = await this.groupService.getById(groupId, ['lastScheduleUpdate'])
 
-        if (!(updatedAt < group.lastScheduleUpdate)) {
+        if (updatedAt && updatedAt >= group.lastScheduleUpdate) {
           return {}
         }
 

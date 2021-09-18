@@ -20,7 +20,9 @@ export class WeeksCountController {
   constructor(private readonly weeksCountService: WeeksCountService) {}
 
   @Get('/')
-  async getWeeksCount(@Query('updatedAt', ParseDatePipe) updatedAt?: Date) {
+  async getWeeksCount(
+    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
+  ) {
     const request = checkAlternativeQueryParameters<GetWeeksCountEnum>({
       updatedAt,
       enum: GetWeeksCountEnum.get,

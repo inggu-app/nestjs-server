@@ -44,9 +44,9 @@ export class FacultyController {
 
   @Get('/')
   async get(
-    @Query('facultyId', ParseMongoIdPipe) facultyId?: Types.ObjectId,
-    @Query('page', CustomParseIntPipe) page?: number,
-    @Query('count', CustomParseIntPipe) count?: number,
+    @Query('facultyId', new ParseMongoIdPipe({ required: false })) facultyId?: Types.ObjectId,
+    @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
+    @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
     @Query('title') title?: string,
     @Query(
       'fields',
@@ -87,7 +87,7 @@ export class FacultyController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete('/delete/:facultyId')
-  async delete(@Param('facultyId', ParseMongoIdPipe) facultyId: Types.ObjectId) {
+  async delete(@Param('facultyId', new ParseMongoIdPipe()) facultyId: Types.ObjectId) {
     await this.facultyService.delete(facultyId)
 
     await this.groupService.deleteAllByFacultyId(facultyId)

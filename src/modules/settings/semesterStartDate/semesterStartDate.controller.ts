@@ -20,7 +20,9 @@ export class SemesterStartDateController {
   constructor(private readonly semesterStartDateService: SemesterStartDateService) {}
 
   @Get('/')
-  async getSemesterStartTime(@Query('updatedAt', ParseDatePipe) updatedAt?: Date) {
+  async getSemesterStartTime(
+    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
+  ) {
     const request = checkAlternativeQueryParameters<GetSemesterStartDateEnum>({
       updatedAt,
       enum: GetSemesterStartDateEnum.get,

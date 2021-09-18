@@ -20,7 +20,9 @@ export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}
 
   @Get('/')
-  async getCallSchedule(@Query('updatedAt', ParseDatePipe) updatedAt?: Date) {
+  async getCallSchedule(
+    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
+  ) {
     const request = checkAlternativeQueryParameters<GetCallScheduleEnum>({
       updatedAt,
       enum: GetCallScheduleEnum.get,
