@@ -15,41 +15,43 @@ import { OsPipe } from '../../../global/pipes/os.pipe'
 import { AppVersionPipe } from '../../../global/pipes/appVersion.pipe'
 import { checkAppVersion } from './appVersion.utils'
 import { OwnerJwtAuthGuard } from '../../../global/guards/ownerJwtAuth.guard'
+import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
+import { GetAppVersionEnum } from './appVersion.constants'
 
 @Controller()
 export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}
 
-  @Get('/get')
-  getAppVersion() {
-    return this.appVersionService.getActiveAppVersion()
-  }
-
-  @Get('/check')
-  async checkAppVersion(
-    @Query('os', OsPipe) os: typeof OSs[number],
-    @Query('version', AppVersionPipe) version: string
+  @Get('/')
+  async get(
+    @Query('os', OsPipe) os?: typeof OSs[number],
+    @Query('version', AppVersionPipe) version?: string
   ) {
-    const osVersions = await this.appVersionService.getActiveAppVersion()
+    const request = checkAlternativeQueryParameters<GetAppVersionEnum>(
+      { required: { os, version }, enum: GetAppVersionEnum.check },
+      { enum: GetAppVersionEnum.get }
+    )
 
-    if (os === 'android' && osVersions) {
-      return {
-        isHaveUpdate: checkAppVersion(osVersions.androidVersion, version),
-      }
-    } else if (os === 'ios' && osVersions) {
-      return {
-        isHaveUpdate: checkAppVersion(osVersions.iosVersion, version),
-      }
-    } else {
-      return {
-        isHaveUpdate: false,
-      }
+    switch (request.enum) {
+      case GetAppVersionEnum.get:
+        return this.appVersionService.getActiveAppVersion()
+      case GetAppVersionEnum.check:
+        const osVersions = await this.appVersionService.getActiveAppVersion()
+
+        return {
+          isHaveUpdate: osVersions
+            ? checkAppVersion(
+                request.os === 'android' ? osVersions.androidVersion : osVersions.iosVersion,
+                request.version
+              )
+            : false,
+        }
     }
   }
 
   @UseGuards(OwnerJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/create')
+  @Post('/')
   async createAppVersion(@Body() dto: CreateAppVersionDto) {
     await this.appVersionService.deleteActiveAppVersion()
 

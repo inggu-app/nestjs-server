@@ -20,7 +20,6 @@ import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
 import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { GroupService } from '../group/group.service'
-import { GROUP_WITH_ID_NOT_FOUND } from '../group/group.constants'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
@@ -32,6 +31,7 @@ import {
 } from './responsible.constants'
 import { ResponsibleField } from './responsible.constants'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
+import { GROUP_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 
 @Controller()
 export class ResponsibleController {

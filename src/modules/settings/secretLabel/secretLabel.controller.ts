@@ -12,20 +12,30 @@ import { CreateSecretLabelDto } from './dto/createSecretLabel.dto'
 import { SecretLabelService } from './secretLabel.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 import { AdminJwtAuthGuard } from '../../../global/guards/adminJwtAuth.guard'
+import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
+import { GetSecretLabelEnum } from './secretLabel.constants'
 
 @Controller()
 export class SecretLabelController {
   constructor(private readonly secretLabelService: SecretLabelService) {}
 
-  @Get('/get')
-  async getSecretLabel(@Query('updatedAt', ParseDatePipe) updatedAt: Date) {
-    const secretLabel = await this.secretLabelService.getActiveSecretLabel(updatedAt)
-    return secretLabel || {}
+  @Get('/')
+  async getSecretLabel(@Query('updatedAt', ParseDatePipe) updatedAt?: Date) {
+    const request = checkAlternativeQueryParameters<GetSecretLabelEnum>({
+      updatedAt,
+      enum: GetSecretLabelEnum.get,
+    })
+
+    switch (request.enum) {
+      case GetSecretLabelEnum.get:
+        const secretLabel = await this.secretLabelService.getActiveSecretLabel(request.updatedAt)
+        return secretLabel || {}
+    }
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/create')
+  @Post('/')
   async createSecretLabel(@Body() dto: CreateSecretLabelDto) {
     await this.secretLabelService.deleteActiveSecretLabel()
 
