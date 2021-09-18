@@ -19,6 +19,15 @@ import { GetCallScheduleEnum } from './callSchedule.constants'
 export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}
 
+  @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Post('/')
+  async createCallSchedule(@Body() dto: CreateCallScheduleDto) {
+    await this.callScheduleService.deleteActiveCallSchedule()
+
+    return this.callScheduleService.createCallSchedule(dto)
+  }
+
   @Get('/')
   async getCallSchedule(
     @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
@@ -33,14 +42,5 @@ export class CallScheduleController {
         const callSchedule = await this.callScheduleService.getActiveCallSchedule(request.updatedAt)
         return callSchedule || {}
     }
-  }
-
-  @UseGuards(AdminJwtAuthGuard)
-  @UsePipes(new ValidationPipe())
-  @Post('/')
-  async createCallSchedule(@Body() dto: CreateCallScheduleDto) {
-    await this.callScheduleService.deleteActiveCallSchedule()
-
-    return this.callScheduleService.createCallSchedule(dto)
   }
 }

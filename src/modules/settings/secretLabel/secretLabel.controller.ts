@@ -19,6 +19,15 @@ import { GetSecretLabelEnum } from './secretLabel.constants'
 export class SecretLabelController {
   constructor(private readonly secretLabelService: SecretLabelService) {}
 
+  @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Post('/')
+  async createSecretLabel(@Body() dto: CreateSecretLabelDto) {
+    await this.secretLabelService.deleteActiveSecretLabel()
+
+    return this.secretLabelService.createSecretLabel(dto)
+  }
+
   @Get('/')
   async getSecretLabel(
     @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
@@ -33,14 +42,5 @@ export class SecretLabelController {
         const secretLabel = await this.secretLabelService.getActiveSecretLabel(request.updatedAt)
         return secretLabel || {}
     }
-  }
-
-  @UseGuards(AdminJwtAuthGuard)
-  @UsePipes(new ValidationPipe())
-  @Post('/')
-  async createSecretLabel(@Body() dto: CreateSecretLabelDto) {
-    await this.secretLabelService.deleteActiveSecretLabel()
-
-    return this.secretLabelService.createSecretLabel(dto)
   }
 }

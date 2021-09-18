@@ -22,6 +22,15 @@ import { GetAppVersionEnum } from './appVersion.constants'
 export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}
 
+  @UseGuards(OwnerJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Post('/')
+  async createAppVersion(@Body() dto: CreateAppVersionDto) {
+    await this.appVersionService.deleteActiveAppVersion()
+
+    return this.appVersionService.createAppVersion(dto)
+  }
+
   @Get('/')
   async get(
     @Query('os', new OsPipe({ required: false })) os?: typeof OSs[number],
@@ -47,14 +56,5 @@ export class AppVersionController {
             : false,
         }
     }
-  }
-
-  @UseGuards(OwnerJwtAuthGuard)
-  @UsePipes(new ValidationPipe())
-  @Post('/')
-  async createAppVersion(@Body() dto: CreateAppVersionDto) {
-    await this.appVersionService.deleteActiveAppVersion()
-
-    return this.appVersionService.createAppVersion(dto)
   }
 }

@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
   Query,
@@ -36,6 +35,15 @@ export class GroupController {
     private readonly facultyService: FacultyService,
     private readonly responsibleService: ResponsibleService
   ) {}
+
+  @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Post('/')
+  async create(@Body() dto: CreateGroupDto) {
+    await this.facultyService.getById(Types.ObjectId(dto.faculty))
+
+    return this.groupService.create(dto)
+  }
 
   @Get('/')
   async get(
@@ -94,23 +102,14 @@ export class GroupController {
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/create')
-  async create(@Body() dto: CreateGroupDto) {
-    await this.facultyService.getById(Types.ObjectId(dto.faculty))
-
-    return this.groupService.create(dto)
-  }
-
-  @UseGuards(AdminJwtAuthGuard)
-  @UsePipes(new ValidationPipe())
   @Patch('/')
   async update(@Body() dto: UpdateGroupDto) {
     return this.groupService.update(dto)
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete('/delete/:groupId')
-  async delete(@Param('groupId', new ParseMongoIdPipe()) groupId: Types.ObjectId) {
-    return this.groupService.delete(groupId)
+  @Delete('/')
+  async delete(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
+    return this.groupService.delete(id)
   }
 }

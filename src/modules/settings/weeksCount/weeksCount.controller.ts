@@ -19,6 +19,15 @@ import { GetWeeksCountEnum } from './weeksCount.constants'
 export class WeeksCountController {
   constructor(private readonly weeksCountService: WeeksCountService) {}
 
+  @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Post('/')
+  async createWeeksCount(@Body() dto: CreateWeeksCountDto) {
+    await this.weeksCountService.deleteActiveWeeksCount()
+
+    return this.weeksCountService.createWeeksCount(dto)
+  }
+
   @Get('/')
   async getWeeksCount(
     @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
@@ -33,14 +42,5 @@ export class WeeksCountController {
         const weeksCount = await this.weeksCountService.getActiveWeeksCount(updatedAt)
         return weeksCount || {}
     }
-  }
-
-  @UseGuards(AdminJwtAuthGuard)
-  @UsePipes(new ValidationPipe())
-  @Post('/')
-  async createWeeksCount(@Body() dto: CreateWeeksCountDto) {
-    await this.weeksCountService.deleteActiveWeeksCount()
-
-    return this.weeksCountService.createWeeksCount(dto)
   }
 }

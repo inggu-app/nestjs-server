@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
   Query,
@@ -71,8 +70,8 @@ export class AdminController {
   }
 
   @UseGuards(OwnerJwtAuthGuard)
-  @Patch('/reset-password/:id')
-  resetPassword(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
+  @Patch('/reset-password')
+  resetPassword(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.adminService.resetPassword(id)
   }
 
@@ -84,8 +83,8 @@ export class AdminController {
   }
 
   @UseGuards(OwnerJwtAuthGuard)
-  @Delete('/:id')
-  delete(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
+  @Delete('/')
+  delete(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.adminService.delete(id)
   }
 

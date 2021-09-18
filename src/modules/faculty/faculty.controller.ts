@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
   Query,
@@ -37,7 +36,7 @@ export class FacultyController {
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/create')
+  @Post('/')
   create(@Body() dto: CreateFacultyDto) {
     return this.facultyService.create(dto)
   }
@@ -86,10 +85,10 @@ export class FacultyController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete('/delete/:facultyId')
-  async delete(@Param('facultyId', new ParseMongoIdPipe()) facultyId: Types.ObjectId) {
-    await this.facultyService.delete(facultyId)
+  @Delete('/')
+  async delete(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
+    await this.facultyService.delete(id)
 
-    await this.groupService.deleteAllByFacultyId(facultyId)
+    await this.groupService.deleteAllByFacultyId(id)
   }
 }

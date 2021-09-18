@@ -19,6 +19,15 @@ import { GetSemesterStartDateEnum } from './semesterStartDate.constants'
 export class SemesterStartDateController {
   constructor(private readonly semesterStartDateService: SemesterStartDateService) {}
 
+  @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Post('/')
+  async createSemesterStartTime(@Body() dto: CreateSemesterStartDateDto) {
+    await this.semesterStartDateService.deleteActiveSemesterStartDate()
+
+    return this.semesterStartDateService.createSemesterStartDate(dto)
+  }
+
   @Get('/')
   async getSemesterStartTime(
     @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
@@ -35,14 +44,5 @@ export class SemesterStartDateController {
         )
         return semesterStartTime || {}
     }
-  }
-
-  @UseGuards(AdminJwtAuthGuard)
-  @UsePipes(new ValidationPipe())
-  @Post('/')
-  async createSemesterStartTime(@Body() dto: CreateSemesterStartDateDto) {
-    await this.semesterStartDateService.deleteActiveSemesterStartDate()
-
-    return this.semesterStartDateService.createSemesterStartDate(dto)
   }
 }

@@ -5,7 +5,6 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Param,
   Patch,
   Post,
   Query,
@@ -42,7 +41,7 @@ export class ResponsibleController {
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/create')
+  @Post('/')
   async create(@Body() dto: CreateResponsibleDto) {
     let nonexistentGroup: Types.ObjectId | null = null
 
@@ -114,21 +113,21 @@ export class ResponsibleController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Patch('/reset-password/:id')
-  async resetPassword(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
+  @Patch('/reset-password')
+  async resetPassword(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.responsibleService.resetPassword(id)
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Patch()
+  @Patch('/')
   async update(@Body() dto: UpdateResponsibleDto) {
     return this.responsibleService.update(dto)
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete('/:id')
-  async delete(@Param('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
+  @Delete('/')
+  async delete(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.responsibleService.delete(id)
   }
 
