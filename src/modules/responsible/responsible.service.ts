@@ -90,9 +90,15 @@ export class ResponsibleService {
   }
 
   async update(dto: UpdateResponsibleDto) {
-    const loginCandidate = await this.responsibleModel.findOne({ login: dto.login })
+    const loginCandidateById = await this.responsibleModel.findById(dto.id)
 
-    if (loginCandidate && loginCandidate?.id !== dto.id) {
+    if (!loginCandidateById) {
+      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(dto.id), HttpStatus.BAD_REQUEST)
+    }
+
+    const loginCandidateByLogin = await this.responsibleModel.findOne({ login: dto.login })
+
+    if (loginCandidateByLogin && loginCandidateByLogin?.id !== dto.id) {
       throw new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
     }
 
@@ -120,7 +126,7 @@ export class ResponsibleService {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
     }
 
-    return candidate
+    return this.responsibleModel.findById(dto.id, { hashedPassword: 0, hashedUniqueKey: 0 })
   }
 
   async resetPassword(id: Types.ObjectId) {

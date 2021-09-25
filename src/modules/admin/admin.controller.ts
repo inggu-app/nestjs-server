@@ -63,7 +63,7 @@ export class AdminController {
 
     switch (request.enum) {
       case GetAdminsEnum.adminId:
-        return this.adminService.getById(request.adminId)
+        return this.adminService.getById(request.adminId, request.fields)
       case GetAdminsEnum.all:
         return this.adminService.getAll(request.page, request.count, request.name, request.fields)
     }

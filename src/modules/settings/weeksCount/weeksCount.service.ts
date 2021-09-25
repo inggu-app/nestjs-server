@@ -11,13 +11,11 @@ export class WeeksCountService {
     @InjectModel(WeeksCountModel) private readonly weeksCountModel: ModelType<WeeksCountModel>
   ) {}
 
-  getActiveWeeksCount(updatedAt?: Date) {
-    const filter = updatedAt ? { updatedAt: { $gt: updatedAt } } : {}
+  getActiveWeeksCount() {
     return this.weeksCountModel.findOne(
       {
         isActive: true,
         settingType: WEEKS_COUNT_TYPE,
-        ...filter,
       },
       { count: 1, updatedAt: 1, _id: 0 }
     )

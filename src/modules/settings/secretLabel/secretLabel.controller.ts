@@ -39,8 +39,19 @@ export class SecretLabelController {
 
     switch (request.enum) {
       case GetSecretLabelEnum.get:
-        const secretLabel = await this.secretLabelService.getActiveSecretLabel(request.updatedAt)
-        return secretLabel || {}
+        const secretLabel = await this.secretLabelService.getActiveSecretLabel()
+
+        if (
+          (secretLabel && secretLabel?.updatedAt && request.updatedAt < secretLabel?.updatedAt) ||
+          !request.updatedAt
+        ) {
+          return secretLabel
+        } else {
+          return {
+            label: '',
+            updatedAt: secretLabel?.updatedAt,
+          }
+        }
     }
   }
 }

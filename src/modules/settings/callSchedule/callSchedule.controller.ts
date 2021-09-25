@@ -39,8 +39,21 @@ export class CallScheduleController {
 
     switch (request.enum) {
       case GetCallScheduleEnum.get:
-        const callSchedule = await this.callScheduleService.getActiveCallSchedule(request.updatedAt)
-        return callSchedule || {}
+        const callSchedule = await this.callScheduleService.getActiveCallSchedule()
+
+        if (
+          (callSchedule &&
+            callSchedule?.updatedAt &&
+            request.updatedAt < callSchedule?.updatedAt) ||
+          !request.updatedAt
+        ) {
+          return callSchedule
+        } else {
+          return {
+            schedule: [],
+            updatedAt: callSchedule?.updatedAt,
+          }
+        }
     }
   }
 }

@@ -11,10 +11,9 @@ export class CallScheduleService {
     @InjectModel(CallScheduleModel) private readonly callScheduleModel: ModelType<CallScheduleModel>
   ) {}
 
-  getActiveCallSchedule(updatedAt?: Date) {
-    const filter = updatedAt ? { updatedAt: { $gt: updatedAt } } : {}
+  getActiveCallSchedule() {
     return this.callScheduleModel.findOne(
-      { isActive: true, settingType: CALL_SCHEDULE_TYPE, ...filter },
+      { isActive: true, settingType: CALL_SCHEDULE_TYPE },
       { schedule: 1, updatedAt: 1, _id: 0 }
     )
   }

@@ -12,13 +12,11 @@ export class SemesterStartDateService {
     private readonly semesterStartDateModel: ModelType<SemesterStartDateModel>
   ) {}
 
-  getActiveSemesterStartDate(updatedAt?: Date) {
-    const filter = updatedAt ? { updatedAt: { $gt: updatedAt } } : {}
+  getActiveSemesterStartDate() {
     return this.semesterStartDateModel.findOne(
       {
         isActive: true,
         settingType: SEMESTER_START_TIME_TYPE,
-        ...filter,
       },
       { date: 1, updatedAt: 1, _id: 0 }
     )

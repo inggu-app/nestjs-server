@@ -39,10 +39,21 @@ export class SemesterStartDateController {
 
     switch (request.enum) {
       case GetSemesterStartDateEnum.get:
-        const semesterStartTime = await this.semesterStartDateService.getActiveSemesterStartDate(
-          updatedAt
-        )
-        return semesterStartTime || {}
+        const semesterStartTime = await this.semesterStartDateService.getActiveSemesterStartDate()
+
+        if (
+          (semesterStartTime &&
+            semesterStartTime?.updatedAt &&
+            request.updatedAt < semesterStartTime?.updatedAt) ||
+          !request.updatedAt
+        ) {
+          return semesterStartTime
+        } else {
+          return {
+            date: new Date(0),
+            updatedAt: semesterStartTime?.updatedAt,
+          }
+        }
     }
   }
 }

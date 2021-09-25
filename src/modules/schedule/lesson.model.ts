@@ -3,10 +3,11 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { FacultyModel } from '../faculty/faculty.model'
 import { Types } from 'mongoose'
-import { ScheduleFieldsEnum } from './schedule.constants'
+import { LessonFieldsEnum, WeeksTypeEnum } from './schedule.constants'
+import { WeekDaysEnum } from '../../global/enums/WeekDays'
 
 type Lesson = {
-  [key in ScheduleFieldsEnum]: any
+  [key in LessonFieldsEnum]: any
 }
 
 export interface LessonModel extends Base {}
@@ -26,8 +27,21 @@ export class LessonModel extends TimeStamps implements Lesson {
   @prop()
   classroom: string
 
-  @prop({ enum: [1, 2, 3, 4, 5, 6, 7] })
+  @prop({
+    enum: [
+      WeekDaysEnum.MONDAY,
+      WeekDaysEnum.TUESDAY,
+      WeekDaysEnum.WEDNESDAY,
+      WeekDaysEnum.THURSDAY,
+      WeekDaysEnum.FRIDAY,
+      WeekDaysEnum.SATURDAY,
+      WeekDaysEnum.SUNDAY,
+    ],
+  })
   weekDay: number
+
+  @prop({ enum: [WeeksTypeEnum.FIRST, WeeksTypeEnum.SECOND, WeeksTypeEnum.WEEKS] })
+  weeksType: number
 
   @prop({ type: [Number] })
   weeks: number[]

@@ -21,10 +21,10 @@ export class CustomParseIntPipe implements PipeTransform<any, number | undefined
   transform(value: any): number | undefined {
     if (!this.options.required && value === undefined) return value
 
-    if (!isInt(Number(value))) {
+    if (!isInt(parseInt(value))) {
       throw new HttpException(INCORRECT_INT, HttpStatus.BAD_REQUEST)
     }
 
-    return Number(value)
+    return parseInt(value)
   }
 }

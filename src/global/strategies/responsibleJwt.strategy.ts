@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { ConfigService } from '@nestjs/config'
@@ -7,6 +7,8 @@ import { ICreateScheduleDto } from '../../modules/schedule/dto/create-schedule.d
 import { ResponsibleAccessTokenData } from '../../modules/responsible/responsible.service'
 import { RESPONSIBLE_STRATEGY_NAME } from '../constants/strategies.constants'
 import { checkJwtType, responsibleExampleAccessTokenData } from '../utils/checkJwtType'
+import { isMongoId } from 'class-validator'
+import { INVALID_MONGO_ID } from '../constants/errors.constants'
 
 @Injectable()
 export class ResponsibleJwtStrategy extends PassportStrategy(Strategy, RESPONSIBLE_STRATEGY_NAME) {
@@ -23,6 +25,10 @@ export class ResponsibleJwtStrategy extends PassportStrategy(Strategy, RESPONSIB
     request: Request<any, any, ICreateScheduleDto>,
     accessTokenData: ResponsibleAccessTokenData
   ) {
+    if (!isMongoId(request.body.group)) {
+      throw new HttpException(INVALID_MONGO_ID, HttpStatus.BAD_REQUEST)
+    }
+
     checkJwtType(accessTokenData, responsibleExampleAccessTokenData)
     if (!accessTokenData.groups.includes(request.body.group)) {
       throw new ForbiddenException()

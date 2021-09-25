@@ -35,3 +35,6 @@ export const RESPONSIBLE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) =>
   `Ответственный с id "${id}" не существует`
 export const RESPONSIBLE_WITH_LOGIN_EXISTS = (login: string) =>
   `Ответственный с логином "${login}" уже существует`
+
+export const SCHEDULE_EXISTS =
+  'Расписание для этой группы уже существует. Попробуйте обновить расписание'

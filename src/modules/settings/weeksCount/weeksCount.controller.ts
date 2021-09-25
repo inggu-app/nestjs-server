@@ -39,8 +39,19 @@ export class WeeksCountController {
 
     switch (request.enum) {
       case GetWeeksCountEnum.get:
-        const weeksCount = await this.weeksCountService.getActiveWeeksCount(updatedAt)
-        return weeksCount || {}
+        const weeksCount = await this.weeksCountService.getActiveWeeksCount()
+
+        if (
+          (weeksCount && weeksCount?.updatedAt && request.updatedAt < weeksCount?.updatedAt) ||
+          !request.updatedAt
+        ) {
+          return weeksCount
+        } else {
+          return {
+            count: 0,
+            updatedAt: weeksCount?.updatedAt,
+          }
+        }
     }
   }
 }
