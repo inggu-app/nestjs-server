@@ -1,29 +1,16 @@
-import {
-  ArrayMinSize,
-  IsArray,
-  IsIn,
-  IsMongoId,
-  IsNumber,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator'
+import { IsArray, IsIn, IsMongoId, IsNumber, IsString, Min, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
+import { WeekDaysEnum } from '../../../global/enums/WeekDays'
+import { LessonFieldsEnum, WeeksTypeEnum } from '../schedule.constants'
 
 export interface ICreateScheduleDto {
   group: Types.ObjectId
-  schedule: ILesson[]
+  schedule: LessonType[]
 }
 
-interface ILesson {
-  title: string
-  teacher: string
-  number: number
-  classroom: string
-  weekDay: 1 | 2 | 3 | 4 | 5 | 6 | 7
-  weeks: number[]
-  type: string
+type LessonType = {
+  [key in keyof Omit<typeof LessonFieldsEnum, 'group'>]: any
 }
 
 export class CreateScheduleDto implements ICreateScheduleDto {
@@ -33,10 +20,10 @@ export class CreateScheduleDto implements ICreateScheduleDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => Lesson)
-  schedule: Lesson[]
+  schedule: LessonType[]
 }
 
-class Lesson implements ILesson {
+class Lesson implements LessonType {
   @IsString()
   title: string
 
@@ -50,11 +37,21 @@ class Lesson implements ILesson {
   @IsString()
   classroom: string
 
-  @IsIn([1, 2, 3, 4, 5, 6, 7])
-  weekDay: 1 | 2 | 3 | 4 | 5 | 6 | 7
+  @IsIn([
+    WeekDaysEnum.MONDAY,
+    WeekDaysEnum.TUESDAY,
+    WeekDaysEnum.WEDNESDAY,
+    WeekDaysEnum.THURSDAY,
+    WeekDaysEnum.FRIDAY,
+    WeekDaysEnum.SATURDAY,
+    WeekDaysEnum.SUNDAY,
+  ])
+  weekDay: WeekDaysEnum
+
+  @IsIn([WeeksTypeEnum.WEEKS, WeeksTypeEnum.FIRST, WeeksTypeEnum.SECOND])
+  weeksType: WeeksTypeEnum
 
   @IsNumber({}, { each: true })
-  @ArrayMinSize(1)
   weeks: number[]
 
   @IsString()

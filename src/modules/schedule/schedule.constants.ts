@@ -1,21 +1,17 @@
 import { DefaultFields } from '../../global/enums/defaultFields'
-
-export const GROUP_NOT_FOUND = 'Группы с таким id не существует'
-export const SCHEDULE_EXISTS =
-  'Расписание для этой группы уже существует. Попробуйте обновить расписание'
-
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 
 export enum GetScheduleEnum {
   groupId,
 }
 
-export enum ScheduleFieldsEnum {
+export enum LessonFieldsEnum {
   title = 'title',
   teacher = 'teacher',
   number = 'number',
   classroom = 'classroom',
   weekDay = 'weekDay',
+  weeksType = 'weeksType',
   weeks = 'weeks',
   type = 'type',
   group = 'group',
@@ -32,8 +28,14 @@ export const ScheduleAdditionalFieldsEnum = {
 }
 
 export type ScheduleField =
-  | keyof typeof ScheduleFieldsEnum
+  | keyof typeof LessonFieldsEnum
   | keyof typeof _ScheduleAdditionalFieldsEnum
 
-enumKeyValuesMatch(ScheduleFieldsEnum)
+enumKeyValuesMatch(LessonFieldsEnum)
 enumKeyValuesMatch(_ScheduleAdditionalFieldsEnum)
+
+export enum WeeksTypeEnum {
+  WEEKS,
+  FIRST,
+  SECOND,
+}

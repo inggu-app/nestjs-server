@@ -18,11 +18,9 @@ import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import {
   GetScheduleEnum,
-  GROUP_NOT_FOUND,
-  SCHEDULE_EXISTS,
   ScheduleAdditionalFieldsEnum,
   ScheduleField,
-  ScheduleFieldsEnum,
+  LessonFieldsEnum,
 } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
@@ -31,6 +29,7 @@ import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import { GROUP_WITH_ID_NOT_FOUND, SCHEDULE_EXISTS } from '../../global/constants/errors.constants'
 
 @Controller()
 export class ScheduleController {
@@ -45,10 +44,6 @@ export class ScheduleController {
   @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
     const groupCandidate = await this.groupService.getById(dto.group)
-
-    if (!groupCandidate) {
-      throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
-    }
 
     const scheduleCandidate = await this.scheduleService.get(dto.group, [])
 
@@ -70,7 +65,7 @@ export class ScheduleController {
     @Query(
       'fields',
       new ParseFieldsPipe({
-        fieldsEnum: ScheduleFieldsEnum,
+        fieldsEnum: LessonFieldsEnum,
         additionalFieldsEnum: ScheduleAdditionalFieldsEnum,
       })
     )
@@ -87,11 +82,14 @@ export class ScheduleController {
         const group = await this.groupService.getById(groupId, ['lastScheduleUpdate'])
 
         if (updatedAt && updatedAt >= group.lastScheduleUpdate) {
-          return {}
+          return {
+            schedule: [],
+            updatedAt: group.lastScheduleUpdate,
+          }
         }
 
         const lessonsSchedule = await this.scheduleService.get(groupId, fields)
-        const callSchedule = await this.callScheduleService.getActiveCallSchedule(new Date(0))
+        const callSchedule = await this.callScheduleService.getActiveCallSchedule()
 
         const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
           const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
@@ -118,7 +116,7 @@ export class ScheduleController {
     const candidate = await this.groupService.updateLastScheduleUpdate(dto, new Date())
 
     if (!candidate) {
-      throw new HttpException(GROUP_NOT_FOUND, HttpStatus.NOT_FOUND)
+      throw new HttpException(GROUP_WITH_ID_NOT_FOUND(dto.group), HttpStatus.NOT_FOUND)
     }
 
     await this.scheduleService.delete(dto.group)
