@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common'
 import { AppVersionController } from './appVersion.controller'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { AppVersionService } from './appVersion.service'
-import { AppVersionModel } from './appVersion.model'
+import { AndroidAppVersionModel } from './models/androidAppVersion.model'
+import { IosAppVersionModel } from './models/iosAppVersion.model'
 
 @Module({
   controllers: [AppVersionController],
@@ -10,7 +11,13 @@ import { AppVersionModel } from './appVersion.model'
   imports: [
     TypegooseModule.forFeature([
       {
-        typegooseClass: AppVersionModel,
+        typegooseClass: AndroidAppVersionModel,
+        schemaOptions: {
+          collection: 'Settings',
+        },
+      },
+      {
+        typegooseClass: IosAppVersionModel,
         schemaOptions: {
           collection: 'Settings',
         },

@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -9,14 +11,15 @@ import {
   ValidationPipe,
 } from '@nestjs/common'
 import { AppVersionService } from './appVersion.service'
-import { CreateAppVersionDto } from './dto/createAppVersion.dto'
+import { SetFeaturesDto } from './dto/setFeaturesDto'
 import { OSs } from '../../../global/constants/other.constants'
 import { OsPipe } from '../../../global/pipes/os.pipe'
 import { AppVersionPipe } from '../../../global/pipes/appVersion.pipe'
-import { checkAppVersion } from './appVersion.utils'
 import { OwnerJwtAuthGuard } from '../../../global/guards/ownerJwtAuth.guard'
 import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
 import { GetAppVersionEnum } from './appVersion.constants'
+import { SetCurrentVersionDto } from './dto/setCurrentVersionDto'
+import { DeleteVersionDto } from './dto/deleteVersionDto'
 
 @Controller()
 export class AppVersionController {
@@ -25,10 +28,15 @@ export class AppVersionController {
   @UseGuards(OwnerJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/')
-  async createAppVersion(@Body() dto: CreateAppVersionDto) {
-    await this.appVersionService.deleteActiveAppVersion()
+  setCurrentVersion(@Body() dto: SetCurrentVersionDto) {
+    return this.appVersionService.setCurrentVersion(dto.os, dto.version)
+  }
 
-    return this.appVersionService.createAppVersion(dto)
+  @UseGuards(OwnerJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Patch('/')
+  setFeatures(@Body() dto: SetFeaturesDto) {
+    return this.appVersionService.setFeatures(dto.os, dto)
   }
 
   @Get('/')
@@ -38,23 +46,21 @@ export class AppVersionController {
   ) {
     const request = checkAlternativeQueryParameters<GetAppVersionEnum>(
       { required: { os, version }, enum: GetAppVersionEnum.check },
-      { enum: GetAppVersionEnum.get }
+      { required: { os }, enum: GetAppVersionEnum.get }
     )
 
     switch (request.enum) {
       case GetAppVersionEnum.get:
-        return this.appVersionService.getActiveAppVersion()
+        return this.appVersionService.getCurrentVersion(request.os)
       case GetAppVersionEnum.check:
-        const osVersions = await this.appVersionService.getActiveAppVersion()
-
-        return {
-          isHaveUpdate: osVersions
-            ? checkAppVersion(
-                request.os === 'android' ? osVersions.androidVersion : osVersions.iosVersion,
-                request.version
-              )
-            : false,
-        }
+        return this.appVersionService.get(request.os, request.version)
     }
+  }
+
+  @UseGuards(OwnerJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  @Delete('/')
+  deleteVersion(@Body() dto: DeleteVersionDto) {
+    return this.appVersionService.deleteVersion(dto)
   }
 }

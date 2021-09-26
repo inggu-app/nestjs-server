@@ -19,7 +19,6 @@ export class AppVersionPipe implements PipeTransform<any, Date | undefined> {
   }
 
   transform(value: any): Date | undefined {
-    console.log('AppVersionPipe', this.options)
     if (!this.options.required && value === undefined) return value
 
     if (!matches(value, /\d+.\d+.\d+/)) {
