@@ -10,6 +10,7 @@ import { ScheduleModule } from '../schedule/schedule.module'
 import { SettingsModule } from '../settings/settings.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
 import { AdminModule } from '../admin/admin.module'
+import { NoteModule } from '../note/note.module'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AdminModule } from '../admin/admin.module'
     SettingsModule,
     ResponsibleModule,
     AdminModule,
+    NoteModule,
     RouterModule.forRoutes(routesConfig),
     ConfigModule.forRoot(),
     TypegooseModule.forRootAsync({
