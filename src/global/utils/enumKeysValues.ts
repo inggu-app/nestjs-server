@@ -5,6 +5,6 @@ export const getEnumKeys = <T>(e: EmptyEnum<T>, valueType: TypesEnum = TypesEnum
   return Object.keys(e).filter(k => typeof e[k as any] === valueType || 'number')
 }
 
-export const getEnumValues = (e: EmptyEnum, valueType: TypesEnum = TypesEnum.NUMBER) => {
+export const getEnumValues = (e: EmptyEnum, valueType: TypesEnum = TypesEnum.NUMBER): string[] => {
   return getEnumKeys(e, valueType).map(k => e[k as any])
 }

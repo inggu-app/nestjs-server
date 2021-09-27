@@ -27,6 +27,7 @@ import { Types } from 'mongoose'
 import { DeviceId } from '../../global/types'
 import { INVALID_NOTE_DEVICE_ID } from '../../global/constants/errors.constants'
 import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
+import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class NoteController {
@@ -64,9 +65,15 @@ export class NoteController {
 
     switch (request.enum) {
       case GetNotesEnum.BY_LESSON:
-        return this.noteService.get(request.lessonId, request.week, request.fields)
+        return normalizeFields(
+          this.noteService.get(request.lessonId, request.week, request.fields),
+          { fields: request.fields, forbiddenFields: NoteForbiddenFieldsEnum }
+        )
       case GetNotesEnum.BY_ID:
-        return this.noteService.getById(request.noteId, request.fields)
+        return normalizeFields(this.noteService.getById(request.noteId, request.fields), {
+          fields: request.fields,
+          forbiddenFields: NoteForbiddenFieldsEnum,
+        })
     }
   }
 
@@ -75,9 +82,8 @@ export class NoteController {
     @Query('id', new ParseMongoIdPipe()) id: Types.ObjectId,
     @Query('deviceId', new CustomParseStringPipe()) deviceId: DeviceId
   ) {
-    const candidate = await this.noteService.getById(id)
+    const candidate = await this.noteService.getById(id, ['deviceId'])
 
-    console.log(candidate, deviceId)
     if (deviceId !== candidate.deviceId) {
       throw new HttpException(INVALID_NOTE_DEVICE_ID(id, deviceId), HttpStatus.BAD_REQUEST)
     }

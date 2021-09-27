@@ -4,11 +4,9 @@ import { NoteModel } from './note.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateNoteDto } from './dto/createNoteDto'
 import { Types } from 'mongoose'
-import { NoteField, NoteForbiddenFieldsEnum } from './note.constants'
+import { NoteField } from './note.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
-import { getEnumValues } from '../../global/utils/enumKeysValues'
-import { TypesEnum } from '../../global/enums/types'
 import { ScheduleService } from '../schedule/schedule.service'
 
 @Injectable()
@@ -27,18 +25,11 @@ export class NoteService {
   async get(lesson: Types.ObjectId, week: number, fields?: NoteField[]) {
     await this.scheduleService.getById(lesson)
 
-    console.log(getEnumValues(NoteForbiddenFieldsEnum, TypesEnum.STRING))
-    return this.noteModel.find(
-      { lesson, week },
-      fieldsArrayToProjection(fields, [], getEnumValues(NoteForbiddenFieldsEnum, TypesEnum.STRING))
-    )
+    return this.noteModel.find({ lesson, week }, fieldsArrayToProjection(fields))
   }
 
   async getById(id: Types.ObjectId, fields?: NoteField[]) {
-    const candidate = await this.noteModel.findById(
-      id,
-      fieldsArrayToProjection(fields, [], getEnumValues(NoteForbiddenFieldsEnum, TypesEnum.STRING))
-    )
+    const candidate = await this.noteModel.findById(id, fieldsArrayToProjection(fields))
 
     if (!candidate) {
       throw new HttpException(NOTE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)

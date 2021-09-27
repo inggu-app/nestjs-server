@@ -94,12 +94,15 @@ export class ScheduleController {
         const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
           const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
 
-          return normalizeFields<ScheduleField[]>(fields, {
-            ...lesson.toObject(),
+          return normalizeFields<ScheduleField[]>(
+            {
+              ...lesson.toObject(),
 
-            startTime: call?.start || new Date(0),
-            endTime: call?.end || new Date(0),
-          })
+              startTime: call?.start || new Date(0),
+              endTime: call?.end || new Date(0),
+            },
+            { fields: request.fields }
+          )
         })
 
         return {

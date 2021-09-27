@@ -4,6 +4,7 @@ import {
   NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER,
   UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER,
 } from '../constants/errors.constants'
+import { getEnumKeys } from '../utils/enumKeysValues'
 
 interface Options {
   fieldsEnum: { [key: string]: string }
@@ -14,14 +15,15 @@ interface Options {
 @Injectable()
 export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined> {
   private readonly fields: string[]
+  private readonly availableFields: string[]
 
   constructor(options?: Options) {
     if (options) {
-      this.fields = ['id', ...Object.keys(options.fieldsEnum)]
+      this.fields = ['id', ...getEnumKeys(options.fieldsEnum)]
       if (options.additionalFieldsEnum)
-        this.fields = [...this.fields, ...Object.keys(options.additionalFieldsEnum)]
+        this.fields = [...this.fields, ...getEnumKeys(options.additionalFieldsEnum)]
       if (options.forbiddenFieldsEnum)
-        this.fields = this.fields.filter(field =>
+        this.availableFields = this.fields.filter(field =>
           options.forbiddenFieldsEnum ? !(field in options.forbiddenFieldsEnum) : false
         )
     }
@@ -29,7 +31,7 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
 
   transform(value: any): string[] | undefined {
     if (typeof value != 'string') {
-      return undefined
+      return this.fields
     } else if (value === '') {
       throw new HttpException(FIELDS_QUERY_PARAMETER_IS_EMPTY, HttpStatus.BAD_REQUEST)
     }
@@ -46,7 +48,7 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
     const receivedFields = value.split(',')
 
     receivedFields.forEach(receivedField => {
-      if (!this.fields.includes(receivedField)) {
+      if (!this.availableFields.includes(receivedField)) {
         throw new HttpException(
           NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER(receivedField),
           HttpStatus.BAD_REQUEST
