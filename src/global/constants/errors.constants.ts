@@ -44,6 +44,7 @@ export const RESPONSIBLE_WITH_LOGIN_EXISTS = (login: string) =>
 
 export const SCHEDULE_EXISTS =
   'Расписание для этой группы уже существует. Попробуйте обновить расписание'
+export const LESSON_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Занятие с id ${id} не существует`
 
 export const NOTE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Заметки с id "${id}" не существует`
 export const INVALID_NOTE_DEVICE_ID = (id: Types.ObjectId, deviceId: DeviceId) =>

@@ -3,9 +3,8 @@ import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { NoteFieldsEnum } from './note.constants'
 import { DeviceId } from '../../global/types'
-import { WeekDaysEnum } from '../../global/enums/WeekDays'
-import { GroupModel } from '../group/group.model'
 import { Types } from 'mongoose'
+import { LessonModel } from '../schedule/lesson.model'
 
 type Note = {
   [key in NoteFieldsEnum]: any
@@ -22,25 +21,9 @@ export class NoteModel extends TimeStamps implements Note {
   @prop()
   deviceId: DeviceId
 
-  @prop({ ref: () => GroupModel })
-  group: Types.ObjectId
-
   @prop()
   week: number
 
-  @prop({
-    enum: [
-      WeekDaysEnum.MONDAY,
-      WeekDaysEnum.TUESDAY,
-      WeekDaysEnum.WEDNESDAY,
-      WeekDaysEnum.THURSDAY,
-      WeekDaysEnum.FRIDAY,
-      WeekDaysEnum.SATURDAY,
-      WeekDaysEnum.SUNDAY,
-    ],
-  })
-  weekDay: number
-
-  @prop()
-  lessonNumber: number
+  @prop({ ref: () => LessonModel })
+  lesson: Types.ObjectId
 }

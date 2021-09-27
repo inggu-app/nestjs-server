@@ -4,13 +4,13 @@ import { NoteController } from './note.controller'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { NoteModel } from './note.model'
-import { GroupModule } from '../group/group.module'
+import { ScheduleModule } from '../schedule/schedule.module'
 
 @Module({
   providers: [NoteService],
   controllers: [NoteController],
   imports: [
-    GroupModule,
+    ScheduleModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: NoteModel,

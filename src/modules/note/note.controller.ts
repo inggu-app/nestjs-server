@@ -13,10 +13,14 @@ import {
 import { NoteService } from './note.service'
 import { CreateNoteDto } from './dto/createNoteDto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import { ParseEnumPipe } from '../../global/pipes/enum.pipe'
-import { WeekDaysEnum } from '../../global/enums/WeekDays'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
-import { GetNotesEnum, NoteField, NoteFieldsEnum, NoteForbiddenFieldsEnum } from './note.constants'
+import {
+  GetNotesEnum,
+  NoteAdditionalFieldsEnum,
+  NoteField,
+  NoteFieldsEnum,
+  NoteForbiddenFieldsEnum,
+} from './note.constants'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
@@ -37,15 +41,13 @@ export class NoteController {
   @Get('/')
   get(
     @Query('noteId', new ParseMongoIdPipe({ required: false })) noteId?: Types.ObjectId,
-    @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
+    @Query('lessonId', new ParseMongoIdPipe({ required: false })) lessonId?: Types.ObjectId,
     @Query('week', new CustomParseIntPipe({ required: false })) week?: number,
-    @Query('weekDay', new ParseEnumPipe({ enum: WeekDaysEnum, required: false }))
-    weekDay?: WeekDaysEnum,
-    @Query('lessonNumber', new CustomParseIntPipe({ required: false })) lessonNumber?: number,
     @Query(
       'fields',
       new ParseFieldsPipe({
         fieldsEnum: NoteFieldsEnum,
+        additionalFieldsEnum: NoteAdditionalFieldsEnum,
         forbiddenFieldsEnum: NoteForbiddenFieldsEnum,
       })
     )
@@ -53,7 +55,7 @@ export class NoteController {
   ) {
     const request = checkAlternativeQueryParameters<GetNotesEnum>(
       {
-        required: { groupId, week, weekDay, lessonNumber },
+        required: { lessonId, week },
         fields,
         enum: GetNotesEnum.BY_LESSON,
       },
@@ -62,13 +64,7 @@ export class NoteController {
 
     switch (request.enum) {
       case GetNotesEnum.BY_LESSON:
-        return this.noteService.get(
-          request.groupId,
-          request.week,
-          request.weekDay,
-          request.lessonNumber,
-          request.fields
-        )
+        return this.noteService.get(request.lessonId, request.week, request.fields)
       case GetNotesEnum.BY_ID:
         return this.noteService.getById(request.noteId, request.fields)
     }
@@ -81,6 +77,7 @@ export class NoteController {
   ) {
     const candidate = await this.noteService.getById(id)
 
+    console.log(candidate, deviceId)
     if (deviceId !== candidate.deviceId) {
       throw new HttpException(INVALID_NOTE_DEVICE_ID(id, deviceId), HttpStatus.BAD_REQUEST)
     }

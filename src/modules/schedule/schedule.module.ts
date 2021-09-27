@@ -24,5 +24,6 @@ import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config
     CallScheduleModule,
     ResponsibleModule,
   ],
+  exports: [ScheduleService],
 })
 export class ScheduleModule {}

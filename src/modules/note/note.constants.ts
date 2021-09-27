@@ -3,14 +3,17 @@ import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 export enum NoteFieldsEnum {
   content = 'content',
   deviceId = 'deviceId',
-  group = 'group',
   week = 'week',
-  weekDay = 'weekDay',
-  lessonNumber = 'lessonNumber',
+  lesson = 'lesson',
 }
 
 export enum NoteForbiddenFieldsEnum {
   deviceId = 'deviceId',
+}
+
+export enum NoteAdditionalFieldsEnum {
+  createdAt = 'createdAt',
+  updatedAt = 'updatedAt',
 }
 
 export type NoteField = keyof typeof NoteFieldsEnum
@@ -20,5 +23,6 @@ export enum GetNotesEnum {
   BY_ID,
 }
 
-enumKeyValuesMatch(NoteForbiddenFieldsEnum)
 enumKeyValuesMatch(NoteFieldsEnum)
+enumKeyValuesMatch(NoteAdditionalFieldsEnum)
+enumKeyValuesMatch(NoteForbiddenFieldsEnum)
