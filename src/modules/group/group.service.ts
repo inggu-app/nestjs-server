@@ -52,6 +52,7 @@ export class GroupService {
       )
       .skip((page - 1) * count)
       .limit(count)
+      .exec()
   }
 
   countAll(title?: string) {

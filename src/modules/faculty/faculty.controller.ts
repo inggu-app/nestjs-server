@@ -26,6 +26,7 @@ import {
   GetFacultiesEnum,
 } from './faculty.constants'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
+import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class FacultyController {
@@ -63,14 +64,22 @@ export class FacultyController {
 
     switch (request.enum) {
       case GetFacultiesEnum.facultyId:
-        return this.facultyService.getById(request.facultyId, request.fields)
+        return normalizeFields(
+          await this.facultyService.getById(request.facultyId, request.fields),
+          {
+            fields: request.fields,
+          }
+        )
       case GetFacultiesEnum.all:
         return {
-          faculties: await this.facultyService.getAll(
-            request.page,
-            request.count,
-            request.title,
-            request.fields
+          faculties: await normalizeFields(
+            await this.facultyService.getAll(
+              request.page,
+              request.count,
+              request.title,
+              request.fields
+            ),
+            { fields: request.fields }
           ),
           count: await this.facultyService.countAll(request.title),
         }

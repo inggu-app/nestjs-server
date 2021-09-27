@@ -14,14 +14,16 @@ interface Options {
 
 @Injectable()
 export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined> {
-  private readonly fields: string[]
-  private readonly availableFields: string[]
+  private readonly fields: string[] = []
+  private readonly availableFields: string[] = []
 
   constructor(options?: Options) {
     if (options) {
       this.fields = ['id', ...getEnumKeys(options.fieldsEnum)]
-      if (options.additionalFieldsEnum)
+      if (options.additionalFieldsEnum) {
         this.fields = [...this.fields, ...getEnumKeys(options.additionalFieldsEnum)]
+        this.availableFields = this.fields
+      }
       if (options.forbiddenFieldsEnum)
         this.availableFields = this.fields.filter(field =>
           options.forbiddenFieldsEnum ? !(field in options.forbiddenFieldsEnum) : false

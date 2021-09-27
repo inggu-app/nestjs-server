@@ -27,6 +27,7 @@ import {
   GroupFieldsEnum,
 } from './group.constants'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
+import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class GroupController {
@@ -79,21 +80,32 @@ export class GroupController {
 
     switch (request.enum) {
       case GetGroupsEnum.groupId:
-        return this.groupService.getById(request.groupId, request.fields)
+        return normalizeFields(await this.groupService.getById(request.groupId, request.fields), {
+          fields: request.fields,
+        })
       case GetGroupsEnum.responsibleId:
-        return this.responsibleService.getAllGroupsByResponsible(
-          request.responsibleId,
-          request.fields
+        return normalizeFields(
+          await this.responsibleService.getAllGroupsByResponsible(
+            request.responsibleId,
+            request.fields
+          ),
+          { fields: request.fields }
         )
       case GetGroupsEnum.facultyId:
-        return this.groupService.getByFacultyId(request.facultyId, request.fields)
+        return normalizeFields(
+          await this.groupService.getByFacultyId(request.facultyId, request.fields),
+          { fields: request.fields }
+        )
       case GetGroupsEnum.all:
         return {
-          groups: await this.groupService.getAll(
-            request.page,
-            request.count,
-            request.title,
-            request.fields
+          groups: await normalizeFields(
+            await this.groupService.getAll(
+              request.page,
+              request.count,
+              request.title,
+              request.fields
+            ),
+            { fields: request.fields }
           ),
           count: await this.groupService.countAll(request.title),
         }

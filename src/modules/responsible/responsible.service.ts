@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateResponsibleDto } from './dto/createResponsible.dto'
-import { ResponsibleField, ResponsibleFieldsEnum } from './responsible.constants'
+import { ResponsibleField } from './responsible.constants'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
 import generatePassword from '../../global/utils/generatePassword'
@@ -23,8 +23,6 @@ import { GroupService } from '../group/group.service'
 import { GroupField } from '../group/group.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import checkPageCount from '../../global/utils/checkPageCount'
-import { getEnumValues } from '../../global/utils/enumKeysValues'
-import { TypesEnum } from '../../global/enums/types'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
@@ -151,10 +149,7 @@ export class ResponsibleService {
   }
 
   async getById(id: Types.ObjectId, fields?: ResponsibleField[]) {
-    const candidate = await this.responsibleModel.findById(
-      id,
-      fieldsArrayToProjection(fields, [], getEnumValues(ResponsibleFieldsEnum, TypesEnum.STRING))
-    )
+    const candidate = await this.responsibleModel.findById(id, fieldsArrayToProjection(fields))
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.BAD_REQUEST)
@@ -165,12 +160,10 @@ export class ResponsibleService {
 
   getAll(page: number, count: number, name?: string, fields?: ResponsibleField[]) {
     return this.responsibleModel
-      .find(
-        name ? { name: { $regex: name, $options: 'i' } } : {},
-        fieldsArrayToProjection(fields, [], getEnumValues(ResponsibleFieldsEnum, TypesEnum.STRING))
-      )
+      .find(name ? { name: { $regex: name, $options: 'i' } } : {}, fieldsArrayToProjection(fields))
       .skip((page - 1) * count)
       .limit(count)
+      .exec()
   }
 
   async getAllByGroup(
@@ -188,7 +181,7 @@ export class ResponsibleService {
 
     const responsibles = this.responsibleModel.find(
       { groups: { $in: [groupId] } },
-      fieldsArrayToProjection(fields, [], getEnumValues(ResponsibleFieldsEnum, TypesEnum.STRING))
+      fieldsArrayToProjection(fields)
     )
 
     if (checkedPageCount.page !== undefined) {

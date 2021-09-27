@@ -31,6 +31,7 @@ import {
 import { ResponsibleField } from './responsible.constants'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { GROUP_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
+import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class ResponsibleController {
@@ -88,24 +89,33 @@ export class ResponsibleController {
 
     switch (request.enum) {
       case GetResponsibleEnum.responsibleId:
-        return this.responsibleService.getById(request.responsibleId, request.fields)
+        return normalizeFields(
+          await this.responsibleService.getById(request.responsibleId, request.fields),
+          { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
+        )
       case GetResponsibleEnum.groupId:
         return {
-          responsibles: await this.responsibleService.getAllByGroup(
-            request.groupId,
-            request.page,
-            request.count,
-            request.fields
+          responsibles: await normalizeFields(
+            await this.responsibleService.getAllByGroup(
+              request.groupId,
+              request.page,
+              request.count,
+              request.fields
+            ),
+            { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
           ),
           count: await this.responsibleService.countByGroup(request.groupId),
         }
       case GetResponsibleEnum.all:
         return {
-          responsibles: await this.responsibleService.getAll(
-            request.page,
-            request.count,
-            request.name,
-            request.fields
+          responsibles: await normalizeFields(
+            await this.responsibleService.getAll(
+              request.page,
+              request.count,
+              request.name,
+              request.fields
+            ),
+            { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
           ),
           count: await this.responsibleService.countByName(request.name),
         }

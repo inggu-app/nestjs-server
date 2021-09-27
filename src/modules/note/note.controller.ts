@@ -40,7 +40,7 @@ export class NoteController {
   }
 
   @Get('/')
-  get(
+  async get(
     @Query('noteId', new ParseMongoIdPipe({ required: false })) noteId?: Types.ObjectId,
     @Query('lessonId', new ParseMongoIdPipe({ required: false })) lessonId?: Types.ObjectId,
     @Query('week', new CustomParseIntPipe({ required: false })) week?: number,
@@ -66,11 +66,11 @@ export class NoteController {
     switch (request.enum) {
       case GetNotesEnum.BY_LESSON:
         return normalizeFields(
-          this.noteService.get(request.lessonId, request.week, request.fields),
+          await this.noteService.get(request.lessonId, request.week, request.fields),
           { fields: request.fields, forbiddenFields: NoteForbiddenFieldsEnum }
         )
       case GetNotesEnum.BY_ID:
-        return normalizeFields(this.noteService.getById(request.noteId, request.fields), {
+        return normalizeFields(await this.noteService.getById(request.noteId, request.fields), {
           fields: request.fields,
           forbiddenFields: NoteForbiddenFieldsEnum,
         })

@@ -6,15 +6,11 @@ interface Options<T> {
   forbiddenFields?: EmptyEnum
 }
 
-export default async function normalizeFields<T extends string[]>(
+export default function normalizeFields<T extends string[]>(
   response: { [key: string]: any },
   data: Options<T>
 ) {
   if (!data.fields) return response
-
-  if (response instanceof Promise) {
-    response = await response
-  }
 
   if (Array.isArray(response)) {
     return response.map(item => normalize(item, data))

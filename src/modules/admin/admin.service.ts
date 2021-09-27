@@ -78,10 +78,7 @@ export class AdminService {
   }
 
   async getById(id: Types.ObjectId, fields?: AdminField[]) {
-    const candidate = await this.adminModel.findById(
-      id,
-      fieldsArrayToProjection(fields, [], ['hashedUniqueKey', 'hashedPassword'])
-    )
+    const candidate = await this.adminModel.findById(id, fieldsArrayToProjection(fields))
 
     if (!candidate) {
       throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -92,12 +89,10 @@ export class AdminService {
 
   getAll(page: number, count: number, name?: string, fields?: AdminField[]) {
     return this.adminModel
-      .find(
-        name ? { name: { $regex: name, $options: 'i' } } : {},
-        fieldsArrayToProjection(fields, [], ['hashedUniqueKey', 'hashedPassword'])
-      )
+      .find(name ? { name: { $regex: name, $options: 'i' } } : {}, fieldsArrayToProjection(fields))
       .skip((page - 1) * count)
       .limit(count)
+      .exec()
   }
 
   async update(dto: UpdateAdminDto) {

@@ -27,7 +27,7 @@ export class FacultyService {
   }
 
   async getById(facultyId: Types.ObjectId, fields?: FacultyField[]) {
-    const candidate = this.facultyModel.findById(facultyId, fieldsArrayToProjection(fields))
+    const candidate = await this.facultyModel.findById(facultyId, fieldsArrayToProjection(fields))
 
     if (!candidate) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
@@ -44,6 +44,7 @@ export class FacultyService {
       )
       .skip((page - 1) * count)
       .limit(count)
+      .exec()
   }
 
   countAll(title?: string) {

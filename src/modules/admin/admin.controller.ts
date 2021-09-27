@@ -27,6 +27,7 @@ import {
   GetAdminsEnum,
 } from './admin.constants'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class AdminController {
@@ -41,7 +42,7 @@ export class AdminController {
 
   @UseGuards(OwnerJwtAuthGuard)
   @Get('/')
-  get(
+  async get(
     @Query('adminId', new ParseMongoIdPipe({ required: false })) adminId?: Types.ObjectId,
     @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
     @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
@@ -63,9 +64,18 @@ export class AdminController {
 
     switch (request.enum) {
       case GetAdminsEnum.adminId:
-        return this.adminService.getById(request.adminId, request.fields)
+        return normalizeFields(await this.adminService.getById(request.adminId, request.fields), {
+          fields: request.fields,
+          forbiddenFields: AdminForbiddenFieldsEnum,
+        })
       case GetAdminsEnum.all:
-        return this.adminService.getAll(request.page, request.count, request.name, request.fields)
+        return normalizeFields(
+          await this.adminService.getAll(request.page, request.count, request.name, request.fields),
+          {
+            fields: request.fields,
+            forbiddenFields: AdminForbiddenFieldsEnum,
+          }
+        )
     }
   }
 

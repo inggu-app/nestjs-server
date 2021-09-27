@@ -73,6 +73,7 @@ export class ScheduleController {
   ) {
     const request = checkAlternativeQueryParameters<GetScheduleEnum>({
       required: { groupId },
+      fields,
       updatedAt,
       enum: GetScheduleEnum.groupId,
     })
@@ -88,7 +89,7 @@ export class ScheduleController {
           }
         }
 
-        const lessonsSchedule = await this.scheduleService.get(groupId, fields)
+        const lessonsSchedule = await this.scheduleService.get(groupId, request.fields)
         const callSchedule = await this.callScheduleService.getActiveCallSchedule()
 
         const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
