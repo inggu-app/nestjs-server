@@ -95,7 +95,7 @@ export class ResponsibleController {
         )
       case GetResponsibleEnum.groupId:
         return {
-          responsibles: await normalizeFields(
+          responsibles: normalizeFields(
             await this.responsibleService.getAllByGroup(
               request.groupId,
               request.page,
@@ -108,7 +108,7 @@ export class ResponsibleController {
         }
       case GetResponsibleEnum.all:
         return {
-          responsibles: await normalizeFields(
+          responsibles: normalizeFields(
             await this.responsibleService.getAll(
               request.page,
               request.count,

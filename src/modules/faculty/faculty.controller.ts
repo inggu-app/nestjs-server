@@ -72,7 +72,7 @@ export class FacultyController {
         )
       case GetFacultiesEnum.all:
         return {
-          faculties: await normalizeFields(
+          faculties: normalizeFields(
             await this.facultyService.getAll(
               request.page,
               request.count,

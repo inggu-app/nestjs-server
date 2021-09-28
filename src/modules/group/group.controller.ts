@@ -98,7 +98,7 @@ export class GroupController {
         )
       case GetGroupsEnum.all:
         return {
-          groups: await normalizeFields(
+          groups: normalizeFields(
             await this.groupService.getAll(
               request.page,
               request.count,
