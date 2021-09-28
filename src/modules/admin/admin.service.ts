@@ -36,7 +36,7 @@ export class AdminService {
   ) {}
 
   async create(dto: CreateAdminDto) {
-    const candidate = await this.adminModel.findOne({ login: dto.login })
+    const candidate = await this.adminModel.findOne({ login: dto.login }).exec()
 
     if (candidate) {
       throw new HttpException(ADMIN_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
@@ -66,7 +66,9 @@ export class AdminService {
   async resetPassword(id: Types.ObjectId) {
     const generatedPassword = generatePassword(20)
     const hashedPassword = await bcrypt.hash(generatedPassword, hashSalt)
-    const candidate = await this.adminModel.findByIdAndUpdate(id, { $set: { hashedPassword } })
+    const candidate = await this.adminModel
+      .findByIdAndUpdate(id, { $set: { hashedPassword } })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -78,7 +80,7 @@ export class AdminService {
   }
 
   async getById(id: Types.ObjectId, fields?: AdminField[]) {
-    const candidate = await this.adminModel.findById(id, fieldsArrayToProjection(fields))
+    const candidate = await this.adminModel.findById(id, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {
       throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -96,21 +98,25 @@ export class AdminService {
   }
 
   async update(dto: UpdateAdminDto) {
-    const candidate = await this.adminModel.findByIdAndUpdate(dto.id, {
-      $set: { name: dto.name, login: dto.login },
-    })
+    const candidate = await this.adminModel
+      .findByIdAndUpdate(dto.id, {
+        $set: { name: dto.name, login: dto.login },
+      })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
     }
 
-    return this.adminModel.findById(dto.id, { hashedUniqueKey: 0, hashedPassword: 0 })
+    return this.adminModel.findById(dto.id, { hashedUniqueKey: 0, hashedPassword: 0 }).exec()
   }
 
   async delete(id: Types.ObjectId) {
-    const candidate = await this.adminModel.findByIdAndDelete(id, {
-      projection: { hashedUniqueKey: 0, hashedPassword: 0 },
-    })
+    const candidate = await this.adminModel
+      .findByIdAndDelete(id, {
+        projection: { hashedUniqueKey: 0, hashedPassword: 0 },
+      })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -122,10 +128,9 @@ export class AdminService {
   async login(dto: LoginAdminDto) {
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
-    const candidate = await this.adminModel.findOneAndUpdate(
-      { login: dto.login },
-      { $set: { hashedUniqueKey } }
-    )
+    const candidate = await this.adminModel
+      .findOneAndUpdate({ login: dto.login }, { $set: { hashedUniqueKey } })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.BAD_REQUEST)

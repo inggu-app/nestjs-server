@@ -6,7 +6,6 @@ import { CreateGroupDto } from './dto/create-group.dto'
 import { Types } from 'mongoose'
 import { GroupField } from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
-import { CreateScheduleDto } from '../schedule/dto/createSchedule.dto'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
@@ -26,7 +25,9 @@ export class GroupService {
   ) {}
 
   async create(dto: CreateGroupDto) {
-    const candidate = await this.groupModel.findOne({ title: dto.title, faculty: dto.faculty })
+    const candidate = await this.groupModel
+      .findOne({ title: dto.title, faculty: dto.faculty })
+      .exec()
 
     if (candidate) {
       throw new HttpException(GROUP_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST)
@@ -35,7 +36,9 @@ export class GroupService {
   }
 
   async getById(groupId: Types.ObjectId, fields?: GroupField[]) {
-    const candidate = await this.groupModel.findById(groupId, fieldsArrayToProjection(fields))
+    const candidate = await this.groupModel
+      .findById(groupId, fieldsArrayToProjection(fields))
+      .exec()
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
@@ -56,7 +59,9 @@ export class GroupService {
   }
 
   countAll(title?: string) {
-    return this.groupModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
+    return this.groupModel
+      .countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
+      .exec()
   }
 
   async getByFacultyId(facultyId: Types.ObjectId, fields?: GroupField[]) {
@@ -66,11 +71,11 @@ export class GroupService {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
     }
 
-    return this.groupModel.find({ faculty: facultyId }, fieldsArrayToProjection(fields))
+    return this.groupModel.find({ faculty: facultyId }, fieldsArrayToProjection(fields)).exec()
   }
 
   async delete(groupId: Types.ObjectId) {
-    const candidate = await this.groupModel.deleteOne({ _id: groupId })
+    const candidate = await this.groupModel.deleteOne({ _id: groupId }).exec()
 
     await this.responsibleService.deleteGroupsFromAllResponsibles([groupId])
 
@@ -80,28 +85,24 @@ export class GroupService {
   }
 
   async deleteAllByFacultyId(facultyId: Types.ObjectId) {
-    const groups = await this.groupModel.find({ faculty: facultyId })
+    const groups = await this.groupModel.find({ faculty: facultyId }).exec()
     const groupsIds: Types.ObjectId[] = groups.map(group => group.id)
 
     await this.responsibleService.deleteGroupsFromAllResponsibles(groupsIds)
-    return this.groupModel.deleteMany({ faculty: facultyId })
-  }
-
-  updateLastScheduleUpdate(dto: CreateScheduleDto, date: Date) {
-    return this.groupModel.findByIdAndUpdate(dto.group, {
-      $set: { lastScheduleUpdate: date, isHaveSchedule: !!dto.schedule.length },
-    })
+    return this.groupModel.deleteMany({ faculty: facultyId }).exec()
   }
 
   async update(dto: UpdateGroupDto) {
-    const candidate = await this.groupModel.findByIdAndUpdate(dto.id, {
-      $set: { title: dto.title, faculty: dto.faculty },
-    })
+    const candidate = await this.groupModel
+      .findByIdAndUpdate(dto.id, {
+        $set: { title: dto.title, faculty: dto.faculty },
+      })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
     }
 
-    return this.groupModel.findById(dto.id)
+    return this.groupModel.findById(dto.id).exec()
   }
 }

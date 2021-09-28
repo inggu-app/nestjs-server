@@ -25,8 +25,6 @@ export const VALUE_IS_NOT_INCLUDES_IN_ENUM = (e: EmptyEnum) =>
 export const ADMIN_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Админ с id "${id}" не существует`
 export const ADMIN_WITH_LOGIN_EXISTS = (login: string) =>
   `Админ с логином "${login}" уже существует`
-export const ADMIN_WITH_LOGIN_NOT_FOUND = (login: string) =>
-  `Админ с логином "${login}" не существует`
 
 export const FACULTY_WITH_ID_NOT_FOUND = (id: Types.ObjectId) =>
   `Факультета с id "${id}" не существует`
@@ -42,8 +40,6 @@ export const RESPONSIBLE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) =>
 export const RESPONSIBLE_WITH_LOGIN_EXISTS = (login: string) =>
   `Ответственный с логином "${login}" уже существует`
 
-export const SCHEDULE_EXISTS =
-  'Расписание для этой группы уже существует. Попробуйте обновить расписание'
 export const LESSON_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Занятие с id ${id} не существует`
 
 export const NOTE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Заметки с id "${id}" не существует`

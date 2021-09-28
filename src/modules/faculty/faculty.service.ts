@@ -17,7 +17,7 @@ export class FacultyService {
   constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
 
   async create(dto: CreateFacultyDto) {
-    const candidate = await this.facultyModel.findOne({ title: dto.title })
+    const candidate = await this.facultyModel.findOne({ title: dto.title }).exec()
 
     if (candidate) {
       throw new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST)
@@ -27,7 +27,9 @@ export class FacultyService {
   }
 
   async getById(facultyId: Types.ObjectId, fields?: FacultyField[]) {
-    const candidate = await this.facultyModel.findById(facultyId, fieldsArrayToProjection(fields))
+    const candidate = await this.facultyModel
+      .findById(facultyId, fieldsArrayToProjection(fields))
+      .exec()
 
     if (!candidate) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
@@ -48,25 +50,27 @@ export class FacultyService {
   }
 
   countAll(title?: string) {
-    return this.facultyModel.countDocuments(
-      title ? { title: { $regex: title, $options: 'i' } } : {}
-    )
+    return this.facultyModel
+      .countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
+      .exec()
   }
 
   async update(dto: UpdateFacultyDto) {
-    const candidate = await this.facultyModel.findByIdAndUpdate(dto.id, {
-      $set: { title: dto.title },
-    })
+    const candidate = await this.facultyModel
+      .findByIdAndUpdate(dto.id, {
+        $set: { title: dto.title },
+      })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
     }
 
-    return this.facultyModel.findById(dto.id)
+    return this.facultyModel.findById(dto.id).exec()
   }
 
   async delete(facultyId: Types.ObjectId) {
-    const deletedDoc = await this.facultyModel.findByIdAndDelete(facultyId)
+    const deletedDoc = await this.facultyModel.findByIdAndDelete(facultyId).exec()
 
     if (!deletedDoc) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)

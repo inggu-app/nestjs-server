@@ -25,11 +25,11 @@ export class NoteService {
   async get(lesson: Types.ObjectId, week: number, fields?: NoteField[]) {
     await this.scheduleService.getById(lesson)
 
-    return this.noteModel.find({ lesson, week }, fieldsArrayToProjection(fields))
+    return this.noteModel.find({ lesson, week }, fieldsArrayToProjection(fields)).exec()
   }
 
   async getById(id: Types.ObjectId, fields?: NoteField[]) {
-    const candidate = await this.noteModel.findById(id, fieldsArrayToProjection(fields))
+    const candidate = await this.noteModel.findById(id, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {
       throw new HttpException(NOTE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -39,6 +39,6 @@ export class NoteService {
   }
 
   delete(id: Types.ObjectId) {
-    return this.noteModel.findByIdAndDelete(id)
+    return this.noteModel.findByIdAndDelete(id).exec()
   }
 }

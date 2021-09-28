@@ -26,7 +26,7 @@ export class ScheduleService {
   }
 
   async getById(id: Types.ObjectId, fields?: ScheduleField[]) {
-    const candidate = await this.lessonModel.findById(id, fieldsArrayToProjection(fields))
+    const candidate = await this.lessonModel.findById(id, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {
       throw new HttpException(LESSON_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -35,11 +35,19 @@ export class ScheduleService {
     return candidate
   }
 
-  updateById(id: Types.ObjectId, lesson: Lesson) {
-    return this.lessonModel.updateOne({ _id: id }, { $set: { ...lesson } })
+  async updateById(id: Types.ObjectId, lesson: Lesson) {
+    const candidate = await this.lessonModel
+      .findOneAndUpdate({ _id: id }, { $set: { ...lesson } })
+      .exec()
+
+    if (!candidate) {
+      throw new HttpException(LESSON_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+    }
+
+    return candidate
   }
 
   async delete(group: Types.ObjectId, ids?: Types.ObjectId[]) {
-    await this.lessonModel.deleteMany(ids ? { group, _id: { $in: ids } } : { group })
+    await this.lessonModel.deleteMany(ids ? { group, _id: { $in: ids } } : { group }).exec()
   }
 }

@@ -41,7 +41,7 @@ export class ResponsibleService {
   ) {}
 
   async create(dto: CreateResponsibleDto) {
-    const candidate = await this.responsibleModel.findOne({ login: dto.login })
+    const candidate = await this.responsibleModel.findOne({ login: dto.login }).exec()
 
     if (candidate) {
       throw new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.CONFLICT)
@@ -71,9 +71,11 @@ export class ResponsibleService {
   }
 
   async delete(id: Types.ObjectId) {
-    const candidate = await this.responsibleModel.findByIdAndDelete(id, {
-      projection: { hashedUniqueKey: 0, hashedPassword: 0 },
-    })
+    const candidate = await this.responsibleModel
+      .findByIdAndDelete(id, {
+        projection: { hashedUniqueKey: 0, hashedPassword: 0 },
+      })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -83,20 +85,19 @@ export class ResponsibleService {
   }
 
   async deleteGroupsFromAllResponsibles(ids: Types.ObjectId[]) {
-    await this.responsibleModel.updateMany(
-      { groups: { $in: ids } },
-      { $pull: { groups: { $in: ids } } }
-    )
+    await this.responsibleModel
+      .updateMany({ groups: { $in: ids } }, { $pull: { groups: { $in: ids } } })
+      .exec()
   }
 
   async update(dto: UpdateResponsibleDto) {
-    const loginCandidateById = await this.responsibleModel.findById(dto.id)
+    const loginCandidateById = await this.responsibleModel.findById(dto.id).exec()
 
     if (!loginCandidateById) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(dto.id), HttpStatus.BAD_REQUEST)
     }
 
-    const loginCandidateByLogin = await this.responsibleModel.findOne({ login: dto.login })
+    const loginCandidateByLogin = await this.responsibleModel.findOne({ login: dto.login }).exec()
 
     if (loginCandidateByLogin && loginCandidateByLogin?.id !== dto.id) {
       throw new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
@@ -110,34 +111,38 @@ export class ResponsibleService {
       }
     }
 
-    const candidate = await this.responsibleModel.findByIdAndUpdate(
-      dto.id,
-      {
-        $set: {
-          groups: dto.groups,
-          login: dto.login,
-          name: dto.name,
+    const candidate = await this.responsibleModel
+      .findByIdAndUpdate(
+        dto.id,
+        {
+          $set: {
+            groups: dto.groups,
+            login: dto.login,
+            name: dto.name,
+          },
         },
-      },
-      { projection: { hashedPassword: 0, hashedUniqueKey: 0 } }
-    )
+        { projection: { hashedPassword: 0, hashedUniqueKey: 0 } }
+      )
+      .exec()
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
     }
 
-    return this.responsibleModel.findById(dto.id, { hashedPassword: 0, hashedUniqueKey: 0 })
+    return this.responsibleModel.findById(dto.id, { hashedPassword: 0, hashedUniqueKey: 0 }).exec()
   }
 
   async resetPassword(id: Types.ObjectId) {
     const generatedPassword = generatePassword()
     const hashedPassword = await bcrypt.hash(generatedPassword, hashSalt)
 
-    const candidate = await this.responsibleModel.findByIdAndUpdate(id, {
-      $set: {
-        hashedPassword,
-      },
-    })
+    const candidate = await this.responsibleModel
+      .findByIdAndUpdate(id, {
+        $set: {
+          hashedPassword,
+        },
+      })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -149,7 +154,9 @@ export class ResponsibleService {
   }
 
   async getById(id: Types.ObjectId, fields?: ResponsibleField[]) {
-    const candidate = await this.responsibleModel.findById(id, fieldsArrayToProjection(fields))
+    const candidate = await this.responsibleModel
+      .findById(id, fieldsArrayToProjection(fields))
+      .exec()
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.BAD_REQUEST)
@@ -194,19 +201,20 @@ export class ResponsibleService {
   }
 
   countByName(name?: string) {
-    return this.responsibleModel.countDocuments(
-      name ? { name: { $regex: name, $options: 'i' } } : {}
-    )
+    return this.responsibleModel
+      .countDocuments(name ? { name: { $regex: name, $options: 'i' } } : {})
+      .exec()
   }
 
   countByGroup(id: Types.ObjectId) {
-    return this.responsibleModel.countDocuments({ groups: { $in: [id] } })
+    return this.responsibleModel.countDocuments({ groups: { $in: [id] } }).exec()
   }
 
   async getAllGroupsByResponsible(id: Types.ObjectId, fields?: GroupField[]) {
     const candidate = await this.responsibleModel
       .findById(id)
       .populate({ path: 'groups', select: fieldsArrayToProjection(fields) })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -218,10 +226,9 @@ export class ResponsibleService {
   async login(dto: LoginResponsibleDto) {
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
-    const candidate = await this.responsibleModel.findOneAndUpdate(
-      { login: dto.login },
-      { $set: { hashedUniqueKey } }
-    )
+    const candidate = await this.responsibleModel
+      .findOneAndUpdate({ login: dto.login }, { $set: { hashedUniqueKey } })
+      .exec()
 
     if (!candidate) {
       throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.BAD_REQUEST)
