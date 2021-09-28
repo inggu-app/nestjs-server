@@ -14,17 +14,26 @@ export class AndroidAppVersionModel extends TimeStamps {
   })
   settingType: string
 
-  @prop({ default: [] })
-  features: {
-    version: string
-    required: boolean
-    desirable: boolean
-    features: string[]
-  }[]
+  @prop({ default: [], ref: () => Feature })
+  features: Feature[]
 
   @prop({ default: '1.0.0' })
   version: string
 
   @prop({ default: true })
   isActive: boolean
+}
+
+class Feature {
+  @prop()
+  version: string
+
+  @prop()
+  required: boolean
+
+  @prop()
+  desirable: boolean
+
+  @prop({ type: [String] })
+  features: string[]
 }

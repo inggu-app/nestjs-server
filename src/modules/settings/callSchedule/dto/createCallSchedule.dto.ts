@@ -1,10 +1,20 @@
-import { IsArray, ValidateNested } from 'class-validator'
+import { IsArray, IsDateString, IsNumber, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
-import { LessonCallSchedule } from '../callSchedule.model'
 
 export class CreateCallScheduleDto {
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => LessonCallSchedule)
-  schedule: LessonCallSchedule[]
+  @Type(() => CallScheduleItem)
+  schedule: CallScheduleItem[]
+}
+
+class CallScheduleItem {
+  @IsNumber()
+  lessonNumber: number
+
+  @IsDateString()
+  start: Date
+
+  @IsDateString()
+  end: Date
 }
