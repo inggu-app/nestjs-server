@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
-import { CreateScheduleDto } from './dto/create-schedule.dto'
+import { CreateScheduleDto, Lesson } from './dto/createSchedule.dto'
 import { Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
@@ -19,8 +19,10 @@ export class ScheduleService {
     return this.lessonModel.create(lessons)
   }
 
-  get(groupId: Types.ObjectId, fields?: ScheduleField[]) {
-    return this.lessonModel.find({ group: groupId }, fieldsArrayToProjection(fields, ['number']))
+  getByGroup(groupId: Types.ObjectId, fields?: ScheduleField[]) {
+    return this.lessonModel
+      .find({ group: groupId }, fieldsArrayToProjection(fields, ['number']))
+      .exec()
   }
 
   async getById(id: Types.ObjectId, fields?: ScheduleField[]) {
@@ -33,7 +35,11 @@ export class ScheduleService {
     return candidate
   }
 
-  async delete(group: Types.ObjectId) {
-    await this.lessonModel.deleteMany({ group })
+  updateById(id: Types.ObjectId, lesson: Lesson) {
+    return this.lessonModel.updateOne({ _id: id }, { $set: { ...lesson } })
+  }
+
+  async delete(group: Types.ObjectId, ids?: Types.ObjectId[]) {
+    await this.lessonModel.deleteMany(ids ? { group, _id: { $in: ids } } : { group })
   }
 }

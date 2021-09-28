@@ -30,6 +30,7 @@ export const ScheduleAdditionalFieldsEnum = {
 export type ScheduleField =
   | keyof typeof LessonFieldsEnum
   | keyof typeof _ScheduleAdditionalFieldsEnum
+  | 'id'
 
 enumKeyValuesMatch(LessonFieldsEnum)
 enumKeyValuesMatch(_ScheduleAdditionalFieldsEnum)

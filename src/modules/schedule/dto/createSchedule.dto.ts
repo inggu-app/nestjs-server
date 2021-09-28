@@ -1,4 +1,13 @@
-import { IsArray, IsIn, IsMongoId, IsNumber, IsString, Min, ValidateNested } from 'class-validator'
+import {
+  IsArray,
+  IsIn,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  ValidateNested,
+} from 'class-validator'
 import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
 import { WeekDaysEnum } from '../../../global/enums/WeekDays'
@@ -20,10 +29,14 @@ export class CreateScheduleDto implements ICreateScheduleDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => Lesson)
-  schedule: LessonType[]
+  schedule: Lesson[]
 }
 
-class Lesson implements LessonType {
+export class Lesson implements LessonType {
+  @IsOptional()
+  @IsMongoId()
+  id: Types.ObjectId | undefined | null
+
   @IsString()
   title: string
 

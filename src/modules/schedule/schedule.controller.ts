@@ -2,16 +2,13 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
-  Patch,
   Post,
   Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common'
-import { CreateScheduleDto } from './dto/create-schedule.dto'
+import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
@@ -25,11 +22,9 @@ import {
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.guard'
-import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
-import { GROUP_WITH_ID_NOT_FOUND, SCHEDULE_EXISTS } from '../../global/constants/errors.constants'
 
 @Controller()
 export class ScheduleController {
@@ -39,23 +34,34 @@ export class ScheduleController {
     private readonly callScheduleService: CallScheduleService
   ) {}
 
-  @UseGuards(AdminJwtAuthGuard)
+  @UseGuards(ResponsibleJwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
-    const groupCandidate = await this.groupService.getById(dto.group)
+    await this.groupService.getById(dto.group)
 
-    const scheduleCandidate = await this.scheduleService.get(dto.group, [])
-
-    if (scheduleCandidate.length) {
-      throw new HttpException(SCHEDULE_EXISTS, HttpStatus.BAD_REQUEST)
+    const existLessons = dto.schedule.filter(lesson => lesson.id)
+    if (existLessons.length) {
+      for await (const lesson of existLessons) {
+        if (lesson.id) {
+          await this.scheduleService.updateById(lesson.id, lesson)
+        }
+      }
     }
 
-    groupCandidate.isHaveSchedule = true
-    await groupCandidate.save()
+    const allLessons = await this.scheduleService.getByGroup(dto.group, ['id'])
+    const extraLessons = allLessons.filter(lesson => !existLessons.find(l => l.id === lesson.id))
+    await this.scheduleService.delete(
+      dto.group,
+      extraLessons.map(l => l.id)
+    )
 
-    await this.scheduleService.delete(groupCandidate.id)
-    await this.scheduleService.create(dto)
+    const newLessons = dto.schedule.filter(lesson => !lesson.id)
+    if (newLessons.length) {
+      await this.scheduleService.create({ group: dto.group, schedule: newLessons })
+    }
+
+    return
   }
 
   @Get('/')
@@ -89,7 +95,7 @@ export class ScheduleController {
           }
         }
 
-        const lessonsSchedule = await this.scheduleService.get(groupId, request.fields)
+        const lessonsSchedule = await this.scheduleService.getByGroup(groupId, request.fields)
         const callSchedule = await this.callScheduleService.getActiveCallSchedule()
 
         const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
@@ -111,20 +117,5 @@ export class ScheduleController {
           updatedAt: group.lastScheduleUpdate,
         }
     }
-  }
-
-  @UseGuards(ResponsibleJwtAuthGuard)
-  @UsePipes(new ValidationPipe())
-  @Patch('/')
-  async update(@Body() dto: CreateScheduleDto) {
-    const candidate = await this.groupService.updateLastScheduleUpdate(dto, new Date())
-
-    if (!candidate) {
-      throw new HttpException(GROUP_WITH_ID_NOT_FOUND(dto.group), HttpStatus.NOT_FOUND)
-    }
-
-    await this.scheduleService.delete(dto.group)
-
-    await this.scheduleService.create(dto)
   }
 }
