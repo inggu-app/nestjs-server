@@ -15,6 +15,7 @@ export enum LessonFieldsEnum {
   weeks = 'weeks',
   type = 'type',
   group = 'group',
+  subgroup = 'subgroup',
 }
 
 export enum _ScheduleAdditionalFieldsEnum {

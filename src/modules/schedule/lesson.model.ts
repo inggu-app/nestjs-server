@@ -51,4 +51,7 @@ export class LessonModel extends TimeStamps implements Lesson {
 
   @prop({ ref: () => FacultyModel, type: Types.ObjectId })
   group: Types.ObjectId
+
+  @prop({ default: null, type: Number })
+  subgroup: number | null
 }

@@ -4,6 +4,7 @@ import {
   IsMongoId,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   Min,
   ValidateNested,
@@ -69,4 +70,8 @@ export class Lesson implements LessonType {
 
   @IsString()
   type: string
+
+  @IsOptional()
+  @IsPositive()
+  subgroup: number
 }
