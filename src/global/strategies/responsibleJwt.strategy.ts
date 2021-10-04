@@ -51,7 +51,7 @@ export class ResponsibleJwtStrategy extends PassportStrategy(Strategy, RESPONSIB
           _id: request.body.group,
           faculty: { $in: responsible.faculties },
         },
-        { message: 'Forbidden', type: HttpStatus.FORBIDDEN }
+        new ForbiddenException()
       )
     )
       return true

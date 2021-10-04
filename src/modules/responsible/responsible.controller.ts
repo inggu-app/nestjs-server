@@ -3,7 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
+  NotFoundException,
   Patch,
   Post,
   Query,
@@ -31,7 +31,10 @@ import {
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 import { FacultyService } from '../faculty/faculty.service'
-import { GROUP_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
+import {
+  FACULTY_WITH_ID_NOT_FOUND,
+  GROUP_WITH_ID_NOT_FOUND,
+} from '../../global/constants/errors.constants'
 
 @Controller()
 export class ResponsibleController {
@@ -47,9 +50,12 @@ export class ResponsibleController {
   async create(@Body() dto: CreateResponsibleDto) {
     await this.groupService.checkExists(
       [...dto.groups, ...dto.forbiddenGroups].map(g => ({ _id: g })),
-      { message: GROUP_WITH_ID_NOT_FOUND, type: HttpStatus.NOT_FOUND, key: '_id' }
+      filter => new NotFoundException(GROUP_WITH_ID_NOT_FOUND(filter._id))
     )
-    await this.facultyService.checkExists(dto.faculties)
+    await this.facultyService.checkExists(
+      dto.faculties.map(f => ({ _id: f })),
+      filter => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(filter._id))
+    )
 
     return this.responsibleService.create(dto)
   }
@@ -126,9 +132,12 @@ export class ResponsibleController {
   async update(@Body() dto: UpdateResponsibleDto) {
     await this.groupService.checkExists(
       [...dto.groups, ...dto.forbiddenGroups].map(g => ({ _id: g })),
-      { message: GROUP_WITH_ID_NOT_FOUND, type: HttpStatus.NOT_FOUND, key: '_id' }
+      filter => new NotFoundException(GROUP_WITH_ID_NOT_FOUND(filter._id))
     )
-    await this.facultyService.checkExists(dto.faculties)
+    await this.facultyService.checkExists(
+      dto.faculties.map(f => ({ _id: f })),
+      filter => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(filter._id))
+    )
 
     return this.responsibleService.update(dto)
   }

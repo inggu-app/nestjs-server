@@ -38,7 +38,7 @@ export class ScheduleController {
   @UsePipes(new ValidationPipe())
   @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
-    await this.groupService.getById(dto.group)
+    await this.groupService.checkExists({ _id: dto.group })
 
     const existLessons = dto.schedule.filter(lesson => lesson.id)
     if (existLessons.length) {

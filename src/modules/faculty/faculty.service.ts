@@ -1,29 +1,27 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { CreateFacultyDto } from './dto/create-faculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { FacultyField, FacultyFieldsEnum } from './faculty.constants'
-import { Types } from 'mongoose'
+import { Error, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import {
   FACULTY_WITH_ID_NOT_FOUND,
   FACULTY_WITH_TITLE_EXISTS,
 } from '../../global/constants/errors.constants'
-import { isMongoId } from 'class-validator'
-import { ObjectByInterface } from '../../global/types'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 
 @Injectable()
 export class FacultyService {
   constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
 
   async create(dto: CreateFacultyDto) {
-    const candidate = await this.facultyModel.findOne({ title: dto.title }).exec()
-
-    if (candidate) {
-      throw new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST)
-    }
+    await this.checkExists(
+      { title: dto.title },
+      new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST)
+    )
 
     return this.facultyModel.create(dto)
   }
@@ -58,45 +56,48 @@ export class FacultyService {
   }
 
   async update(dto: UpdateFacultyDto) {
-    const candidate = await this.facultyModel
-      .findByIdAndUpdate(dto.id, {
-        $set: { title: dto.title },
-      })
+    await this.checkExists({ _id: dto.id })
+    await this.facultyModel
+      .updateOne(
+        { _id: dto.id },
+        {
+          $set: { title: dto.title },
+        }
+      )
       .exec()
-
-    if (!candidate) {
-      throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
-    }
 
     return this.facultyModel.findById(dto.id).exec()
   }
 
-  async delete(facultyId: Types.ObjectId) {
-    const deletedDoc = await this.facultyModel.findByIdAndDelete(facultyId).exec()
-
-    if (!deletedDoc) {
-      throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
-    }
+  async delete(id: Types.ObjectId) {
+    await this.checkExists({ _id: id })
+    await this.facultyModel.deleteOne({ _id: id }).exec()
   }
 
   async checkExists(
-    ids: Types.ObjectId | Types.ObjectId[],
-    filter?: ObjectByInterface<typeof FacultyFieldsEnum>
+    filter:
+      | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>
+      | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>[],
+    error:
+      | ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error)
+      | Error = f => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id))
   ) {
-    if (isMongoId(ids)) {
-      ids = ids as Types.ObjectId
-      if (!(await this.facultyModel.exists(filter || { _id: ids }))) {
-        throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(ids), HttpStatus.NOT_FOUND)
-      }
-    } else {
-      ids = ids as Types.ObjectId[]
-      for await (const id of ids) {
-        const candidate = await this.facultyModel.exists(filter || { _id: id })
+    if (Array.isArray(filter)) {
+      for await (const f of filter) {
+        const candidate = await this.facultyModel.exists(f)
 
         if (!candidate) {
-          throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+          if (error instanceof Error) throw Error
+          throw error(f)
         }
       }
+    } else {
+      if (!(await this.facultyModel.exists(filter))) {
+        if (error instanceof Error) throw error
+        throw error(filter)
+      }
     }
+
+    return true
   }
 }

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import * as bcrypt from 'bcrypt'
 import { AdminModel } from './admin.model'
@@ -7,8 +7,8 @@ import { CreateAdminDto } from './dto/createAdmin.dto'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import generatePassword from '../../global/utils/generatePassword'
 import { hashSalt } from '../../global/constants/other.constants'
-import { Types } from 'mongoose'
-import { AdminField } from './admin.constants'
+import { Error, Types } from 'mongoose'
+import { AdminField, AdminFieldsEnum } from './admin.constants'
 import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
 import {
@@ -19,6 +19,7 @@ import {
 import { JwtService } from '@nestjs/jwt'
 import { ADMIN_ACCESS_TOKEN_DATA, JwtType } from '../../global/utils/checkJwtType'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 
 export interface AdminAccessTokenData extends JwtType<typeof ADMIN_ACCESS_TOKEN_DATA> {
   tokenType: typeof ADMIN_ACCESS_TOKEN_DATA
@@ -36,11 +37,10 @@ export class AdminService {
   ) {}
 
   async create(dto: CreateAdminDto) {
-    const candidate = await this.adminModel.findOne({ login: dto.login }).exec()
-
-    if (candidate) {
-      throw new HttpException(ADMIN_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
-    }
+    await this.checkExists(
+      { login: dto.login },
+      new HttpException(ADMIN_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
+    )
 
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
@@ -64,15 +64,11 @@ export class AdminService {
   }
 
   async resetPassword(id: Types.ObjectId) {
+    await this.checkExists({ _id: id })
+
     const generatedPassword = generatePassword(20)
     const hashedPassword = await bcrypt.hash(generatedPassword, hashSalt)
-    const candidate = await this.adminModel
-      .findByIdAndUpdate(id, { $set: { hashedPassword } })
-      .exec()
-
-    if (!candidate) {
-      throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
-    }
+    await this.adminModel.updateOne({ _id: id }, { $set: { hashedPassword } }).exec()
 
     return {
       password: generatedPassword,
@@ -98,31 +94,25 @@ export class AdminService {
   }
 
   async update(dto: UpdateAdminDto) {
-    const candidate = await this.adminModel
-      .findByIdAndUpdate(dto.id, {
-        $set: { name: dto.name, login: dto.login },
-      })
-      .exec()
+    await this.checkExists({ _id: dto.id })
 
-    if (!candidate) {
-      throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
-    }
+    await this.adminModel
+      .updateOne(
+        { _id: dto.id },
+        {
+          $set: { name: dto.name, login: dto.login },
+        }
+      )
+      .exec()
 
     return this.adminModel.findById(dto.id, { hashedUniqueKey: 0, hashedPassword: 0 }).exec()
   }
 
   async delete(id: Types.ObjectId) {
-    const candidate = await this.adminModel
-      .findByIdAndDelete(id, {
-        projection: { hashedUniqueKey: 0, hashedPassword: 0 },
-      })
-      .exec()
+    await this.checkExists({ _id: id })
+    await this.adminModel.deleteOne({ _id: id }).exec()
 
-    if (!candidate) {
-      throw new HttpException(ADMIN_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
-    }
-
-    return candidate
+    return
   }
 
   async login(dto: LoginAdminDto) {
@@ -152,5 +142,31 @@ export class AdminService {
         accessToken: this.jwtService.sign(accessTokenData),
       }
     }
+  }
+
+  async checkExists(
+    filter:
+      | ObjectByInterface<typeof AdminFieldsEnum, ModelBase>
+      | ObjectByInterface<typeof AdminFieldsEnum, ModelBase>[],
+    error: ((filter: ObjectByInterface<typeof AdminFieldsEnum, ModelBase>) => Error) | Error = f =>
+      new NotFoundException(ADMIN_WITH_ID_NOT_FOUND(f._id))
+  ) {
+    if (Array.isArray(filter)) {
+      for await (const f of filter) {
+        const candidate = await this.adminModel.exists(f)
+
+        if (!candidate) {
+          if (error instanceof Error) throw Error
+          throw error(f)
+        }
+      }
+    } else {
+      if (!(await this.adminModel.exists(filter))) {
+        if (error instanceof Error) throw error
+        throw error(filter)
+      }
+    }
+
+    return true
   }
 }

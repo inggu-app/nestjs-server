@@ -1,4 +1,11 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
@@ -8,12 +15,11 @@ import { ResponsibleField, ResponsibleFieldsEnum } from './responsible.constants
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
 import generatePassword from '../../global/utils/generatePassword'
-import { Types } from 'mongoose'
+import { Error, Types } from 'mongoose'
 import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { JwtService } from '@nestjs/jwt'
 import { UpdateResponsibleDto } from './dto/updateResponsible.dto'
 import {
-  GROUP_WITH_ID_NOT_FOUND,
   INCORRECT_CREDENTIALS,
   RESPONSIBLE_WITH_ID_NOT_FOUND,
   RESPONSIBLE_WITH_LOGIN_EXISTS,
@@ -23,8 +29,7 @@ import { GroupService } from '../group/group.service'
 import { GroupField } from '../group/group.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import checkPageCount from '../../global/utils/checkPageCount'
-import { isMongoId } from 'class-validator'
-import { ObjectByInterface } from '../../global/types'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
@@ -43,11 +48,10 @@ export class ResponsibleService {
   ) {}
 
   async create(dto: CreateResponsibleDto) {
-    const candidate = await this.responsibleModel.findOne({ login: dto.login }).exec()
-
-    if (candidate) {
-      throw new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.CONFLICT)
-    }
+    await this.checkExists(
+      { login: dto.login },
+      new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.CONFLICT)
+    )
 
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
@@ -66,17 +70,10 @@ export class ResponsibleService {
   }
 
   async delete(id: Types.ObjectId) {
-    const candidate = await this.responsibleModel
-      .findByIdAndDelete(id, {
-        projection: { hashedUniqueKey: 0, hashedPassword: 0 },
-      })
-      .exec()
+    await this.checkExists({ _id: id })
+    await this.responsibleModel.deleteOne({ _id: id }).exec()
 
-    if (!candidate) {
-      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
-    }
-
-    return candidate
+    return
   }
 
   async deleteGroupsFromAllResponsibles(ids: Types.ObjectId[]) {
@@ -86,25 +83,16 @@ export class ResponsibleService {
   }
 
   async update(dto: UpdateResponsibleDto) {
-    await this.checkExists(dto.id)
+    await this.checkExists({ _id: dto.id })
+    await this.checkExists(
+      { login: dto.login },
+      new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
+    )
+    for await (const groupId of dto.groups) await this.groupService.checkExists({ _id: groupId })
 
-    const loginCandidateByLogin = await this.responsibleModel.findOne({ login: dto.login }).exec()
-
-    if (loginCandidateByLogin && loginCandidateByLogin?.id !== dto.id) {
-      throw new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
-    }
-
-    for await (const groupId of dto.groups) {
-      const groupCandidate = await this.groupService.getById(groupId)
-
-      if (!groupCandidate) {
-        throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
-      }
-    }
-
-    const candidate = await this.responsibleModel
-      .findByIdAndUpdate(
-        dto.id,
+    await this.responsibleModel
+      .updateOne(
+        { _id: dto.id },
         {
           $set: {
             groups: dto.groups,
@@ -113,33 +101,29 @@ export class ResponsibleService {
             login: dto.login,
             name: dto.name,
           },
-        },
-        { projection: { hashedPassword: 0, hashedUniqueKey: 0 } }
+        }
       )
       .exec()
-
-    if (!candidate) {
-      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(dto.id), HttpStatus.NOT_FOUND)
-    }
 
     return this.responsibleModel.findById(dto.id, { hashedPassword: 0, hashedUniqueKey: 0 }).exec()
   }
 
   async resetPassword(id: Types.ObjectId) {
+    await this.checkExists({ _id: id })
+
     const generatedPassword = generatePassword()
     const hashedPassword = await bcrypt.hash(generatedPassword, hashSalt)
 
-    const candidate = await this.responsibleModel
-      .findByIdAndUpdate(id, {
-        $set: {
-          hashedPassword,
-        },
-      })
+    await this.responsibleModel
+      .updateOne(
+        { _id: id },
+        {
+          $set: {
+            hashedPassword,
+          },
+        }
+      )
       .exec()
-
-    if (!candidate) {
-      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
-    }
 
     return {
       password: generatedPassword,
@@ -172,12 +156,8 @@ export class ResponsibleService {
     count?: number,
     fields?: ResponsibleField[]
   ) {
+    await this.groupService.checkExists({ _id: groupId })
     const checkedPageCount = checkPageCount(page, count)
-    const candidate = await this.groupService.getById(groupId)
-
-    if (!candidate) {
-      throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
-    }
 
     const responsibles = this.responsibleModel.find(
       { groups: { $in: [groupId] } },
@@ -246,24 +226,29 @@ export class ResponsibleService {
   }
 
   async checkExists(
-    ids: Types.ObjectId | Types.ObjectId[],
-    filter?: ObjectByInterface<typeof ResponsibleFieldsEnum>
+    filter:
+      | ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>
+      | ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>[],
+    error:
+      | ((filter: ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>) => Error)
+      | Error = f => new NotFoundException(RESPONSIBLE_WITH_ID_NOT_FOUND(f._id))
   ) {
-    if (isMongoId(ids)) {
-      ids = ids as Types.ObjectId
-      const candidate = await this.responsibleModel.exists(filter || { _id: ids })
-      if (!candidate) {
-        throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(ids), HttpStatus.NOT_FOUND)
-      }
-    } else {
-      ids = ids as Types.ObjectId[]
-      for await (const id of ids) {
-        const candidate = await this.responsibleModel.exists(filter || { _id: id })
+    if (Array.isArray(filter)) {
+      for await (const f of filter) {
+        const candidate = await this.responsibleModel.exists(f)
 
         if (!candidate) {
-          throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+          if (error instanceof Error) throw Error
+          throw error(f)
         }
       }
+    } else {
+      if (!(await this.responsibleModel.exists(filter))) {
+        if (error instanceof Error) throw error
+        throw error(filter)
+      }
     }
+
+    return true
   }
 }
