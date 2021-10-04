@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
   HttpStatus,
   Patch,
   Post,
@@ -25,18 +24,20 @@ import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import {
   GetResponsibleEnum,
   ResponsibleAdditionalFieldsEnum,
+  ResponsibleField,
   ResponsibleFieldsEnum,
   ResponsibleForbiddenFieldsEnum,
 } from './responsible.constants'
-import { ResponsibleField } from './responsible.constants'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import { GROUP_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import normalizeFields from '../../global/utils/normalizeFields'
+import { FacultyService } from '../faculty/faculty.service'
+import { GROUP_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 
 @Controller()
 export class ResponsibleController {
   constructor(
     private readonly responsibleService: ResponsibleService,
+    private readonly facultyService: FacultyService,
     private readonly groupService: GroupService
   ) {}
 
@@ -44,20 +45,11 @@ export class ResponsibleController {
   @UsePipes(new ValidationPipe())
   @Post('/')
   async create(@Body() dto: CreateResponsibleDto) {
-    let nonexistentGroup: Types.ObjectId | null = null
-
-    for await (const group of dto.groups) {
-      const candidate = await this.groupService.getById(group)
-
-      if (!candidate) {
-        nonexistentGroup = group
-        break
-      }
-    }
-
-    if (nonexistentGroup) {
-      throw new HttpException(GROUP_WITH_ID_NOT_FOUND(nonexistentGroup), HttpStatus.NOT_FOUND)
-    }
+    await this.groupService.checkExists(
+      [...dto.groups, ...dto.forbiddenGroups].map(g => ({ _id: g })),
+      { message: GROUP_WITH_ID_NOT_FOUND, type: HttpStatus.NOT_FOUND, key: '_id' }
+    )
+    await this.facultyService.checkExists(dto.faculties)
 
     return this.responsibleService.create(dto)
   }
@@ -132,6 +124,12 @@ export class ResponsibleController {
   @UsePipes(new ValidationPipe())
   @Patch('/')
   async update(@Body() dto: UpdateResponsibleDto) {
+    await this.groupService.checkExists(
+      [...dto.groups, ...dto.forbiddenGroups].map(g => ({ _id: g })),
+      { message: GROUP_WITH_ID_NOT_FOUND, type: HttpStatus.NOT_FOUND, key: '_id' }
+    )
+    await this.facultyService.checkExists(dto.faculties)
+
     return this.responsibleService.update(dto)
   }
 

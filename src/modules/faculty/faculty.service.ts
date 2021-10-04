@@ -3,7 +3,7 @@ import { CreateFacultyDto } from './dto/create-faculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FacultyField } from './faculty.constants'
+import { FacultyField, FacultyFieldsEnum } from './faculty.constants'
 import { Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
@@ -11,6 +11,8 @@ import {
   FACULTY_WITH_ID_NOT_FOUND,
   FACULTY_WITH_TITLE_EXISTS,
 } from '../../global/constants/errors.constants'
+import { isMongoId } from 'class-validator'
+import { ObjectByInterface } from '../../global/types'
 
 @Injectable()
 export class FacultyService {
@@ -74,6 +76,27 @@ export class FacultyService {
 
     if (!deletedDoc) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
+    }
+  }
+
+  async checkExists(
+    ids: Types.ObjectId | Types.ObjectId[],
+    filter?: ObjectByInterface<typeof FacultyFieldsEnum>
+  ) {
+    if (isMongoId(ids)) {
+      ids = ids as Types.ObjectId
+      if (!(await this.facultyModel.exists(filter || { _id: ids }))) {
+        throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(ids), HttpStatus.NOT_FOUND)
+      }
+    } else {
+      ids = ids as Types.ObjectId[]
+      for await (const id of ids) {
+        const candidate = await this.facultyModel.exists(filter || { _id: id })
+
+        if (!candidate) {
+          throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+        }
+      }
     }
   }
 }

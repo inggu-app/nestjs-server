@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateResponsibleDto } from './dto/createResponsible.dto'
-import { ResponsibleField } from './responsible.constants'
+import { ResponsibleField, ResponsibleFieldsEnum } from './responsible.constants'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
 import generatePassword from '../../global/utils/generatePassword'
@@ -23,12 +23,14 @@ import { GroupService } from '../group/group.service'
 import { GroupField } from '../group/group.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import checkPageCount from '../../global/utils/checkPageCount'
+import { isMongoId } from 'class-validator'
+import { ObjectByInterface } from '../../global/types'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
   tokenType: typeof RESPONSIBLE_ACCESS_TOKEN_DATA
+  id: Types.ObjectId
   login: string
   name: string
-  groups: Types.ObjectId[]
   uniqueKey: string
 }
 
@@ -52,22 +54,15 @@ export class ResponsibleService {
     const generatedPassword = generatePassword()
     const hashedPassword = await bcrypt.hash(generatedPassword, hashSalt)
 
-    const responsible = await this.responsibleModel.create({
+    return this.responsibleModel.create({
       groups: dto.groups,
+      faculties: dto.faculties,
+      forbiddenGroups: dto.forbiddenGroups,
       login: dto.login,
       name: dto.name,
       hashedUniqueKey,
       hashedPassword,
     })
-
-    return {
-      id: responsible.id,
-      groups: dto.groups,
-      login: dto.login,
-      name: dto.name,
-      uniqueKey: generatedUniqueKey,
-      password: generatedPassword,
-    }
   }
 
   async delete(id: Types.ObjectId) {
@@ -91,11 +86,7 @@ export class ResponsibleService {
   }
 
   async update(dto: UpdateResponsibleDto) {
-    const loginCandidateById = await this.responsibleModel.findById(dto.id).exec()
-
-    if (!loginCandidateById) {
-      throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(dto.id), HttpStatus.BAD_REQUEST)
-    }
+    await this.checkExists(dto.id)
 
     const loginCandidateByLogin = await this.responsibleModel.findOne({ login: dto.login }).exec()
 
@@ -117,6 +108,8 @@ export class ResponsibleService {
         {
           $set: {
             groups: dto.groups,
+            faculties: dto.faculties,
+            forbiddenGroups: dto.forbiddenGroups,
             login: dto.login,
             name: dto.name,
           },
@@ -241,13 +234,35 @@ export class ResponsibleService {
     } else {
       const accessTokenData: ResponsibleAccessTokenData = {
         tokenType: RESPONSIBLE_ACCESS_TOKEN_DATA,
+        id: candidate.id,
         login: candidate.login,
         name: candidate.name,
-        groups: candidate.groups,
         uniqueKey: generatedUniqueKey,
       }
       return {
         accessToken: this.jwtService.sign(accessTokenData),
+      }
+    }
+  }
+
+  async checkExists(
+    ids: Types.ObjectId | Types.ObjectId[],
+    filter?: ObjectByInterface<typeof ResponsibleFieldsEnum>
+  ) {
+    if (isMongoId(ids)) {
+      ids = ids as Types.ObjectId
+      const candidate = await this.responsibleModel.exists(filter || { _id: ids })
+      if (!candidate) {
+        throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(ids), HttpStatus.NOT_FOUND)
+      }
+    } else {
+      ids = ids as Types.ObjectId[]
+      for await (const id of ids) {
+        const candidate = await this.responsibleModel.exists(filter || { _id: id })
+
+        if (!candidate) {
+          throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
+        }
       }
     }
   }

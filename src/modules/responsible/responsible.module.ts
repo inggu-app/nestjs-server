@@ -8,10 +8,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ResponsibleController } from './responsible.controller'
 import { GroupModule } from '../group/group.module'
 import { ResponsibleJwtStrategy } from '../../global/strategies/responsibleJwt.strategy'
+import { FacultyModule } from '../faculty/faculty.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    forwardRef(() => FacultyModule),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

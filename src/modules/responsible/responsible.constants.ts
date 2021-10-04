@@ -12,6 +12,8 @@ export enum GetResponsibleEnum {
 
 export enum ResponsibleFieldsEnum {
   groups = 'groups',
+  faculties = 'faculties',
+  forbiddenGroups = 'forbiddenGroups',
   name = 'name',
   hashedUniqueKey = 'hashedUniqueKey',
   login = 'login',

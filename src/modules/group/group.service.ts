@@ -4,7 +4,7 @@ import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateGroupDto } from './dto/create-group.dto'
 import { Types } from 'mongoose'
-import { GroupField } from './group.constants'
+import { GroupField, GroupFieldsEnum } from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
@@ -14,6 +14,7 @@ import {
   GROUP_WITH_ID_NOT_FOUND,
   GROUP_WITH_TITLE_EXISTS,
 } from '../../global/constants/errors.constants'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 
 @Injectable()
 export class GroupService {
@@ -104,5 +105,42 @@ export class GroupService {
     }
 
     return this.groupModel.findById(dto.id).exec()
+  }
+
+  async checkExists(
+    filter:
+      | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>
+      | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>[],
+    errorMessage: {
+      message: ((args?: any) => string) | string
+      type: HttpStatus
+      key?: keyof ObjectByInterface<typeof GroupFieldsEnum, ModelBase>
+    }
+  ) {
+    if (Array.isArray(filter)) {
+      for await (const f of filter) {
+        const candidate = await this.groupModel.exists(f)
+
+        if (!candidate) {
+          throw new HttpException(
+            typeof errorMessage.message === 'string'
+              ? errorMessage.message
+              : errorMessage.message(errorMessage.key ? f[errorMessage.key] : undefined),
+            errorMessage.type
+          )
+        }
+      }
+    } else {
+      if (!(await this.groupModel.exists(filter))) {
+        throw new HttpException(
+          typeof errorMessage.message === 'string'
+            ? errorMessage.message
+            : errorMessage.message(errorMessage.key ? filter[errorMessage.key] : undefined),
+          errorMessage.type
+        )
+      }
+    }
+
+    return true
   }
 }

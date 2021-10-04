@@ -2,6 +2,7 @@ import { UnauthorizedException } from '@nestjs/common'
 import { AdminAccessTokenData } from '../../modules/admin/admin.service'
 import { OwnerAccessTokenData } from '../strategies/ownerJwt.strategy'
 import { ResponsibleAccessTokenData } from '../../modules/responsible/responsible.service'
+import { Types } from 'mongoose'
 
 export const OWNER_ACCESS_TOKEN_DATA = 'OWNER_ACCESS_TOKEN_DATA'
 export const ADMIN_ACCESS_TOKEN_DATA = 'ADMIN_ACCESS_TOKEN_DATA'
@@ -23,10 +24,10 @@ export const adminExampleAccessTokenData: AdminAccessTokenData = {
 
 export const responsibleExampleAccessTokenData: ResponsibleAccessTokenData = {
   tokenType: RESPONSIBLE_ACCESS_TOKEN_DATA,
+  id: Types.ObjectId('614f988c42232d2d79af9451'),
   login: '',
   name: '',
   uniqueKey: '',
-  groups: [],
 }
 
 export interface JwtType<T> {
