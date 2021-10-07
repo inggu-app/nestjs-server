@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common'
 import { GroupService } from './group.service'
-import { CreateGroupDto } from './dto/create-group.dto'
+import { CreateGroupDto } from './dto/createGroup.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
@@ -28,6 +28,8 @@ import {
 } from './group.constants'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
+import { Functionality } from '../../decorators/Functionality.decorator'
+import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 
 @Controller()
 export class GroupController {
@@ -37,15 +39,22 @@ export class GroupController {
     private readonly responsibleService: ResponsibleService
   ) {}
 
-  @UseGuards(AdminJwtAuthGuard)
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__CREATE,
+    title: 'Создать группу',
+  })
   @UsePipes(new ValidationPipe())
   @Post('/')
   async create(@Body() dto: CreateGroupDto) {
-    await this.facultyService.getById(Types.ObjectId(dto.faculty))
+    await this.facultyService.getById(dto.faculty)
 
     return this.groupService.create(dto)
   }
 
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__GET,
+    title: 'Получить группу/список групп',
+  })
   @Get('/')
   async get(
     @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
@@ -112,16 +121,29 @@ export class GroupController {
     }
   }
 
-  @UseGuards(AdminJwtAuthGuard)
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__UPDATE,
+    title: 'Обновить группу',
+  })
   @UsePipes(new ValidationPipe())
   @Patch('/')
   async update(@Body() dto: UpdateGroupDto) {
     return this.groupService.update(dto)
   }
 
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__DELETE,
+    title: 'Обновить группу',
+  })
   @UseGuards(AdminJwtAuthGuard)
   @Delete('/')
   async delete(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
     return this.groupService.delete(id)
   }
+
+  // -----------------
+  // updateHandler(
+  //   functionality: AvailableFunctionality<GroupUpdateDataForFunctionality>,
+  //   body: UpdateGroupDto
+  // ) {}
 }

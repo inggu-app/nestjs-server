@@ -1,8 +1,8 @@
 import enumKeyValuesMatch from '../utils/enumKeyValuesMatch'
 
-export enum DefaultFields {
+export enum DefaultFieldsEnum {
   createdAt = 'createdAt',
   updatedAt = 'updatedAt',
 }
 
-enumKeyValuesMatch(DefaultFields)
+enumKeyValuesMatch(DefaultFieldsEnum)

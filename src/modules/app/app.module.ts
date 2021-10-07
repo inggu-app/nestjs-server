@@ -11,6 +11,11 @@ import { SettingsModule } from '../settings/settings.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
 import { AdminModule } from '../admin/admin.module'
 import { NoteModule } from '../note/note.module'
+import { UserModule } from '../user/user.module'
+import { RoleModule } from '../role/role.module'
+import { FunctionalityModule } from '../functionality/functionality.module'
+import { JwtModule } from '@nestjs/jwt'
+import getJWTConfig from '../../configs/jwt.config'
 
 @Module({
   imports: [
@@ -19,8 +24,19 @@ import { NoteModule } from '../note/note.module'
     ResponsibleModule,
     AdminModule,
     NoteModule,
+    UserModule,
+    RoleModule,
+    FunctionalityModule,
     RouterModule.forRoutes(routesConfig),
     ConfigModule.forRoot(),
+    {
+      ...JwtModule.registerAsync({
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: getJWTConfig,
+      }),
+      global: true,
+    },
     TypegooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

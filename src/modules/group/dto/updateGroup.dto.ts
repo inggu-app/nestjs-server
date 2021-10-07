@@ -1,14 +1,14 @@
 import { IsMongoId, IsNotEmpty, IsString } from 'class-validator'
-import { Types } from 'mongoose'
+import { MongoIdString } from '../../../global/types'
 
 export class UpdateGroupDto {
   @IsMongoId()
-  id: Types.ObjectId
+  id: MongoIdString
 
   @IsString()
   @IsNotEmpty()
   title: string
 
   @IsMongoId()
-  faculty: Types.ObjectId
+  faculty: MongoIdString
 }

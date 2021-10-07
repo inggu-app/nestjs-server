@@ -11,3 +11,5 @@ export type ObjectByInterface<T, F = any, K = any> = Partial<
     [key in keyof T | keyof F]: K
   }
 >
+
+export type MongoIdString = string

@@ -11,6 +11,7 @@ import { AppVersionModule } from '../modules/settings/appVersion/appVersion.modu
 import { ResponsibleModule } from '../modules/responsible/responsible.module'
 import { AdminModule } from '../modules/admin/admin.module'
 import { NoteModule } from '../modules/note/note.module'
+import { UserModule } from '../modules/user/user.module'
 
 export const routesConfig: Routes = [
   {
@@ -36,6 +37,10 @@ export const routesConfig: Routes = [
   {
     path: '/notes',
     module: NoteModule,
+  },
+  {
+    path: '/users',
+    module: UserModule,
   },
   {
     path: '/settings',

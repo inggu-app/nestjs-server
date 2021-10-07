@@ -3,6 +3,7 @@ import { AdminAccessTokenData } from '../../modules/admin/admin.service'
 import { OwnerAccessTokenData } from '../strategies/ownerJwt.strategy'
 import { ResponsibleAccessTokenData } from '../../modules/responsible/responsible.service'
 import { Types } from 'mongoose'
+import { UserAccessTokenData } from '../../modules/user/user.service'
 
 export const OWNER_ACCESS_TOKEN_DATA = 'OWNER_ACCESS_TOKEN_DATA'
 export const ADMIN_ACCESS_TOKEN_DATA = 'ADMIN_ACCESS_TOKEN_DATA'

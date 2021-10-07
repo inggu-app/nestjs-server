@@ -1,4 +1,4 @@
-import { DefaultFields } from '../../global/enums/defaultFields'
+import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 
 export enum GetScheduleEnum {
@@ -25,7 +25,7 @@ export enum _ScheduleAdditionalFieldsEnum {
 
 export const ScheduleAdditionalFieldsEnum = {
   ..._ScheduleAdditionalFieldsEnum,
-  ...DefaultFields,
+  ...DefaultFieldsEnum,
 }
 
 export type ScheduleField =

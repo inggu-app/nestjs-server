@@ -1,8 +1,5 @@
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
-import { DefaultFields } from '../../global/enums/defaultFields'
-
-export const RESPONSIBLE_EXISTS = 'Ответственный с таким логином уже существует'
-export const RESPONSIBLE_NOT_FOUND = 'Ответственный с таким id не существует'
+import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
 
 export enum GetResponsibleEnum {
   responsibleId,
@@ -21,7 +18,7 @@ export enum ResponsibleFieldsEnum {
 }
 
 export const ResponsibleAdditionalFieldsEnum = {
-  ...DefaultFields,
+  ...DefaultFieldsEnum,
 }
 
 export enum ResponsibleForbiddenFieldsEnum {

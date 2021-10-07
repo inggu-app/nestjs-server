@@ -1,5 +1,5 @@
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
-import { DefaultFields } from '../../global/enums/defaultFields'
+import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
 
 export enum GetFacultiesEnum {
   facultyId,
@@ -11,7 +11,7 @@ export enum FacultyFieldsEnum {
 }
 
 export const FacultyAdditionalFieldsEnum = {
-  ...DefaultFields,
+  ...DefaultFieldsEnum,
 }
 
 export type FacultyField = keyof typeof FacultyFieldsEnum

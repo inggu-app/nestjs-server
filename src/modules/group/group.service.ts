@@ -9,7 +9,7 @@ import {
 import { InjectModel } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { CreateGroupDto } from './dto/create-group.dto'
+import { CreateGroupDto } from './dto/createGroup.dto'
 import { Error, Types } from 'mongoose'
 import { GroupField, GroupFieldsEnum } from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
@@ -20,7 +20,8 @@ import {
   GROUP_WITH_ID_NOT_FOUND,
   GROUP_WITH_TITLE_EXISTS,
 } from '../../global/constants/errors.constants'
-import { ModelBase, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
 export class GroupService {
@@ -34,13 +35,16 @@ export class GroupService {
   async create(dto: CreateGroupDto) {
     await this.checkExists(
       { title: dto.title, faculty: dto.faculty },
-      new HttpException(GROUP_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST)
+      new HttpException(GROUP_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST),
+      false
     )
 
     return this.groupModel.create(dto)
   }
 
-  async getById(groupId: Types.ObjectId, fields?: GroupField[]) {
+  async getById(groupId: MongoIdString | Types.ObjectId, fields?: GroupField[]) {
+    groupId = stringToObjectId(groupId)
+
     const candidate = await this.groupModel
       .findById(groupId, fieldsArrayToProjection(fields))
       .exec()
@@ -109,21 +113,29 @@ export class GroupService {
       | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>
       | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(GROUP_WITH_ID_NOT_FOUND(f._id))
+      new NotFoundException(GROUP_WITH_ID_NOT_FOUND(f._id)),
+    checkExisting = true
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.groupModel.exists(f)
 
-        if (!candidate) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+        if (!candidate && checkExisting) {
+          if (typeof error === 'function') throw error(f)
+          throw Error
+        } else if (candidate && !checkExisting) {
+          if (typeof error === 'function') throw error(f)
+          throw Error
         }
       }
     } else {
-      if (!(await this.groupModel.exists(filter))) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+      const candidate = await this.groupModel.exists(filter)
+      if (!candidate && checkExisting) {
+        if (typeof error === 'function') throw error(filter)
+        throw Error
+      } else if (candidate && !checkExisting) {
+        if (typeof error === 'function') throw error(filter)
+        throw error
       }
     }
 

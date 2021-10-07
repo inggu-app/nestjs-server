@@ -1,5 +1,5 @@
 import { IsIn, IsString, Matches } from 'class-validator'
-import { OperationSystems } from '../../../../global/enums/OS'
+import { OperationSystems } from '../../../../global/enums/OS.enum'
 
 export class SetCurrentVersionDto {
   @IsIn([OperationSystems.ANDROID, OperationSystems.IOS])

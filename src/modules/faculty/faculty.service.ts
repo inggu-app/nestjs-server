@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
-import { CreateFacultyDto } from './dto/create-faculty.dto'
+import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
@@ -11,7 +11,8 @@ import {
   FACULTY_WITH_ID_NOT_FOUND,
   FACULTY_WITH_TITLE_EXISTS,
 } from '../../global/constants/errors.constants'
-import { ModelBase, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
 export class FacultyService {
@@ -26,7 +27,8 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
-  async getById(facultyId: Types.ObjectId, fields?: FacultyField[]) {
+  async getById(facultyId: MongoIdString | Types.ObjectId, fields?: FacultyField[]) {
+    facultyId = stringToObjectId(facultyId)
     const candidate = await this.facultyModel
       .findById(facultyId, fieldsArrayToProjection(fields))
       .exec()

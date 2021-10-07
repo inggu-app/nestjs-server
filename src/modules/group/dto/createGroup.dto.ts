@@ -1,4 +1,5 @@
 import { IsMongoId, IsNotEmpty, IsString } from 'class-validator'
+import { MongoIdString } from '../../../global/types'
 
 export class CreateGroupDto {
   @IsString()
@@ -6,5 +7,5 @@ export class CreateGroupDto {
   title: string
 
   @IsMongoId()
-  faculty: string
+  faculty: MongoIdString
 }

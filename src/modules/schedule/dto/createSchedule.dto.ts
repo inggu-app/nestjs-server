@@ -11,7 +11,7 @@ import {
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
-import { WeekDaysEnum } from '../../../global/enums/WeekDays'
+import { WeekDaysEnum } from '../../../global/enums/WeekDays.enum'
 import { LessonFieldsEnum, WeeksTypeEnum } from '../schedule.constants'
 
 export interface ICreateScheduleDto {

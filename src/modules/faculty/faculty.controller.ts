@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common'
 import { FacultyService } from './faculty.service'
-import { CreateFacultyDto } from './dto/create-faculty.dto'
+import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'

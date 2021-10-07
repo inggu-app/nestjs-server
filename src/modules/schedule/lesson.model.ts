@@ -4,7 +4,7 @@ import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config
 import { FacultyModel } from '../faculty/faculty.model'
 import { Types } from 'mongoose'
 import { LessonFieldsEnum, WeeksTypeEnum } from './schedule.constants'
-import { WeekDaysEnum } from '../../global/enums/WeekDays'
+import { WeekDaysEnum } from '../../global/enums/WeekDays.enum'
 
 type Lesson = {
   [key in LessonFieldsEnum]: any

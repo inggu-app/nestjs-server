@@ -2,6 +2,7 @@ import { Types } from 'mongoose'
 import { EmptyEnum } from './other.constants'
 import { DeviceId } from '../types'
 import { getEnumValues } from '../utils/enumKeysValues'
+import { FunctionalityCodesEnum } from '../enums/functionalities.enum'
 
 export const INVALID_MONGO_ID = 'Некорретный id'
 export const INVALID_DATE = 'Дата должна быть в формате yyyy-MM-ddThh:mm:ss.SSSZ'
@@ -33,7 +34,7 @@ export const FACULTY_WITH_TITLE_EXISTS = (title: string) =>
 
 export const GROUP_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Группа с id "${id}" не существует`
 export const GROUP_WITH_TITLE_EXISTS = (title: string) =>
-  `Группа сназванием "${title}" уже существует`
+  `Группа с названием "${title}" уже существует`
 
 export const RESPONSIBLE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) =>
   `Ответственный с id "${id}" не существует`
@@ -45,3 +46,12 @@ export const LESSON_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Занятие 
 export const NOTE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Заметки с id "${id}" не существует`
 export const INVALID_NOTE_DEVICE_ID = (id: Types.ObjectId, deviceId: DeviceId) =>
   `Заметка c id ${id} создана не устройством с deviceId ${deviceId}`
+
+export const ROLE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Роль с id "${id}" не существует`
+export const ROLE_WITH_TITLE_EXISTS = (title: string) =>
+  `Роль с названием "${title}" уже существует`
+
+export const USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) =>
+  `Пользователь с id "${id}" не существует`
+export const USER_WITH_LOGIN_EXISTS = (login: string) =>
+  `Пользователь с логином "${login}" уже существует`
