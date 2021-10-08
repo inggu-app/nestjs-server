@@ -7,9 +7,7 @@ import { CreateSecretLabelDto } from './dto/createSecretLabel.dto'
 
 @Injectable()
 export class SecretLabelService {
-  constructor(
-    @InjectModel(SecretLabelModel) private readonly secretLabelModel: ModelType<SecretLabelModel>
-  ) {}
+  constructor(@InjectModel(SecretLabelModel) private readonly secretLabelModel: ModelType<SecretLabelModel>) {}
 
   getActiveSecretLabel() {
     return this.secretLabelModel.findOne(

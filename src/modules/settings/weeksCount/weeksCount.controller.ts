@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { WeeksCountService } from './weeksCount.service'
 import { CreateWeeksCountDto } from './dto/createWeeksCount.dto'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
@@ -29,9 +20,7 @@ export class WeeksCountController {
   }
 
   @Get('/')
-  async getWeeksCount(
-    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
-  ) {
+  async getWeeksCount(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
     const request = checkAlternativeQueryParameters<GetWeeksCountEnum>({
       updatedAt,
       enum: GetWeeksCountEnum.get,
@@ -41,10 +30,7 @@ export class WeeksCountController {
       case GetWeeksCountEnum.get:
         const weeksCount = await this.weeksCountService.getActiveWeeksCount()
 
-        if (
-          (weeksCount && weeksCount?.updatedAt && request.updatedAt < weeksCount?.updatedAt) ||
-          !request.updatedAt
-        ) {
+        if ((weeksCount && weeksCount?.updatedAt && request.updatedAt < weeksCount?.updatedAt) || !request.updatedAt) {
           return weeksCount
         } else {
           return {

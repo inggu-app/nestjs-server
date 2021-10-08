@@ -1,26 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpException,
-  HttpStatus,
-  Post,
-  Query,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { NoteService } from './note.service'
 import { CreateNoteDto } from './dto/createNoteDto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
-import {
-  GetNotesEnum,
-  NoteAdditionalFieldsEnum,
-  NoteField,
-  NoteFieldsEnum,
-  NoteForbiddenFieldsEnum,
-} from './note.constants'
+import { GetNotesEnum, NoteAdditionalFieldsEnum, NoteField, NoteFieldsEnum, NoteForbiddenFieldsEnum } from './note.constants'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
@@ -65,10 +48,10 @@ export class NoteController {
 
     switch (request.enum) {
       case GetNotesEnum.BY_LESSON:
-        return normalizeFields(
-          await this.noteService.get(request.lessonId, request.week, request.fields),
-          { fields: request.fields, forbiddenFields: NoteForbiddenFieldsEnum }
-        )
+        return normalizeFields(await this.noteService.get(request.lessonId, request.week, request.fields), {
+          fields: request.fields,
+          forbiddenFields: NoteForbiddenFieldsEnum,
+        })
       case GetNotesEnum.BY_ID:
         return normalizeFields(await this.noteService.getById(request.noteId, request.fields), {
           fields: request.fields,

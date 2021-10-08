@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
@@ -29,9 +20,7 @@ export class CallScheduleController {
   }
 
   @Get('/')
-  async getCallSchedule(
-    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
-  ) {
+  async getCallSchedule(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
     const request = checkAlternativeQueryParameters<GetCallScheduleEnum>({
       updatedAt,
       enum: GetCallScheduleEnum.get,
@@ -41,12 +30,7 @@ export class CallScheduleController {
       case GetCallScheduleEnum.get:
         const callSchedule = await this.callScheduleService.getActiveCallSchedule()
 
-        if (
-          (callSchedule &&
-            callSchedule?.updatedAt &&
-            request.updatedAt < callSchedule?.updatedAt) ||
-          !request.updatedAt
-        ) {
+        if ((callSchedule && callSchedule?.updatedAt && request.updatedAt < callSchedule?.updatedAt) || !request.updatedAt) {
           return callSchedule
         } else {
           return {

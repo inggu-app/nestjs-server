@@ -11,9 +11,7 @@ export class FunctionalityService {
     cacheManager
       .reset()
       .then(() =>
-        this.create(FunctionalityService.initializableFunctionalities).then(() =>
-          console.log('Функциональности инициализированы')
-        )
+        this.create(FunctionalityService.initializableFunctionalities).then(() => console.log('Функциональности инициализированы'))
       )
   }
 

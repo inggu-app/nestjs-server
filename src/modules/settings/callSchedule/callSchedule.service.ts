@@ -7,15 +7,10 @@ import { CallScheduleModel } from './callSchedule.model'
 
 @Injectable()
 export class CallScheduleService {
-  constructor(
-    @InjectModel(CallScheduleModel) private readonly callScheduleModel: ModelType<CallScheduleModel>
-  ) {}
+  constructor(@InjectModel(CallScheduleModel) private readonly callScheduleModel: ModelType<CallScheduleModel>) {}
 
   getActiveCallSchedule() {
-    return this.callScheduleModel.findOne(
-      { isActive: true, settingType: CALL_SCHEDULE_TYPE },
-      { schedule: 1, updatedAt: 1, _id: 0 }
-    )
+    return this.callScheduleModel.findOne({ isActive: true, settingType: CALL_SCHEDULE_TYPE }, { schedule: 1, updatedAt: 1, _id: 0 })
   }
 
   createCallSchedule(dto: CreateCallScheduleDto) {

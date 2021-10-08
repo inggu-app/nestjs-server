@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
@@ -16,10 +9,7 @@ import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
-import {
-  GROUP_WITH_ID_NOT_FOUND,
-  GROUP_WITH_TITLE_EXISTS,
-} from '../../global/constants/errors.constants'
+import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
@@ -45,9 +35,7 @@ export class GroupService {
   async getById(groupId: MongoIdString | Types.ObjectId, fields?: GroupField[]) {
     groupId = stringToObjectId(groupId)
 
-    const candidate = await this.groupModel
-      .findById(groupId, fieldsArrayToProjection(fields))
-      .exec()
+    const candidate = await this.groupModel.findById(groupId, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
@@ -58,19 +46,14 @@ export class GroupService {
 
   getAll(page: number, count: number, title?: string, fields?: GroupField[]) {
     return this.groupModel
-      .find(
-        title ? { title: { $regex: title, $options: 'i' } } : {},
-        fieldsArrayToProjection(fields)
-      )
+      .find(title ? { title: { $regex: title, $options: 'i' } } : {}, fieldsArrayToProjection(fields))
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
   countAll(title?: string) {
-    return this.groupModel
-      .countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
-      .exec()
+    return this.groupModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {}).exec()
   }
 
   async getByFacultyId(facultyId: Types.ObjectId, fields?: GroupField[]) {
@@ -109,9 +92,7 @@ export class GroupService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>[],
+    filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase> | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase>) => Error) | Error = f =>
       new NotFoundException(GROUP_WITH_ID_NOT_FOUND(f._id)),
     checkExisting = true

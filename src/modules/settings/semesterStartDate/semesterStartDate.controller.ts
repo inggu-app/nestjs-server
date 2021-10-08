@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { SemesterStartDateService } from './semesterStartDate.service'
 import { CreateSemesterStartDateDto } from './dto/createSemesterStartDate.dto'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
@@ -29,9 +20,7 @@ export class SemesterStartDateController {
   }
 
   @Get('/')
-  async getSemesterStartTime(
-    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
-  ) {
+  async getSemesterStartTime(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
     const request = checkAlternativeQueryParameters<GetSemesterStartDateEnum>({
       updatedAt,
       enum: GetSemesterStartDateEnum.get,
@@ -41,12 +30,7 @@ export class SemesterStartDateController {
       case GetSemesterStartDateEnum.get:
         const semesterStartTime = await this.semesterStartDateService.getActiveSemesterStartDate()
 
-        if (
-          (semesterStartTime &&
-            semesterStartTime?.updatedAt &&
-            request.updatedAt < semesterStartTime?.updatedAt) ||
-          !request.updatedAt
-        ) {
+        if ((semesterStartTime && semesterStartTime?.updatedAt && request.updatedAt < semesterStartTime?.updatedAt) || !request.updatedAt) {
           return semesterStartTime
         } else {
           return {

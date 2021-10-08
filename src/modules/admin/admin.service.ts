@@ -11,11 +11,8 @@ import { Error, Types } from 'mongoose'
 import { AdminField, AdminFieldsEnum } from './admin.constants'
 import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
-import {
-  ADMIN_WITH_ID_NOT_FOUND,
-  ADMIN_WITH_LOGIN_EXISTS,
-  INCORRECT_CREDENTIALS,
-} from '../../global/constants/errors.constants'
+import { ADMIN_WITH_ID_NOT_FOUND, ADMIN_WITH_LOGIN_EXISTS, INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
+
 import { JwtService } from '@nestjs/jwt'
 import { ADMIN_ACCESS_TOKEN_DATA, JwtType } from '../../global/utils/checkJwtType'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
@@ -31,16 +28,10 @@ export interface AdminAccessTokenData extends JwtType<typeof ADMIN_ACCESS_TOKEN_
 
 @Injectable()
 export class AdminService {
-  constructor(
-    @InjectModel(AdminModel) private readonly adminModel: ModelType<AdminModel>,
-    private readonly jwtService: JwtService
-  ) {}
+  constructor(@InjectModel(AdminModel) private readonly adminModel: ModelType<AdminModel>, private readonly jwtService: JwtService) {}
 
   async create(dto: CreateAdminDto) {
-    await this.checkExists(
-      { login: dto.login },
-      new HttpException(ADMIN_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
-    )
+    await this.checkExists({ login: dto.login }, new HttpException(ADMIN_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST))
 
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
@@ -118,9 +109,7 @@ export class AdminService {
   async login(dto: LoginAdminDto) {
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
-    const candidate = await this.adminModel
-      .findOneAndUpdate({ login: dto.login }, { $set: { hashedUniqueKey } })
-      .exec()
+    const candidate = await this.adminModel.findOneAndUpdate({ login: dto.login }, { $set: { hashedUniqueKey } }).exec()
 
     if (!candidate) {
       throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.BAD_REQUEST)
@@ -145,9 +134,7 @@ export class AdminService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof AdminFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof AdminFieldsEnum, ModelBase>[],
+    filter: ObjectByInterface<typeof AdminFieldsEnum, ModelBase> | ObjectByInterface<typeof AdminFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof AdminFieldsEnum, ModelBase>) => Error) | Error = f =>
       new NotFoundException(ADMIN_WITH_ID_NOT_FOUND(f._id))
   ) {

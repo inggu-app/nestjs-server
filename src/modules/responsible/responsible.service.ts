@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import * as bcrypt from 'bcrypt'
 import { ResponsibleModel } from './responsible.model'
@@ -48,10 +41,7 @@ export class ResponsibleService {
   ) {}
 
   async create(dto: CreateResponsibleDto) {
-    await this.checkExists(
-      { login: dto.login },
-      new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.CONFLICT)
-    )
+    await this.checkExists({ login: dto.login }, new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.CONFLICT))
 
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
@@ -77,17 +67,12 @@ export class ResponsibleService {
   }
 
   async deleteGroupsFromAllResponsibles(ids: Types.ObjectId[]) {
-    await this.responsibleModel
-      .updateMany({ groups: { $in: ids } }, { $pull: { groups: { $in: ids } } })
-      .exec()
+    await this.responsibleModel.updateMany({ groups: { $in: ids } }, { $pull: { groups: { $in: ids } } }).exec()
   }
 
   async update(dto: UpdateResponsibleDto) {
     await this.checkExists({ _id: dto.id })
-    await this.checkExists(
-      { login: dto.login },
-      new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST)
-    )
+    await this.checkExists({ login: dto.login }, new HttpException(RESPONSIBLE_WITH_LOGIN_EXISTS(dto.login), HttpStatus.BAD_REQUEST))
     for await (const groupId of dto.groups) await this.groupService.checkExists({ _id: groupId })
 
     await this.responsibleModel
@@ -131,9 +116,7 @@ export class ResponsibleService {
   }
 
   async getById(id: Types.ObjectId, fields?: ResponsibleField[]) {
-    const candidate = await this.responsibleModel
-      .findById(id, fieldsArrayToProjection(fields))
-      .exec()
+    const candidate = await this.responsibleModel.findById(id, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {
       throw new HttpException(RESPONSIBLE_WITH_ID_NOT_FOUND(id), HttpStatus.BAD_REQUEST)
@@ -150,33 +133,21 @@ export class ResponsibleService {
       .exec()
   }
 
-  async getAllByGroup(
-    groupId: Types.ObjectId,
-    page?: number,
-    count?: number,
-    fields?: ResponsibleField[]
-  ) {
+  async getAllByGroup(groupId: Types.ObjectId, page?: number, count?: number, fields?: ResponsibleField[]) {
     await this.groupService.checkExists({ _id: groupId })
     const checkedPageCount = checkPageCount(page, count)
 
-    const responsibles = this.responsibleModel.find(
-      { groups: { $in: [groupId] } },
-      fieldsArrayToProjection(fields)
-    )
+    const responsibles = this.responsibleModel.find({ groups: { $in: [groupId] } }, fieldsArrayToProjection(fields))
 
     if (checkedPageCount.page !== undefined) {
-      return responsibles
-        .skip((checkedPageCount.page - 1) * checkedPageCount.count)
-        .limit(checkedPageCount.count)
+      return responsibles.skip((checkedPageCount.page - 1) * checkedPageCount.count).limit(checkedPageCount.count)
     }
 
     return responsibles
   }
 
   countByName(name?: string) {
-    return this.responsibleModel
-      .countDocuments(name ? { name: { $regex: name, $options: 'i' } } : {})
-      .exec()
+    return this.responsibleModel.countDocuments(name ? { name: { $regex: name, $options: 'i' } } : {}).exec()
   }
 
   countByGroup(id: Types.ObjectId) {
@@ -199,9 +170,7 @@ export class ResponsibleService {
   async login(dto: LoginResponsibleDto) {
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
-    const candidate = await this.responsibleModel
-      .findOneAndUpdate({ login: dto.login }, { $set: { hashedUniqueKey } })
-      .exec()
+    const candidate = await this.responsibleModel.findOneAndUpdate({ login: dto.login }, { $set: { hashedUniqueKey } }).exec()
 
     if (!candidate) {
       throw new HttpException(INCORRECT_CREDENTIALS, HttpStatus.BAD_REQUEST)
@@ -226,12 +195,9 @@ export class ResponsibleService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>[],
-    error:
-      | ((filter: ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>) => Error)
-      | Error = f => new NotFoundException(RESPONSIBLE_WITH_ID_NOT_FOUND(f._id))
+    filter: ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase> | ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>[],
+    error: ((filter: ObjectByInterface<typeof ResponsibleFieldsEnum, ModelBase>) => Error) | Error = f =>
+      new NotFoundException(RESPONSIBLE_WITH_ID_NOT_FOUND(f._id))
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {

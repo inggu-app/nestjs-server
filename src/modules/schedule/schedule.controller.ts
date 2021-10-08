@@ -1,24 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
-import {
-  GetScheduleEnum,
-  ScheduleAdditionalFieldsEnum,
-  ScheduleField,
-  LessonFieldsEnum,
-} from './schedule.constants'
+import { GetScheduleEnum, ScheduleAdditionalFieldsEnum, ScheduleField, LessonFieldsEnum } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.guard'

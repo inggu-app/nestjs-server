@@ -45,9 +45,7 @@ export class NoteService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof NoteFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof NoteFieldsEnum, ModelBase>[],
+    filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase> | ObjectByInterface<typeof NoteFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase>) => Error) | Error = f =>
       new NotFoundException(NOTE_WITH_ID_NOT_FOUND(f._id))
   ) {

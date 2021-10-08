@@ -25,9 +25,7 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
         this.availableFields = this.fields
       }
       if (options.forbiddenFieldsEnum)
-        this.availableFields = this.fields.filter(field =>
-          options.forbiddenFieldsEnum ? !(field in options.forbiddenFieldsEnum) : false
-        )
+        this.availableFields = this.fields.filter(field => (options.forbiddenFieldsEnum ? !(field in options.forbiddenFieldsEnum) : false))
     }
   }
 
@@ -41,20 +39,14 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
     const unnecessarySymbols = value.replace(/([a-zA-Z0-9,_])+/g, '')
 
     if (unnecessarySymbols) {
-      throw new HttpException(
-        UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER(unnecessarySymbols),
-        HttpStatus.BAD_REQUEST
-      )
+      throw new HttpException(UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER(unnecessarySymbols), HttpStatus.BAD_REQUEST)
     }
 
     const receivedFields = value.split(',')
 
     receivedFields.forEach(receivedField => {
       if (!this.availableFields.includes(receivedField)) {
-        throw new HttpException(
-          NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER(receivedField),
-          HttpStatus.BAD_REQUEST
-        )
+        throw new HttpException(NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER(receivedField), HttpStatus.BAD_REQUEST)
       }
     })
 

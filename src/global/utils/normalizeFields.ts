@@ -6,10 +6,7 @@ interface Options<T> {
   forbiddenFields?: EmptyEnum
 }
 
-export default function normalizeFields<T extends string[]>(
-  response: { [key: string]: any },
-  data: Options<T>
-) {
+export default function normalizeFields<T extends string[]>(response: { [key: string]: any }, data: Options<T>) {
   if (!data.fields) return response
 
   if (Array.isArray(response)) {

@@ -11,9 +11,7 @@ import { ModelBase, ObjectByInterface } from '../../global/types'
 
 @Injectable()
 export class ScheduleService {
-  constructor(
-    @InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>
-  ) {}
+  constructor(@InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>) {}
 
   async create(dto: CreateScheduleDto) {
     const lessons = dto.schedule.map(lesson => ({ ...lesson, group: dto.group }))
@@ -21,9 +19,7 @@ export class ScheduleService {
   }
 
   getByGroup(groupId: Types.ObjectId, fields?: ScheduleField[]) {
-    return this.lessonModel
-      .find({ group: groupId }, fieldsArrayToProjection(fields, ['number']))
-      .exec()
+    return this.lessonModel.find({ group: groupId }, fieldsArrayToProjection(fields, ['number'])).exec()
   }
 
   async getById(id: Types.ObjectId, fields?: ScheduleField[]) {
@@ -48,9 +44,7 @@ export class ScheduleService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof LessonFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof LessonFieldsEnum, ModelBase>[],
+    filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase> | ObjectByInterface<typeof LessonFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase>) => Error) | Error = f =>
       new NotFoundException(LESSON_WITH_ID_NOT_FOUND(f._id))
   ) {

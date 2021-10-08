@@ -5,10 +5,7 @@ import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateUserDto } from './dto/createUser.dto'
 import { ModelBase, ObjectByInterface } from '../../global/types'
 import { Error, Types } from 'mongoose'
-import {
-  USER_WITH_ID_NOT_FOUND,
-  USER_WITH_LOGIN_EXISTS,
-} from '../../global/constants/errors.constants'
+import { USER_WITH_ID_NOT_FOUND, USER_WITH_LOGIN_EXISTS } from '../../global/constants/errors.constants'
 import { UserFieldsEnum } from './user.constants'
 import generatePassword from '../../global/utils/generatePassword'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
@@ -25,11 +22,7 @@ export class UserService {
   constructor(@InjectModel(UserModel) private readonly userModel: ModelType<UserModel>) {}
 
   async create(dto: CreateUserDto) {
-    await this.checkExists(
-      { login: dto.login },
-      new BadRequestException(USER_WITH_LOGIN_EXISTS(dto.login)),
-      false
-    )
+    await this.checkExists({ login: dto.login }, new BadRequestException(USER_WITH_LOGIN_EXISTS(dto.login)), false)
 
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
@@ -56,9 +49,7 @@ export class UserService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof UserFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof UserFieldsEnum, ModelBase>[],
+    filter: ObjectByInterface<typeof UserFieldsEnum, ModelBase> | ObjectByInterface<typeof UserFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof UserFieldsEnum, ModelBase>) => Error) | Error = f =>
       new NotFoundException(USER_WITH_ID_NOT_FOUND(f._id)),
     checkExisting = true

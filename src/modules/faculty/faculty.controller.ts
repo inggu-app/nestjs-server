@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { FacultyService } from './faculty.service'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
@@ -19,21 +8,13 @@ import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
-import {
-  FacultyAdditionalFieldsEnum,
-  FacultyField,
-  FacultyFieldsEnum,
-  GetFacultiesEnum,
-} from './faculty.constants'
+import { FacultyAdditionalFieldsEnum, FacultyField, FacultyFieldsEnum, GetFacultiesEnum } from './faculty.constants'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class FacultyController {
-  constructor(
-    private readonly facultyService: FacultyService,
-    private readonly groupService: GroupService
-  ) {}
+  constructor(private readonly facultyService: FacultyService, private readonly groupService: GroupService) {}
 
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
@@ -64,23 +45,14 @@ export class FacultyController {
 
     switch (request.enum) {
       case GetFacultiesEnum.facultyId:
-        return normalizeFields(
-          await this.facultyService.getById(request.facultyId, request.fields),
-          {
-            fields: request.fields,
-          }
-        )
+        return normalizeFields(await this.facultyService.getById(request.facultyId, request.fields), {
+          fields: request.fields,
+        })
       case GetFacultiesEnum.all:
         return {
-          faculties: normalizeFields(
-            await this.facultyService.getAll(
-              request.page,
-              request.count,
-              request.title,
-              request.fields
-            ),
-            { fields: request.fields }
-          ),
+          faculties: normalizeFields(await this.facultyService.getAll(request.page, request.count, request.title, request.fields), {
+            fields: request.fields,
+          }),
           count: await this.facultyService.countAll(request.title),
         }
     }

@@ -5,16 +5,9 @@ import { ConfigService } from '@nestjs/config'
 import * as bcrypt from 'bcrypt'
 import { Credentials } from '../../modules/admin/dto/createAdmin.dto'
 import { OWNER_STRATEGY_NAME } from '../constants/strategies.constants'
-import {
-  checkJwtType,
-  JwtType,
-  OWNER_ACCESS_TOKEN_DATA,
-  ownerExampleAccessTokenData,
-} from '../utils/checkJwtType'
+import { checkJwtType, JwtType, OWNER_ACCESS_TOKEN_DATA, ownerExampleAccessTokenData } from '../utils/checkJwtType'
 
-export interface OwnerAccessTokenData
-  extends JwtType<typeof OWNER_ACCESS_TOKEN_DATA>,
-    Credentials {}
+export interface OwnerAccessTokenData extends JwtType<typeof OWNER_ACCESS_TOKEN_DATA>, Credentials {}
 
 @Injectable()
 export class OwnerJwtStrategy extends PassportStrategy(Strategy, OWNER_STRATEGY_NAME) {

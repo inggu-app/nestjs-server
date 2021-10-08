@@ -1,15 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+
 import { OwnerJwtAuthGuard } from '../../global/guards/ownerJwtAuth.guard'
 import { AdminService } from './admin.service'
 import { CreateAdminDto } from './dto/createAdmin.dto'
@@ -19,13 +9,7 @@ import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
-import {
-  AdminAdditionalFieldsEnum,
-  AdminField,
-  AdminFieldsEnum,
-  AdminForbiddenFieldsEnum,
-  GetAdminsEnum,
-} from './admin.constants'
+import { AdminAdditionalFieldsEnum, AdminField, AdminFieldsEnum, AdminForbiddenFieldsEnum, GetAdminsEnum } from './admin.constants'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import normalizeFields from '../../global/utils/normalizeFields'
 
@@ -69,13 +53,10 @@ export class AdminController {
           forbiddenFields: AdminForbiddenFieldsEnum,
         })
       case GetAdminsEnum.all:
-        return normalizeFields(
-          await this.adminService.getAll(request.page, request.count, request.name, request.fields),
-          {
-            fields: request.fields,
-            forbiddenFields: AdminForbiddenFieldsEnum,
-          }
-        )
+        return normalizeFields(await this.adminService.getAll(request.page, request.count, request.name, request.fields), {
+          fields: request.fields,
+          forbiddenFields: AdminForbiddenFieldsEnum,
+        })
     }
   }
 

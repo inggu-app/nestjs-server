@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CreateSecretLabelDto } from './dto/createSecretLabel.dto'
 import { SecretLabelService } from './secretLabel.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
@@ -29,9 +20,7 @@ export class SecretLabelController {
   }
 
   @Get('/')
-  async getSecretLabel(
-    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date
-  ) {
+  async getSecretLabel(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
     const request = checkAlternativeQueryParameters<GetSecretLabelEnum>({
       updatedAt,
       enum: GetSecretLabelEnum.get,
@@ -41,10 +30,7 @@ export class SecretLabelController {
       case GetSecretLabelEnum.get:
         const secretLabel = await this.secretLabelService.getActiveSecretLabel()
 
-        if (
-          (secretLabel && secretLabel?.updatedAt && request.updatedAt < secretLabel?.updatedAt) ||
-          !request.updatedAt
-        ) {
+        if ((secretLabel && secretLabel?.updatedAt && request.updatedAt < secretLabel?.updatedAt) || !request.updatedAt) {
           return secretLabel
         } else {
           return {

@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
@@ -19,15 +8,8 @@ import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import checkAlternativeQueryParameters, {
-  ParameterObjectType,
-} from '../../global/utils/alternativeQueryParameters'
-import {
-  GetGroupsEnum,
-  GroupAdditionalFieldsEnum,
-  GroupField,
-  GroupFieldsEnum,
-} from './group.constants'
+import checkAlternativeQueryParameters, { ParameterObjectType } from '../../global/utils/alternativeQueryParameters'
+import { GetGroupsEnum, GroupAdditionalFieldsEnum, GroupField, GroupFieldsEnum } from './group.constants'
 import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 import { Functionality } from '../../decorators/Functionality.decorator'
@@ -112,10 +94,9 @@ export class GroupController {
     title: 'Запросить по id ответственного',
   })
   private async _getByUserId(request: ParameterObjectType<GetGroupsEnum>) {
-    return normalizeFields(
-      await this.responsibleService.getAllGroupsByResponsible(request.userId, request.fields),
-      { fields: request.fields }
-    )
+    return normalizeFields(await this.responsibleService.getAllGroupsByResponsible(request.userId, request.fields), {
+      fields: request.fields,
+    })
   }
 
   @Functionality({
@@ -123,10 +104,7 @@ export class GroupController {
     title: 'Запросить по id факультета',
   })
   private async _getByFacultyId(request: ParameterObjectType<GetGroupsEnum>) {
-    return normalizeFields(
-      await this.groupService.getByFacultyId(request.facultyId, request.fields),
-      { fields: request.fields }
-    )
+    return normalizeFields(await this.groupService.getByFacultyId(request.facultyId, request.fields), { fields: request.fields })
   }
 
   @Functionality({
@@ -135,10 +113,9 @@ export class GroupController {
   })
   private async _getMany(request: ParameterObjectType<GetGroupsEnum>) {
     return {
-      groups: normalizeFields(
-        await this.groupService.getAll(request.page, request.count, request.title, request.fields),
-        { fields: request.fields }
-      ),
+      groups: normalizeFields(await this.groupService.getAll(request.page, request.count, request.title, request.fields), {
+        fields: request.fields,
+      }),
       count: await this.groupService.countAll(request.title),
     }
   }

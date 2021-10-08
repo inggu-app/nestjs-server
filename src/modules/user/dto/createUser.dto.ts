@@ -1,12 +1,4 @@
-import {
-  IsArray,
-  IsIn,
-  IsMongoId,
-  IsNotEmpty,
-  IsObject,
-  IsString,
-  ValidateNested,
-} from 'class-validator'
+import { IsArray, IsIn, IsMongoId, IsNotEmpty, IsObject, IsString, ValidateNested } from 'class-validator'
 import { Types } from 'mongoose'
 import { Type } from 'class-transformer'
 import { getEnumValues } from '../../../global/utils/enumKeysValues'

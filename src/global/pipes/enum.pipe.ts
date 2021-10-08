@@ -29,10 +29,7 @@ export class ParseEnumPipe<T extends EmptyEnum> implements PipeTransform<any, T>
         .map(i => JSON.stringify(i))
         .includes(value)
     ) {
-      throw new HttpException(
-        VALUE_IS_NOT_INCLUDES_IN_ENUM(this.options.enum),
-        HttpStatus.BAD_REQUEST
-      )
+      throw new HttpException(VALUE_IS_NOT_INCLUDES_IN_ENUM(this.options.enum), HttpStatus.BAD_REQUEST)
     }
 
     return value

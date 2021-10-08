@@ -14,9 +14,5 @@ export function checkAppVersion(verifiableVersion: string, currentVersion: strin
     return true
   }
 
-  return (
-    isPatch &&
-    verifiableVersionRelease[0] >= currentVersionRelease[0] &&
-    verifiableVersionRelease[1] >= currentVersionRelease[1]
-  )
+  return isPatch && verifiableVersionRelease[0] >= currentVersionRelease[0] && verifiableVersionRelease[1] >= currentVersionRelease[1]
 }

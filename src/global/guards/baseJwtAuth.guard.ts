@@ -17,11 +17,7 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
     protected readonly jwtService: JwtService
   ) {}
 
-  async validate(
-    functionalityCode: FunctionalityCodesEnum,
-    user: DocumentType<UserModel>,
-    context: ExecutionContext
-  ): Promise<boolean> {
+  async validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, context: ExecutionContext): Promise<boolean> {
     return true
   }
 
@@ -49,9 +45,5 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
 }
 
 export interface JwtAuthGuardValidate {
-  validate(
-    functionalityCode: FunctionalityCodesEnum,
-    user: DocumentType<UserModel>,
-    context: ExecutionContext
-  ): boolean | Promise<boolean>
+  validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, context: ExecutionContext): boolean | Promise<boolean>
 }

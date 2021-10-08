@@ -4,10 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
 import { ConfigService } from '@nestjs/config'
 import { Request } from 'express'
 import { ICreateScheduleDto } from '../../modules/schedule/dto/createSchedule.dto'
-import {
-  ResponsibleAccessTokenData,
-  ResponsibleService,
-} from '../../modules/responsible/responsible.service'
+import { ResponsibleAccessTokenData, ResponsibleService } from '../../modules/responsible/responsible.service'
 import { RESPONSIBLE_STRATEGY_NAME } from '../constants/strategies.constants'
 import { checkJwtType, responsibleExampleAccessTokenData } from '../utils/checkJwtType'
 import { isMongoId } from 'class-validator'
@@ -29,10 +26,7 @@ export class ResponsibleJwtStrategy extends PassportStrategy(Strategy, RESPONSIB
     })
   }
 
-  async validate(
-    request: Request<any, any, ICreateScheduleDto>,
-    accessTokenData: ResponsibleAccessTokenData
-  ) {
+  async validate(request: Request<any, any, ICreateScheduleDto>, accessTokenData: ResponsibleAccessTokenData) {
     if (!isMongoId(request.body.group)) {
       throw new HttpException(INVALID_MONGO_ID, HttpStatus.BAD_REQUEST)
     }

@@ -4,10 +4,7 @@ import { RoleModel } from './role.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { ModelBase, ObjectByInterface } from '../../global/types'
 import { Error, Types } from 'mongoose'
-import {
-  ROLE_WITH_ID_NOT_FOUND,
-  ROLE_WITH_TITLE_EXISTS,
-} from '../../global/constants/errors.constants'
+import { ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { RoleFieldsEnum } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
@@ -17,11 +14,7 @@ export class RoleService {
   constructor(@InjectModel(RoleModel) private readonly roleModel: ModelType<RoleModel>) {}
 
   async create(dto: CreateRoleDto) {
-    await this.checkExists(
-      { title: dto.title },
-      new BadRequestException(ROLE_WITH_TITLE_EXISTS(dto.title)),
-      false
-    )
+    await this.checkExists({ title: dto.title }, new BadRequestException(ROLE_WITH_TITLE_EXISTS(dto.title)), false)
     await this.roleModel.create(dto)
 
     return
@@ -55,9 +48,7 @@ export class RoleService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof RoleFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof RoleFieldsEnum, ModelBase>[],
+    filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase> | ObjectByInterface<typeof RoleFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase>) => Error) | Error = f =>
       new NotFoundException(ROLE_WITH_ID_NOT_FOUND(f._id)),
     checkExisting = true

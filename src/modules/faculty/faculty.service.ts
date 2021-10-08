@@ -7,10 +7,7 @@ import { FacultyField, FacultyFieldsEnum } from './faculty.constants'
 import { Error, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
-import {
-  FACULTY_WITH_ID_NOT_FOUND,
-  FACULTY_WITH_TITLE_EXISTS,
-} from '../../global/constants/errors.constants'
+import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
@@ -19,19 +16,14 @@ export class FacultyService {
   constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
 
   async create(dto: CreateFacultyDto) {
-    await this.checkExists(
-      { title: dto.title },
-      new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST)
-    )
+    await this.checkExists({ title: dto.title }, new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST))
 
     return this.facultyModel.create(dto)
   }
 
   async getById(facultyId: MongoIdString | Types.ObjectId, fields?: FacultyField[]) {
     facultyId = stringToObjectId(facultyId)
-    const candidate = await this.facultyModel
-      .findById(facultyId, fieldsArrayToProjection(fields))
-      .exec()
+    const candidate = await this.facultyModel.findById(facultyId, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
@@ -42,19 +34,14 @@ export class FacultyService {
 
   getAll(page: number, count: number, title?: string, fields?: FacultyField[]) {
     return this.facultyModel
-      .find(
-        title ? { title: { $regex: title, $options: 'i' } } : {},
-        fieldsArrayToProjection(fields)
-      )
+      .find(title ? { title: { $regex: title, $options: 'i' } } : {}, fieldsArrayToProjection(fields))
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
   countAll(title?: string) {
-    return this.facultyModel
-      .countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {})
-      .exec()
+    return this.facultyModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {}).exec()
   }
 
   async update(dto: UpdateFacultyDto) {
@@ -77,12 +64,9 @@ export class FacultyService {
   }
 
   async checkExists(
-    filter:
-      | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>
-      | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>[],
-    error:
-      | ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error)
-      | Error = f => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id))
+    filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase> | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>[],
+    error: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error = f =>
+      new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id))
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {

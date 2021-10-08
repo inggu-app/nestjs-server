@@ -89,9 +89,7 @@ export class AppVersionService {
       case OperationSystems.ANDROID:
         appVersion = await this.androidAppVersionModel.findOne(androidFilter)
         if (appVersion) {
-          appVersion.features = appVersion.features.filter(
-            feature => feature.version !== dto.version
-          )
+          appVersion.features = appVersion.features.filter(feature => feature.version !== dto.version)
           appVersion.features.push(dto)
           await appVersion.save()
         }
@@ -99,9 +97,7 @@ export class AppVersionService {
       case OperationSystems.IOS:
         appVersion = await this.iosAppVersionModel.findOne(iosFilter)
         if (appVersion) {
-          appVersion.features = appVersion.features.filter(
-            feature => feature.version !== dto.version
-          )
+          appVersion.features = appVersion.features.filter(feature => feature.version !== dto.version)
           appVersion.features.push(dto)
           await appVersion.save()
         }
@@ -115,18 +111,14 @@ export class AppVersionService {
       case OperationSystems.ANDROID:
         appVersion = await this.androidAppVersionModel.findOne(androidFilter)
         if (appVersion) {
-          appVersion.features = appVersion.features.filter(
-            feature => feature.version !== dto.version
-          )
+          appVersion.features = appVersion.features.filter(feature => feature.version !== dto.version)
           await appVersion.save()
         }
         break
       case OperationSystems.IOS:
         appVersion = await this.iosAppVersionModel.findOne(iosFilter)
         if (appVersion) {
-          appVersion.features = appVersion.features.filter(
-            feature => feature.version !== dto.version
-          )
+          appVersion.features = appVersion.features.filter(feature => feature.version !== dto.version)
           await appVersion.save()
         }
     }

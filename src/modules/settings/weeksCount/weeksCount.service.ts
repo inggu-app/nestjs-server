@@ -7,9 +7,7 @@ import { CreateWeeksCountDto } from './dto/createWeeksCount.dto'
 
 @Injectable()
 export class WeeksCountService {
-  constructor(
-    @InjectModel(WeeksCountModel) private readonly weeksCountModel: ModelType<WeeksCountModel>
-  ) {}
+  constructor(@InjectModel(WeeksCountModel) private readonly weeksCountModel: ModelType<WeeksCountModel>) {}
 
   getActiveWeeksCount() {
     return this.weeksCountModel.findOne(

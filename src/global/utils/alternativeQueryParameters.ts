@@ -53,10 +53,7 @@ function getAllNotEmptyKeys<T>(parameterObjects: ParameterObjectWithRequiredType
     Object.keys(parameterObject).map(parameterKey => {
       if (parameterKey === 'required' && parameterObject.required) {
         Object.keys(parameterObject.required).map(requiredParameterKey => {
-          if (
-            parameterObject.required &&
-            parameterObject.required[requiredParameterKey] != undefined
-          ) {
+          if (parameterObject.required && parameterObject.required[requiredParameterKey] != undefined) {
             isNotEmptyKeys.add(requiredParameterKey)
           }
         })

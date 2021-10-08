@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, NotFoundException, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { ResponsibleService } from './responsible.service'
 import { CreateResponsibleDto } from './dto/createResponsible.dto'
 import { Types } from 'mongoose'
@@ -31,10 +19,7 @@ import {
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 import { FacultyService } from '../faculty/faculty.service'
-import {
-  FACULTY_WITH_ID_NOT_FOUND,
-  GROUP_WITH_ID_NOT_FOUND,
-} from '../../global/constants/errors.constants'
+import { FACULTY_WITH_ID_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 
 @Controller()
 export class ResponsibleController {
@@ -87,34 +72,24 @@ export class ResponsibleController {
 
     switch (request.enum) {
       case GetResponsibleEnum.responsibleId:
-        return normalizeFields(
-          await this.responsibleService.getById(request.responsibleId, request.fields),
-          { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
-        )
+        return normalizeFields(await this.responsibleService.getById(request.responsibleId, request.fields), {
+          fields: request.fields,
+          forbiddenFields: ResponsibleForbiddenFieldsEnum,
+        })
       case GetResponsibleEnum.groupId:
         return {
           responsibles: normalizeFields(
-            await this.responsibleService.getAllByGroup(
-              request.groupId,
-              request.page,
-              request.count,
-              request.fields
-            ),
+            await this.responsibleService.getAllByGroup(request.groupId, request.page, request.count, request.fields),
             { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
           ),
           count: await this.responsibleService.countByGroup(request.groupId),
         }
       case GetResponsibleEnum.all:
         return {
-          responsibles: normalizeFields(
-            await this.responsibleService.getAll(
-              request.page,
-              request.count,
-              request.name,
-              request.fields
-            ),
-            { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
-          ),
+          responsibles: normalizeFields(await this.responsibleService.getAll(request.page, request.count, request.name, request.fields), {
+            fields: request.fields,
+            forbiddenFields: ResponsibleForbiddenFieldsEnum,
+          }),
           count: await this.responsibleService.countByName(request.name),
         }
     }

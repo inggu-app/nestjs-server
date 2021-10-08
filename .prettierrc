@@ -3,6 +3,5 @@
   "semi": false,
   "jsxSingleQuote": true,
   "arrowParens": "avoid",
-  "printWidth": 100,
-
+  "printWidth": 140
 }
