@@ -10,6 +10,7 @@ import {
   GroupCreateDataForFunctionality,
   GroupDeleteDataForFunctionality,
   GroupFunctionalityCodesEnum,
+  GroupGetByFacultyIdDataForFunctionality,
   GroupGetByGroupIdDataForFunctionality,
   GroupUpdateDataForFunctionality,
 } from './group.constants'
@@ -74,6 +75,18 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
           return true
         if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString()))
           return true
+        break
+      case FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID:
+        castedFunctionality =
+          functionality as AvailableFunctionality<GroupGetByFacultyIdDataForFunctionality>
+
+        queryParams = GroupJwtAuthGuard.getQueryParameters(['facultyId'], context)
+        if (!queryParams.facultyId) return true
+
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL)
+          return true
+        if (castedFunctionality.data.availableFaculties.includes(queryParams.facultyId)) return true
+
         break
       case FunctionalityCodesEnum.GROUP__UPDATE:
         castedFunctionality =

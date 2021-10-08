@@ -47,6 +47,11 @@ export interface GroupGetByGroupIdDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
 
+export interface GroupGetByFacultyIdDataForFunctionality {
+  availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетоВ, группы которых может получить пользователь
+  availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь
+}
+
 export interface GroupUpdateDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность  факультетов, группы которых может обновлять пользователь
   availableFaculties: MongoIdString[] // id факультетов, группы которых может обновлять пользователь
