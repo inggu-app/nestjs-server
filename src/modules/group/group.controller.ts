@@ -19,7 +19,9 @@ import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import checkAlternativeQueryParameters, {
+  ParameterObjectType,
+} from '../../global/utils/alternativeQueryParameters'
 import {
   GetGroupsEnum,
   GroupAdditionalFieldsEnum,
@@ -51,10 +53,6 @@ export class GroupController {
     return this.groupService.create(dto)
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__GET,
-    title: 'Получить группу/список групп',
-  })
   @Get('/')
   async get(
     @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
@@ -89,35 +87,62 @@ export class GroupController {
 
     switch (request.enum) {
       case GetGroupsEnum.groupId:
-        return normalizeFields(await this.groupService.getById(request.groupId, request.fields), {
-          fields: request.fields,
-        })
+        return this._getByGroupId(request)
       case GetGroupsEnum.responsibleId:
-        return normalizeFields(
-          await this.responsibleService.getAllGroupsByResponsible(
-            request.responsibleId,
-            request.fields
-          ),
-          { fields: request.fields }
-        )
+        return this._getByResponsibleId(request)
       case GetGroupsEnum.facultyId:
-        return normalizeFields(
-          await this.groupService.getByFacultyId(request.facultyId, request.fields),
-          { fields: request.fields }
-        )
+        return this._getByFacultyId(request)
       case GetGroupsEnum.all:
-        return {
-          groups: normalizeFields(
-            await this.groupService.getAll(
-              request.page,
-              request.count,
-              request.title,
-              request.fields
-            ),
-            { fields: request.fields }
-          ),
-          count: await this.groupService.countAll(request.title),
-        }
+        return this._getMany(request)
+    }
+  }
+
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID,
+    title: 'Запросить одну группу',
+  })
+  private async _getByGroupId(request: ParameterObjectType<GetGroupsEnum>) {
+    return normalizeFields(await this.groupService.getById(request.groupId, request.fields), {
+      fields: request.fields,
+    })
+  }
+
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__GET_BY_RESPONSIBLE_ID,
+    title: 'Запросить по id ответственного',
+  })
+  private async _getByResponsibleId(request: ParameterObjectType<GetGroupsEnum>) {
+    return normalizeFields(
+      await this.responsibleService.getAllGroupsByResponsible(
+        request.responsibleId,
+        request.fields
+      ),
+      { fields: request.fields }
+    )
+  }
+
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID,
+    title: 'Запросить по id факультета',
+  })
+  private async _getByFacultyId(request: ParameterObjectType<GetGroupsEnum>) {
+    return normalizeFields(
+      await this.groupService.getByFacultyId(request.facultyId, request.fields),
+      { fields: request.fields }
+    )
+  }
+
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__GET_MANY,
+    title: 'Запросить множество групп',
+  })
+  private async _getMany(request: ParameterObjectType<GetGroupsEnum>) {
+    return {
+      groups: normalizeFields(
+        await this.groupService.getAll(request.page, request.count, request.title, request.fields),
+        { fields: request.fields }
+      ),
+      count: await this.groupService.countAll(request.title),
     }
   }
 

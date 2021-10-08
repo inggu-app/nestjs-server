@@ -10,7 +10,7 @@ import {
   GroupCreateDataForFunctionality,
   GroupDeleteDataForFunctionality,
   GroupFunctionalityCodesEnum,
-  GroupGetDataForFunctionality,
+  GroupGetByGroupIdDataForFunctionality,
   GroupUpdateDataForFunctionality,
 } from './group.constants'
 import { CreateGroupDto } from './dto/createGroup.dto'
@@ -47,6 +47,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
     let castedFunctionality
     let requestBody
     let currentGroup
+    let queryParams
     switch (functionalityCode) {
       case FunctionalityCodesEnum.GROUP__CREATE:
         castedFunctionality =
@@ -58,14 +59,21 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         requestBody = GroupJwtAuthGuard.getBodyFromContext<CreateGroupDto>(context)
         if (castedFunctionality.data.availableFaculties.includes(requestBody.faculty)) return true
         break
-      case FunctionalityCodesEnum.GROUP__GET:
-        castedFunctionality = functionality as AvailableFunctionality<GroupGetDataForFunctionality>
-        // console.log(
-        //   parseRequestQueries(
-        //     ['groupId', 'responsibleId', 'facultyId', 'page', 'count', 'title', 'fields'],
-        //     context.switchToHttp().getRequest<Request>().url
-        //   )
-        // )
+      case FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID:
+        castedFunctionality =
+          functionality as AvailableFunctionality<GroupGetByGroupIdDataForFunctionality>
+
+        queryParams = GroupJwtAuthGuard.getQueryParameters(['groupId'], context)
+        if (!queryParams.groupId) return true
+
+        if (castedFunctionality.data.forbiddenGroups.includes(queryParams.groupId)) break
+        if (castedFunctionality.data.availableGroups.includes(queryParams.groupId)) return true
+
+        currentGroup = await this.groupService.getById(queryParams.groupId, ['faculty'])
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL)
+          return true
+        if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString()))
+          return true
         break
       case FunctionalityCodesEnum.GROUP__UPDATE:
         castedFunctionality =
@@ -79,7 +87,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
 
         currentGroup = await this.groupService.getById(requestBody.id, ['faculty'])
         if (
-          castedFunctionality.data.availableFaculties.includes(String(currentGroup.faculty)) &&
+          castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString()) &&
           castedFunctionality.data.availableFaculties.includes(requestBody.faculty)
         )
           return true
@@ -88,7 +96,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
       case FunctionalityCodesEnum.GROUP__DELETE:
         castedFunctionality =
           functionality as AvailableFunctionality<GroupDeleteDataForFunctionality>
-        const queryParams = GroupJwtAuthGuard.getQueryParameters(['id'], context)
+        queryParams = GroupJwtAuthGuard.getQueryParameters(['id'], context)
         if (!queryParams.id) return true
 
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.id)) break
@@ -97,7 +105,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
           return true
 
         currentGroup = await this.groupService.getById(queryParams.id, ['faculty'])
-        if (castedFunctionality.data.availableFaculties.includes(String(currentGroup.faculty)))
+        if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString()))
           return true
 
         break

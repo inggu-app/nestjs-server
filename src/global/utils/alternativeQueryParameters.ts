@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { INCORRECT_FIELDS_SET_IN_FIELDS_QUERY_PARAMETER } from '../constants/errors.constants'
 
-type ParameterObjectType<T> = {
+export type ParameterObjectType<T> = {
   [key: string]: any
   enum: T
 }

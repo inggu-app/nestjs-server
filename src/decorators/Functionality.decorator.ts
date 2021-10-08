@@ -15,7 +15,10 @@ export const Functionality = (options: FunctionalityDecoratorOptions) => {
 function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
   switch (functionalityCode) {
     case FunctionalityCodesEnum.GROUP__CREATE:
-    case FunctionalityCodesEnum.GROUP__GET:
+    case FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID:
+    case FunctionalityCodesEnum.GROUP__GET_BY_RESPONSIBLE_ID:
+    case FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID:
+    case FunctionalityCodesEnum.GROUP__GET_MANY:
     case FunctionalityCodesEnum.GROUP__UPDATE:
     case FunctionalityCodesEnum.GROUP__DELETE:
       return GroupJwtAuthGuard
