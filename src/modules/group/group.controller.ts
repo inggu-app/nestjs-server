@@ -56,8 +56,8 @@ export class GroupController {
   @Get('/')
   async get(
     @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
-    @Query('responsibleId', new ParseMongoIdPipe({ required: false }))
-    responsibleId?: Types.ObjectId,
+    @Query('userId', new ParseMongoIdPipe({ required: false }))
+    userId?: Types.ObjectId,
     @Query('facultyId', new ParseMongoIdPipe({ required: false })) facultyId?: Types.ObjectId,
     @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
     @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
@@ -74,7 +74,7 @@ export class GroupController {
     const request = checkAlternativeQueryParameters<GetGroupsEnum>(
       { required: { groupId }, fields, enum: GetGroupsEnum.groupId },
       {
-        required: { responsibleId },
+        required: { userId },
         page,
         count,
         title,
@@ -89,7 +89,7 @@ export class GroupController {
       case GetGroupsEnum.groupId:
         return this._getByGroupId(request)
       case GetGroupsEnum.responsibleId:
-        return this._getByResponsibleId(request)
+        return this._getByUserId(request)
       case GetGroupsEnum.facultyId:
         return this._getByFacultyId(request)
       case GetGroupsEnum.all:
@@ -108,15 +108,12 @@ export class GroupController {
   }
 
   @Functionality({
-    code: FunctionalityCodesEnum.GROUP__GET_BY_RESPONSIBLE_ID,
+    code: FunctionalityCodesEnum.GROUP__GET_BY_USER_ID,
     title: 'Запросить по id ответственного',
   })
-  private async _getByResponsibleId(request: ParameterObjectType<GetGroupsEnum>) {
+  private async _getByUserId(request: ParameterObjectType<GetGroupsEnum>) {
     return normalizeFields(
-      await this.responsibleService.getAllGroupsByResponsible(
-        request.responsibleId,
-        request.fields
-      ),
+      await this.responsibleService.getAllGroupsByResponsible(request.userId, request.fields),
       { fields: request.fields }
     )
   }

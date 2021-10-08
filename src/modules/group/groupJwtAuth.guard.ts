@@ -12,6 +12,8 @@ import {
   GroupFunctionalityCodesEnum,
   GroupGetByFacultyIdDataForFunctionality,
   GroupGetByGroupIdDataForFunctionality,
+  GroupGetByUserIdDataForFunctionality,
+  GroupGetManyDataForFunctionality,
   GroupUpdateDataForFunctionality,
 } from './group.constants'
 import { CreateGroupDto } from './dto/createGroup.dto'
@@ -76,6 +78,17 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString()))
           return true
         break
+      case FunctionalityCodesEnum.GROUP__GET_BY_USER_ID:
+        castedFunctionality =
+          functionality as AvailableFunctionality<GroupGetByUserIdDataForFunctionality>
+
+        queryParams = GroupJwtAuthGuard.getQueryParameters(['userId'], context)
+        if (!queryParams.userId) return true
+
+        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL)
+          return true
+        if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true
+        break
       case FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID:
         castedFunctionality =
           functionality as AvailableFunctionality<GroupGetByFacultyIdDataForFunctionality>
@@ -87,6 +100,18 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
           return true
         if (castedFunctionality.data.availableFaculties.includes(queryParams.facultyId)) return true
 
+        break
+      case FunctionalityCodesEnum.GROUP__GET_MANY:
+        castedFunctionality =
+          functionality as AvailableFunctionality<GroupGetManyDataForFunctionality>
+
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL)
+          return true
+        if (
+          castedFunctionality.data.availableFaculties.length ||
+          castedFunctionality.data.availableGroups
+        )
+          return true
         break
       case FunctionalityCodesEnum.GROUP__UPDATE:
         castedFunctionality =

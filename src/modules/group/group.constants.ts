@@ -29,7 +29,7 @@ enumKeyValuesMatch(GroupFieldsEnum)
 export type GroupFunctionalityCodesEnum =
   | FunctionalityCodesEnum.GROUP__CREATE
   | FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID
-  | FunctionalityCodesEnum.GROUP__GET_BY_RESPONSIBLE_ID
+  | FunctionalityCodesEnum.GROUP__GET_BY_USER_ID
   | FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID
   | FunctionalityCodesEnum.GROUP__GET_MANY
   | FunctionalityCodesEnum.GROUP__UPDATE
@@ -47,9 +47,21 @@ export interface GroupGetByGroupIdDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
 
+export interface GroupGetByUserIdDataForFunctionality {
+  availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, список групп которых может получить пользователь
+  availableUsers: MongoIdString[] // id пользователей, список групп которых может получить пользователь
+}
+
 export interface GroupGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетоВ, группы которых может получить пользователь
   availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь
+}
+
+export interface GroupGetManyDataForFunctionality {
+  availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, группы которых может получить пользователь
+  availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь
+  availableGroups: MongoIdString[] // id отдельных групп, которые может получить пользователь
+  forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
 
 export interface GroupUpdateDataForFunctionality {
