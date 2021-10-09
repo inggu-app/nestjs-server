@@ -1,9 +1,9 @@
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common'
-import { FunctionalityService } from '../modules/functionality/functionality.service'
-import { RegisterFunctionality } from '../modules/functionality/functionality.constants'
-import { FunctionalityCodesEnum } from '../global/enums/functionalities.enum'
-import { GroupJwtAuthGuard } from '../modules/group/groupJwtAuth.guard'
-import { BaseJwtAuthGuard } from '../global/guards/baseJwtAuth.guard'
+import { FunctionalityService } from '../../modules/functionality/functionality.service'
+import { RegisterFunctionality } from '../../modules/functionality/functionality.constants'
+import { FunctionalityCodesEnum } from '../enums/functionalities.enum'
+import { GroupJwtAuthGuard } from '../../modules/group/groupJwtAuth.guard'
+import { BaseJwtAuthGuard } from '../guards/baseJwtAuth.guard'
 
 interface FunctionalityDecoratorOptions extends RegisterFunctionality {}
 

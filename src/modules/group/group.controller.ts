@@ -9,9 +9,9 @@ import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { GroupAdditionalFieldsEnum, GroupField, GroupFieldsEnum, GroupGetQueryParametersEnum, GroupRoutesEnum } from './group.constants'
 import normalizeFields from '../../global/utils/normalizeFields'
-import { Functionality } from '../../decorators/Functionality.decorator'
+import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
-import { Fields } from '../../decorators/Fields.decorator'
+import { Fields } from '../../global/decorators/Fields.decorator'
 
 @Controller()
 export class GroupController {
