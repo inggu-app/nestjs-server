@@ -18,6 +18,11 @@ export enum FunctionalityCodesEnum {
   GROUP__GET_MANY = 'GROUP__GET_MANY',
   GROUP__UPDATE = 'GROUP__UPDATE',
   GROUP__DELETE = 'GROUP__DELETE',
+
+  NOTE__CREATE = 'NOTE__CREATE',
+  NOTE__GET_BY_NOTE_ID = 'NOTE__GET_BY_NOTE_ID',
+  NOTE__GET_BY_LESSON_ID = 'NOTE__GET_BY_LESSON_ID',
+  NOTE__DELETE = 'NOTE__DELETE',
 }
 
 enumKeyValuesMatch(FunctionalityCodesEnum)

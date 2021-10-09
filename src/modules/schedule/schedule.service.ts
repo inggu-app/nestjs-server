@@ -7,7 +7,8 @@ import { ModelType } from '@typegoose/typegoose/lib/types'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { LessonFieldsEnum, ScheduleField } from './schedule.constants'
 import { LESSON_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
-import { ModelBase, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
 export class ScheduleService {
@@ -18,11 +19,13 @@ export class ScheduleService {
     return this.lessonModel.create(lessons)
   }
 
-  getByGroup(groupId: Types.ObjectId, fields?: ScheduleField[]) {
+  getByGroup(groupId: Types.ObjectId | MongoIdString, fields?: ScheduleField[]) {
+    groupId = stringToObjectId(groupId)
     return this.lessonModel.find({ group: groupId }, fieldsArrayToProjection(fields, ['number'])).exec()
   }
 
-  async getById(id: Types.ObjectId, fields?: ScheduleField[]) {
+  async getById(id: Types.ObjectId | MongoIdString, fields?: ScheduleField[]) {
+    id = stringToObjectId(id)
     const candidate = await this.lessonModel.findById(id, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {

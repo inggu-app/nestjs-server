@@ -1,6 +1,5 @@
 import { IsInt, IsMongoId, IsNotEmpty, IsString, Min } from 'class-validator'
 import { DeviceId } from '../../../global/types'
-import { Types } from 'mongoose'
 
 export class CreateNoteDto {
   @IsString()
@@ -16,5 +15,5 @@ export class CreateNoteDto {
   week: number
 
   @IsMongoId()
-  lesson: Types.ObjectId
+  lesson: string
 }

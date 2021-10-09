@@ -8,7 +8,8 @@ import { NoteField, NoteFieldsEnum } from './note.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ScheduleService } from '../schedule/schedule.service'
-import { ModelBase, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
 export class NoteService {
@@ -29,7 +30,8 @@ export class NoteService {
     return this.noteModel.find({ lesson, week }, fieldsArrayToProjection(fields)).exec()
   }
 
-  async getById(id: Types.ObjectId, fields?: NoteField[]) {
+  async getById(id: Types.ObjectId | MongoIdString, fields?: NoteField[]) {
+    id = stringToObjectId(id)
     const candidate = await this.noteModel.findById(id, fieldsArrayToProjection(fields)).exec()
 
     if (!candidate) {
