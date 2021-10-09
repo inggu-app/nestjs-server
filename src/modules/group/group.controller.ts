@@ -21,11 +21,11 @@ export class GroupController {
     private readonly responsibleService: ResponsibleService
   ) {}
 
+  @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__CREATE,
     title: 'Создать группу',
   })
-  @UsePipes(new ValidationPipe())
   @Post(GroupRoutesEnum.CREATE)
   async create(@Body() dto: CreateGroupDto) {
     await this.facultyService.getById(dto.faculty)
@@ -86,11 +86,11 @@ export class GroupController {
     }
   }
 
+  @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__UPDATE,
     title: 'Обновить группу',
   })
-  @UsePipes(new ValidationPipe())
   @Patch(GroupRoutesEnum.UPDATE)
   async update(@Body() dto: UpdateGroupDto) {
     return this.groupService.update(dto)
