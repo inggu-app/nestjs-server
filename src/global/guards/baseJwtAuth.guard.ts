@@ -35,7 +35,11 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
     if (!(await this.jwtService.verifyAsync(token))) throw new UnauthorizedException()
 
     const tokenData = this.jwtService.decode(token) as UserAccessTokenData
-    return this.validate(code, await this.userService.getById(tokenData.id), context.switchToHttp().getRequest<Request>())
+    const user = await this.userService.getById(tokenData.id)
+
+    if (!user) throw new UnauthorizedException()
+
+    return this.validate(code, user, context.switchToHttp().getRequest<Request>())
   }
 }
 
