@@ -7,7 +7,6 @@ import { UserAccessTokenData, UserService } from '../../modules/user/user.servic
 import { UserModel } from '../../modules/user/user.model'
 import { FunctionalityCodesEnum } from '../enums/functionalities.enum'
 import { Request } from 'express'
-import { parseRequestQueries } from '../utils/parseRequestQueries'
 
 @Injectable()
 export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
@@ -23,10 +22,6 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
 
   protected static getBody<T>(request: Request<any, any, T>): T {
     return request.body
-  }
-
-  protected static getQueryParameters<T extends string>(names: T[], request: Request<any, any, T>) {
-    return parseRequestQueries<T>(names, request.url)
   }
 
   async canActivate(context: ExecutionContext) {

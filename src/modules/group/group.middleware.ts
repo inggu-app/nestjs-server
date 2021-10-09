@@ -6,7 +6,7 @@ import { GetGroupsEnum, GroupGetQueryParametersEnum, GroupRoutesEnum } from './g
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
 @Injectable()
-export class RoutesMiddleware implements NestMiddleware {
+export class GroupRoutesMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const query = parseRequestQueries(getEnumValues(GroupGetQueryParametersEnum), req.url)
 

@@ -1,9 +1,10 @@
-import { forwardRef, Module } from '@nestjs/common'
+import { forwardRef, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { FacultyController } from './faculty.controller'
 import { FacultyService } from './faculty.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { GroupModule } from '../group/group.module'
+import { FacultyRoutesMiddleware } from './faculty.middleware'
 
 @Module({
   controllers: [FacultyController],
@@ -21,4 +22,8 @@ import { GroupModule } from '../group/group.module'
   ],
   exports: [FacultyService],
 })
-export class FacultyModule {}
+export class FacultyModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(FacultyRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+  }
+}
