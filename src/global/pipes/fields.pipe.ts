@@ -4,9 +4,9 @@ import {
   NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER,
   UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER,
 } from '../constants/errors.constants'
-import { getEnumKeys } from '../utils/enumKeysValues'
+import { objectKeys } from '../utils/objectKeys'
 
-interface Options {
+export interface ParseFieldsPipeOptions {
   fieldsEnum: { [key: string]: string }
   additionalFieldsEnum?: { [key: string]: string }
   forbiddenFieldsEnum?: { [key: string]: string }
@@ -17,11 +17,11 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
   private readonly fields: string[] = []
   private readonly availableFields: string[] = []
 
-  constructor(options?: Options) {
+  constructor(options?: ParseFieldsPipeOptions) {
     if (options) {
-      this.fields = ['id', ...getEnumKeys(options.fieldsEnum)]
+      this.fields = ['id', ...(objectKeys(options.fieldsEnum) as string[])]
       if (options.additionalFieldsEnum) {
-        this.fields = [...this.fields, ...getEnumKeys(options.additionalFieldsEnum)]
+        this.fields = [...this.fields, ...(objectKeys(options.additionalFieldsEnum) as string[])]
         this.availableFields = this.fields
       }
       if (options.forbiddenFieldsEnum)

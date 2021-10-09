@@ -17,16 +17,16 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
     protected readonly jwtService: JwtService
   ) {}
 
-  async validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, context: ExecutionContext): Promise<boolean> {
+  async validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request): Promise<boolean> {
     return true
   }
 
-  protected static getBodyFromContext<T>(context: ExecutionContext): T {
-    return context.switchToHttp().getRequest<Request<any, any, T>>().body
+  protected static getBody<T>(request: Request<any, any, T>): T {
+    return request.body
   }
 
-  protected static getQueryParameters<T extends string>(names: T[], context: ExecutionContext) {
-    return parseRequestQueries<T>(names, context.switchToHttp().getRequest<Request>().url)
+  protected static getQueryParameters<T extends string>(names: T[], request: Request<any, any, T>) {
+    return parseRequestQueries<T>(names, request.url)
   }
 
   async canActivate(context: ExecutionContext) {
@@ -40,10 +40,10 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
     if (!(await this.jwtService.verifyAsync(token))) throw new UnauthorizedException()
 
     const tokenData = this.jwtService.decode(token) as UserAccessTokenData
-    return this.validate(code, await this.userService.getById(tokenData.id), context)
+    return this.validate(code, await this.userService.getById(tokenData.id), context.switchToHttp().getRequest<Request>())
   }
 }
 
 export interface JwtAuthGuardValidate {
-  validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, context: ExecutionContext): boolean | Promise<boolean>
+  validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request): boolean | Promise<boolean>
 }

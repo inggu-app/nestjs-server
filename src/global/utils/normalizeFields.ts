@@ -2,7 +2,7 @@ import { EmptyEnum } from '../constants/other.constants'
 import { getEnumValues } from './enumKeysValues'
 
 interface Options<T> {
-  fields: T
+  fields?: T
   forbiddenFields?: EmptyEnum
 }
 
@@ -22,7 +22,7 @@ function normalize<T extends string[]>(response: { [key: string]: any }, data: O
   const forbiddenFields: string[] = []
   if (data.forbiddenFields) forbiddenFields.push(...getEnumValues(data.forbiddenFields))
 
-  data.fields.forEach(field => {
+  data.fields?.forEach(field => {
     if (!forbiddenFields.includes(field)) {
       normalizedResponse[field] = response[field]
     }

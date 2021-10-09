@@ -6,9 +6,29 @@ import { MongoIdString } from '../../global/types'
 
 export enum GetGroupsEnum {
   groupId,
-  responsibleId,
+  userId,
   facultyId,
-  all,
+  many,
+}
+
+export enum GroupRoutesEnum {
+  CREATE = '/',
+  GET_BY_GROUP_ID = '/by-group-id',
+  GET_BY_USER_ID = '/by-user-id',
+  GET_BY_FACULTY_ID = '/by-faculty-id',
+  GET_MANY = '/many',
+  UPDATE = '/',
+  DELETE = '/',
+}
+
+export enum GroupGetQueryParametersEnum {
+  GROUP_ID = 'groupId',
+  USER_ID = 'userId',
+  FACULTY_ID = 'facultyId',
+  PAGE = 'page',
+  COUNT = 'count',
+  TITLE = 'title',
+  FIELDS = 'fields',
 }
 
 export enum GroupFieldsEnum {
