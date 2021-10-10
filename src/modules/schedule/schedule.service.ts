@@ -35,15 +35,17 @@ export class ScheduleService {
     return candidate
   }
 
-  async updateById(id: Types.ObjectId, lesson: Lesson) {
+  async updateById(id: Types.ObjectId | MongoIdString, lesson: Lesson) {
+    id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.lessonModel.updateOne({ _id: id }, { $set: { ...lesson } }).exec()
 
     return
   }
 
-  async delete(group: Types.ObjectId, ids?: Types.ObjectId[]) {
-    await this.lessonModel.deleteMany(ids ? { group, _id: { $in: ids } } : { group }).exec()
+  async delete(groupId: Types.ObjectId | MongoIdString, ids?: Types.ObjectId[]) {
+    groupId = stringToObjectId(groupId)
+    await this.lessonModel.deleteMany(ids ? { groupId, _id: { $in: ids } } : { groupId }).exec()
   }
 
   async checkExists(

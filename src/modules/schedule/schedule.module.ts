@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { FacultyModule } from '../faculty/faculty.module'
 import { GroupModule } from '../group/group.module'
 import { ScheduleController } from './schedule.controller'
@@ -8,6 +8,7 @@ import { LessonModel } from './lesson.model'
 import { CallScheduleModule } from '../settings/callSchedule/callSchedule.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
+import { ScheduleRoutesMiddleware } from './schedule.middleware'
 
 @Module({
   controllers: [ScheduleController],
@@ -26,4 +27,8 @@ import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config
   ],
   exports: [ScheduleService],
 })
-export class ScheduleModule {}
+export class ScheduleModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ScheduleRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+  }
+}

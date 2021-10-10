@@ -10,6 +10,7 @@ import { checkJwtType, responsibleExampleAccessTokenData } from '../utils/checkJ
 import { isMongoId } from 'class-validator'
 import { INVALID_MONGO_ID } from '../constants/errors.constants'
 import { GroupService } from '../../modules/group/group.service'
+import { Types } from 'mongoose'
 
 @Injectable()
 export class ResponsibleJwtStrategy extends PassportStrategy(Strategy, RESPONSIBLE_STRATEGY_NAME) {
@@ -35,9 +36,9 @@ export class ResponsibleJwtStrategy extends PassportStrategy(Strategy, RESPONSIB
 
     checkJwtType(accessTokenData, responsibleExampleAccessTokenData)
 
-    if (responsible.groups.includes(request.body.group)) return true
+    if (responsible.groups.includes(Types.ObjectId(request.body.group))) return true
 
-    if (responsible.forbiddenGroups.includes(request.body.group)) throw new ForbiddenException()
+    if (responsible.forbiddenGroups.includes(Types.ObjectId(request.body.group))) throw new ForbiddenException()
 
     if (
       await this.groupService.checkExists(

@@ -1,16 +1,24 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
-import { GetScheduleEnum, ScheduleAdditionalFieldsEnum, ScheduleField, LessonFieldsEnum } from './schedule.constants'
+import {
+  GetScheduleEnum,
+  LessonFieldsEnum,
+  ScheduleAdditionalFieldsEnum,
+  ScheduleField,
+  ScheduleGetQueryParametersEnum,
+  ScheduleRoutesEnum,
+} from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
-import { ResponsibleJwtAuthGuard } from '../../global/guards/responsibleJwtAuth.guard'
-import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import { Fields } from '../../global/decorators/Fields.decorator'
+import { Functionality } from '../../global/decorators/Functionality.decorator'
+import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 
 @Controller()
 export class ScheduleController {
@@ -20,9 +28,12 @@ export class ScheduleController {
     private readonly callScheduleService: CallScheduleService
   ) {}
 
-  @UseGuards(ResponsibleJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.SCHEDULE__CREATE,
+    title: 'Создать или обновить расписание',
+  })
+  @Post(ScheduleRoutesEnum.CREATE)
   async create(@Body() dto: CreateScheduleDto) {
     await this.groupService.checkExists({ _id: dto.group })
 
@@ -50,18 +61,15 @@ export class ScheduleController {
     return
   }
 
-  @Get('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.SCHEDULE__GET_BY_GROUP_ID,
+    title: 'Получить расписание',
+  })
+  @Get(ScheduleRoutesEnum.GET_BY_GROUP_ID)
   async get(
-    @Query('groupId', new ParseMongoIdPipe()) groupId: Types.ObjectId,
-    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date,
-    @Query(
-      'fields',
-      new ParseFieldsPipe({
-        fieldsEnum: LessonFieldsEnum,
-        additionalFieldsEnum: ScheduleAdditionalFieldsEnum,
-      })
-    )
-    fields?: ScheduleField[]
+    @Query(ScheduleGetQueryParametersEnum.GROUP_ID, new ParseMongoIdPipe()) groupId: Types.ObjectId,
+    @Query(ScheduleGetQueryParametersEnum.UPDATED_AT, new ParseDatePipe({ required: false })) updatedAt?: Date,
+    @Fields({ fieldsEnum: LessonFieldsEnum, additionalFieldsEnum: ScheduleAdditionalFieldsEnum }) fields?: ScheduleField[]
   ) {
     const request = checkAlternativeQueryParameters<GetScheduleEnum>({
       required: { groupId },
