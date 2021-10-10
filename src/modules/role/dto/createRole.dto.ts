@@ -1,5 +1,4 @@
 import { IsArray, IsMongoId, IsString, ValidateNested } from 'class-validator'
-import { Types } from 'mongoose'
 import { Type } from 'class-transformer'
 
 export class CreateRoleDto {
@@ -14,7 +13,7 @@ export class CreateRoleDto {
 
 class Functionality {
   @IsMongoId()
-  functionality: Types.ObjectId
+  functionality: string
 
   @IsArray()
   @Type(() => Object)

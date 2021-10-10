@@ -26,6 +26,12 @@ export enum FunctionalityCodesEnum {
   NOTE__GET_BY_NOTE_ID = 'NOTE__GET_BY_NOTE_ID',
   NOTE__GET_BY_LESSON_ID = 'NOTE__GET_BY_LESSON_ID',
   NOTE__DELETE = 'NOTE__DELETE',
+
+  ROLE__CREATE = 'ROLE__CREATE',
+  ROLE__GET_BY_ROLE_ID = 'ROLE__GET_BY_ROLE_ID',
+  ROLE__GET_MANY = 'ROLE__GET_MANY',
+  ROLE__UPDATE = 'ROLE__UPDATE',
+  ROLE__DELETE = 'ROLE__DELETE',
 }
 
 enumKeyValuesMatch(FunctionalityCodesEnum)

@@ -5,9 +5,10 @@ import { ModelType } from '@typegoose/typegoose/lib/types'
 import { ModelBase, ObjectByInterface } from '../../global/types'
 import { Error, Types } from 'mongoose'
 import { ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { RoleFieldsEnum } from './role.constants'
+import { RoleField, RoleFieldsEnum } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
+import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 
 @Injectable()
 export class RoleService {
@@ -20,14 +21,18 @@ export class RoleService {
     return
   }
 
-  async getById(id: Types.ObjectId) {
+  async getById(id: Types.ObjectId, fields?: RoleField[]) {
     await this.checkExists({ _id: id })
-    return this.roleModel.findById({ _id: id })
+    return this.roleModel.findById({ _id: id }, fieldsArrayToProjection(fields))
   }
 
-  async getByTitle(title: string) {
+  async getByTitle(title: string, fields?: RoleField[]) {
     await this.checkExists({ title })
-    return this.roleModel.findOne({ title })
+    return this.roleModel.findOne({ title }, fieldsArrayToProjection(fields))
+  }
+
+  async getMany(fields?: RoleField[]) {
+    return this.roleModel.find({}, fieldsArrayToProjection(fields))
   }
 
   async update(dto: UpdateRoleDto) {
