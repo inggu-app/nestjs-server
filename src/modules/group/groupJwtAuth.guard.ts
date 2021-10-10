@@ -66,6 +66,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.groupId)) break
         if (castedFunctionality.data.availableGroups.includes(queryParams.groupId)) return true
         currentGroup = await this.groupService.getById(queryParams.groupId, ['faculty'])
+        if (castedFunctionality.data.forbiddenFaculties.includes(currentGroup.faculty.toString())) break
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString())) return true
         break
@@ -99,8 +100,9 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         requestBody = GroupJwtAuthGuard.getBody<UpdateGroupDto>(request)
         if (castedFunctionality.data.forbiddenGroups.includes(requestBody.id)) break
         if (castedFunctionality.data.availableGroups.includes(requestBody.id)) return true
-        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         currentGroup = await this.groupService.getById(requestBody.id, ['faculty'])
+        if (castedFunctionality.data.forbiddenFaculties.includes(currentGroup.faculty.toString())) break
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (
           castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString()) &&
           castedFunctionality.data.availableFaculties.includes(requestBody.faculty)
@@ -114,8 +116,9 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         if (!queryParams.id) return true
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.id)) break
         if (castedFunctionality.data.availableGroups.includes(queryParams.id)) return true
-        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         currentGroup = await this.groupService.getById(queryParams.id, ['faculty'])
+        if (castedFunctionality.data.forbiddenFaculties.includes(currentGroup.faculty.toString())) break
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString())) return true
 
         break
