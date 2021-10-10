@@ -58,6 +58,7 @@ export type GroupFunctionalityCodesEnum =
 export interface GroupCreateDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, на которые можно создать группу
   availableFaculties: MongoIdString[] // id факультетов, на которые пользователь может создать группу
+  forbiddenFaculties: MongoIdString[] // id факультетов, на которые пользователь НЕ может создать группу
 }
 
 export interface GroupGetByGroupIdDataForFunctionality {
@@ -70,11 +71,13 @@ export interface GroupGetByGroupIdDataForFunctionality {
 export interface GroupGetByUserIdDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, список групп которых может получить пользователь
   availableUsers: MongoIdString[] // id пользователей, список групп которых может получить пользователь
+  forbiddenUsers: MongoIdString[] // id пользователей, список групп которых пользователь получить НЕ может
 }
 
 export interface GroupGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетоВ, группы которых может получить пользователь
   availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь
+  forbiddenFaculties: MongoIdString[] // id факультетов, группы которых пользователь получить НЕ может
 }
 
 export interface GroupGetManyDataForFunctionality {
