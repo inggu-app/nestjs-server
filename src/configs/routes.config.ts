@@ -12,6 +12,7 @@ import { ResponsibleModule } from '../modules/responsible/responsible.module'
 import { AdminModule } from '../modules/admin/admin.module'
 import { NoteModule } from '../modules/note/note.module'
 import { UserModule } from '../modules/user/user.module'
+import { FunctionalityModule } from '../modules/functionality/functionality.module'
 
 export const routesConfig: Routes = [
   {
@@ -41,6 +42,10 @@ export const routesConfig: Routes = [
   {
     path: '/users',
     module: UserModule,
+  },
+  {
+    path: '/functionalities',
+    module: FunctionalityModule,
   },
   {
     path: '/settings',

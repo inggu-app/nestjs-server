@@ -37,6 +37,8 @@ export enum FunctionalityCodesEnum {
   USER__GET_BY_USER_ID = 'USER__GET_BY_USER_ID',
   USER__UPDATE = 'USER__UPDATE',
   USER__DELETE = 'USER__DELETE',
+
+  FUNCTIONALITIES__GET = 'FUNCTIONALITIES__GET',
 }
 
 enumKeyValuesMatch(FunctionalityCodesEnum)

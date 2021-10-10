@@ -44,7 +44,7 @@ export class FunctionalityService {
     return currentFunctionalities?.find(f => f.code === code)
   }
 
-  async getAll() {
+  async getMany() {
     return (await this._get()) || []
   }
 
