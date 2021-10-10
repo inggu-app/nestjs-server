@@ -7,6 +7,7 @@ import { AvailableFunctionality } from '../functionality/functionality.constants
 import {
   FacultyDeleteDataForFunctionality,
   FacultyGetByFacultyIdDataForFunctionality,
+  FacultyGetManyDataForFunctionality,
   FacultyGetQueryParametersEnum,
   FacultyUpdateDataForFunctionality,
 } from './faculty.constants'
@@ -30,28 +31,35 @@ export class FacultyJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuar
       case FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID:
         castedFunctionality = functionality as AvailableFunctionality<FacultyGetByFacultyIdDataForFunctionality>
 
-        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
-
         queryParams = parseRequestQueries(getEnumValues(FacultyGetQueryParametersEnum), request.url)
         if (!queryParams.facultyId) return true
-
+        if (castedFunctionality.data.forbiddenFaculties.includes(queryParams.facultyId)) break
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableFaculties.includes(queryParams.facultyId)) return true
         break
       case FunctionalityCodesEnum.FACULTY__GET_MANY:
-        return true
+        castedFunctionality = functionality as AvailableFunctionality<FacultyGetManyDataForFunctionality>
+        if (
+          castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL ||
+          castedFunctionality.data.availableFaculties.length
+        )
+          return true
+        break
       case FunctionalityCodesEnum.FACULTY__UPDATE:
         castedFunctionality = functionality as AvailableFunctionality<FacultyUpdateDataForFunctionality>
 
-        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         requestBody = FacultyJwtAuthGuard.getBody<UpdateFacultyDto>(request)
+        if (castedFunctionality.data.forbiddenFaculties.includes(requestBody.id)) break
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableFaculties.includes(requestBody.id)) return true
         break
       case FunctionalityCodesEnum.FACULTY__DELETE:
         castedFunctionality = functionality as AvailableFunctionality<FacultyDeleteDataForFunctionality>
 
-        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         queryParams = parseRequestQueries(['id'], request.url)
         if (!queryParams.id) return true
+        if (castedFunctionality.data.forbiddenFaculties.includes(queryParams.id)) break
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableFaculties.includes(queryParams.id)) return true
         break
     }

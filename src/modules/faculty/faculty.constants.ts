@@ -39,19 +39,23 @@ export interface FacultyCreateDataForFunctionality {}
 export interface FacultyGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может получить
   availableFaculties: MongoIdString[] // id факультетов, которые может получить пользователь
+  forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
 
 export interface FacultyGetManyDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может получить
   availableFaculties: MongoIdString[] // id факультетов, которые может получить пользователь
+  forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
 
 export interface FacultyUpdateDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может изменить
   availableFaculties: MongoIdString[] // id факультетов, которые может изменить пользователь
+  forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь изменить НЕ может
 }
 
 export interface FacultyDeleteDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может удалить
   availableFaculties: MongoIdString[] // id факультетов, которые может удалить пользователь
+  forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь удалить НЕ может
 }
