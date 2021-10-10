@@ -8,6 +8,7 @@ import { FacultyJwtAuthGuard } from '../../modules/faculty/facultyJwtAuth.guard'
 import { NoteJwtAuthGuard } from '../../modules/note/noteJwtAuth.guard'
 import { ScheduleJwtAuthGuard } from '../../modules/schedule/scheduleJwtAuth.guard'
 import { RoleJwtAuthGuard } from '../../modules/role/roleJwtAuth.guard'
+import { UserJwtAuthGuard } from '../../modules/user/userJwtAuth.guard'
 
 interface FunctionalityDecoratorOptions extends RegisterFunctionality {}
 
@@ -46,6 +47,11 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
     case FunctionalityCodesEnum.ROLE__UPDATE:
     case FunctionalityCodesEnum.ROLE__DELETE:
       return RoleJwtAuthGuard
+    case FunctionalityCodesEnum.USER__CREATE:
+    case FunctionalityCodesEnum.USER__GET_BY_USER_ID:
+    case FunctionalityCodesEnum.USER__UPDATE:
+    case FunctionalityCodesEnum.USER__DELETE:
+      return UserJwtAuthGuard
     default:
       return BaseJwtAuthGuard
   }

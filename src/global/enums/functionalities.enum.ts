@@ -32,6 +32,11 @@ export enum FunctionalityCodesEnum {
   ROLE__GET_MANY = 'ROLE__GET_MANY',
   ROLE__UPDATE = 'ROLE__UPDATE',
   ROLE__DELETE = 'ROLE__DELETE',
+
+  USER__CREATE = 'USER__CREATE',
+  USER__GET_BY_USER_ID = 'USER__GET_BY_USER_ID',
+  USER__UPDATE = 'USER__UPDATE',
+  USER__DELETE = 'USER__DELETE',
 }
 
 enumKeyValuesMatch(FunctionalityCodesEnum)

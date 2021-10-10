@@ -6,12 +6,13 @@ import { CreateUserDto } from './dto/createUser.dto'
 import { ModelBase, ObjectByInterface } from '../../global/types'
 import { Error, Types } from 'mongoose'
 import { USER_WITH_ID_NOT_FOUND, USER_WITH_LOGIN_EXISTS } from '../../global/constants/errors.constants'
-import { UserFieldsEnum } from './user.constants'
+import { UserField, UserFieldsEnum } from './user.constants'
 import generatePassword from '../../global/utils/generatePassword'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import * as bcrypt from 'bcrypt'
 import { hashSalt } from '../../global/constants/other.constants'
 import { UpdateUserDto } from './dto/updateUser.dto'
+import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -37,15 +38,21 @@ export class UserService {
     }
   }
 
-  async getById(id: Types.ObjectId) {
+  async getById(id: Types.ObjectId, fields?: UserField[]) {
     await this.checkExists({ _id: id })
-    return (await this.userModel.findById(id)) as DocumentType<UserModel>
+    return (await this.userModel.findById(id, fieldsArrayToProjection(fields))) as DocumentType<UserModel>
   }
 
   async update(dto: UpdateUserDto) {
     await this.checkExists({ _id: dto.id })
 
     await this.userModel.updateOne({ _id: dto.id }, dto)
+  }
+
+  async delete(userId: Types.ObjectId) {
+    await this.checkExists({ _id: userId })
+
+    await this.userModel.deleteOne({ _id: userId })
   }
 
   async checkExists(

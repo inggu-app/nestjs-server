@@ -1,9 +1,9 @@
 import { IsArray, IsIn, IsMongoId, IsNotEmpty, IsObject, IsString, ValidateNested } from 'class-validator'
-import { Types } from 'mongoose'
 import { Type } from 'class-transformer'
 import { getEnumValues } from '../../../global/utils/enumKeysValues'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 import { AvailableFunctionality } from '../../functionality/functionality.constants'
+import { MongoIdString } from '../../../global/types'
 
 export class CreateUserDto {
   @IsString()
@@ -21,7 +21,7 @@ export class CreateUserDto {
 
   @IsArray()
   @IsMongoId({ each: true })
-  roles: Types.ObjectId[]
+  roles: MongoIdString[]
 }
 
 class Functionality implements AvailableFunctionality {
