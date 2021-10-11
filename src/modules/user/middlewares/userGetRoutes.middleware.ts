@@ -1,9 +1,9 @@
 import { NestMiddleware } from '@nestjs/common'
 import { Request } from 'express'
-import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
-import { getEnumValues } from '../../global/utils/enumKeysValues'
-import { UserGetQueryParametersEnum, UserRoutesEnum } from './user.constants'
-import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
+import { parseRequestQueries } from '../../../global/utils/parseRequestQueries'
+import { getEnumValues } from '../../../global/utils/enumKeysValues'
+import { UserGetQueryParametersEnum, UserRoutesEnum } from '../user.constants'
+import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
 
 export class UserGetRoutesMiddleware implements NestMiddleware {
   use(req: Request, res: any, next: () => void) {

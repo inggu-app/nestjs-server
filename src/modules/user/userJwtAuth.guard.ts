@@ -17,6 +17,7 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { UpdateUserDto } from './dto/updateUser.dto'
+import { objectKeys } from '../../global/utils/objectKeys'
 
 export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
@@ -67,9 +68,18 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
       case FunctionalityCodesEnum.USER__UPDATE:
         castedFunctionality = functionality as AvailableFunctionality<UserUpdateDataForFunctionality>
 
+        requestBody = UserJwtAuthGuard.getBody<UpdateUserDto>(request)
+        let isCorrectFields = true
+        for (const key of objectKeys(requestBody)) {
+          castedFunctionality = functionality as AvailableFunctionality<UserUpdateDataForFunctionality>
+          if (!castedFunctionality.data.availableFields.includes(key) && key !== 'id') {
+            isCorrectFields = false
+            break
+          }
+        }
+        if (!isCorrectFields) break
         if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
 
-        requestBody = UserJwtAuthGuard.getBody<UpdateUserDto>(request)
         if (castedFunctionality.data.availableUsers.includes(requestBody.id)) return true
         break
       case FunctionalityCodesEnum.USER__DELETE:

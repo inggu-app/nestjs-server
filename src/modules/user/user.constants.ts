@@ -1,9 +1,9 @@
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
-import { AdminFieldsEnum } from '../admin/admin.constants'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { MongoIdString } from '../../global/types'
+import { UpdateUserDtoKeysEnum } from './dto/updateUser.dto'
 
 export enum UserRoutesEnum {
   CREATE = '/',
@@ -34,7 +34,7 @@ export enum UserForbiddenFieldsEnum {
   hashedUniqueKey = 'hashedUniqueKey',
   hashedPassword = 'hashedPassword',
 }
-export type UserField = keyof typeof AdminFieldsEnum
+export type UserField = keyof typeof UserFieldsEnum
 
 enumKeyValuesMatch(UserFieldsEnum)
 enumKeyValuesMatch(UserForbiddenFieldsEnum)
@@ -54,6 +54,7 @@ export interface UserGetByUserIdDataForFunctionality {
 export interface UserUpdateDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно обновить
   availableUsers: MongoIdString[] // id пользователей, которых можно обновить
+  availableFields: (keyof typeof UpdateUserDtoKeysEnum)[] // поля пользователя, которые пользователь может редактировать
 }
 
 export interface UserDeleteDataForFunctionality {

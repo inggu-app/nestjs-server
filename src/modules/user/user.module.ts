@@ -3,7 +3,7 @@ import { UserController } from './user.controller'
 import { UserService } from './user.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
-import { UserGetRoutesMiddleware } from './userGetRoutes.middleware'
+import { UserGetRoutesMiddleware } from './middlewares/userGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 
 @Global()
