@@ -18,10 +18,7 @@ import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { Request } from 'express'
 
 export class FacultyJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
-  async validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request) {
-    const functionality = user.available.find(functionality => functionality.code === functionalityCode)
-    if (!functionality) throw new ForbiddenException()
-
+  async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
     let castedFunctionality
     let queryParams
     let requestBody

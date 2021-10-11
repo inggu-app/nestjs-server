@@ -63,21 +63,21 @@ export class RoleService {
         const candidate = await this.roleModel.exists(f)
 
         if (!candidate && checkExisting) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+          if (typeof error === 'function') throw error(f)
+          throw error
         } else if (candidate && !checkExisting) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+          if (typeof error === 'function') throw error(f)
+          throw error
         }
       }
     } else {
       const candidate = await this.roleModel.exists(filter)
       if (!candidate && checkExisting) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+        if (typeof error === 'function') throw error(filter)
+        throw error
       } else if (candidate && !checkExisting) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+        if (typeof error === 'function') throw error(filter)
+        throw error
       }
     }
 

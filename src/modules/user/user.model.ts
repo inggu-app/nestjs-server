@@ -1,11 +1,11 @@
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
-import { modelOptions, prop } from '@typegoose/typegoose'
+import { modelOptions, prop, Ref } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { UserFieldsEnum } from './user.constants'
-import { Types } from 'mongoose'
 import { RoleModel } from '../role/role.model'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { AvailableFunctionality } from '../functionality/functionality.constants'
+import { Types } from 'mongoose'
 
 type User = {
   [key in UserFieldsEnum]: any
@@ -26,7 +26,7 @@ export class UserModel extends TimeStamps implements User {
   available: Available[]
 
   @prop({ ref: () => RoleModel })
-  roles: Types.ObjectId[]
+  roles: Ref<RoleModel, Types.ObjectId>[]
 
   @prop()
   hashedPassword: string

@@ -33,7 +33,7 @@ export class UserController {
     @Fields({ fieldsEnum: UserFieldsEnum, additionalFieldsEnum: UserAdditionalFieldsEnum, forbiddenFieldsEnum: UserForbiddenFieldsEnum })
     fields?: UserField[]
   ) {
-    return this.userService.getById(userId, fields)
+    return this.userService.getById(userId, { fields })
   }
 
   @UsePipes(new ValidationPipe())

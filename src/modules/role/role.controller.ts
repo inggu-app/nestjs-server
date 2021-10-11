@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { RoleService } from './role.service'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
@@ -9,16 +9,17 @@ import { Types } from 'mongoose'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 
-@Controller('role')
+@Controller()
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
+  @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.ROLE__CREATE,
-    title: 'Создать поль',
+    title: 'Создать роль',
   })
   @Post(RoleRoutesEnum.CREATE)
-  create(dto: CreateRoleDto) {
+  create(@Body() dto: CreateRoleDto) {
     return this.roleService.create(dto)
   }
 
@@ -43,12 +44,13 @@ export class RoleController {
     return this.roleService.getMany(fields)
   }
 
+  @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.ROLE__UPDATE,
     title: 'Обновить роль',
   })
   @Patch(RoleRoutesEnum.UPDATE)
-  update(dto: UpdateRoleDto) {
+  update(@Body() dto: UpdateRoleDto) {
     return this.roleService.update(dto)
   }
 

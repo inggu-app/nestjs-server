@@ -17,10 +17,7 @@ import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 
 export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
-  async validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request) {
-    const functionality = user.available.find(functionality => functionality.code === functionalityCode)
-    if (!functionality) throw new ForbiddenException()
-
+  async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
     let castedFunctionality
     let queryParams
     let requestBody
@@ -43,9 +40,9 @@ export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         if (castedFunctionality.data.availableFunctionalitiesType === FunctionalityAvailableTypeEnum.ALL) return true
         let isCorrect = true
         requestBody = RoleJwtAuthGuard.getBody<UpdateRoleDto>(request) as UpdateRoleDto
-        requestBody.functionalities.forEach(f => {
+        requestBody.available.forEach(f => {
           castedFunctionality = functionality as AvailableFunctionality<RoleUpdateDataForFunctionality>
-          if (!castedFunctionality.data.availableFunctionalities.includes(f.code)) isCorrect = false
+          if (!castedFunctionality.data.availableFunctionalities.includes(f)) isCorrect = false
         })
         if (!isCorrect) break
         break

@@ -31,6 +31,7 @@ export class GroupRoutesMiddleware implements NestMiddleware {
         req.url = GroupRoutesEnum.GET_MANY + req.url
         break
     }
+    console.log(req.url)
     next()
   }
 }

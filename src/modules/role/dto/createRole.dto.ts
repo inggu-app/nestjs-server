@@ -1,23 +1,11 @@
-import { IsArray, IsMongoId, IsString, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
+import { IsArray, IsEnum, IsString } from 'class-validator'
+import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 
 export class CreateRoleDto {
   @IsString()
   title: string
 
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Functionality)
-  functionalities: Functionality[]
-}
-
-class Functionality {
-  @IsMongoId()
-  functionality: string
-
-  @IsArray()
-  @Type(() => Object)
-  data: {
-    [key: string]: any
-  }[]
+  @IsEnum(FunctionalityCodesEnum, { each: true })
+  available: FunctionalityCodesEnum[]
 }

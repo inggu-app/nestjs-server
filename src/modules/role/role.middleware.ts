@@ -11,15 +11,16 @@ export class RoleRoutesMiddleware implements NestMiddleware {
 
     const request = checkAlternativeQueryParameters<RoleRoutesEnum>(
       { required: { roleId: query.roleId }, fields: query.fields, enum: RoleRoutesEnum.GET_BY_ROLE_ID },
-      { required: { page: query.page, count: query.count }, fields: query.fields, enum: RoleRoutesEnum.GET_MANY }
+      { fields: query.fields, enum: RoleRoutesEnum.GET_MANY }
     )
 
+    const [start = '', queryStr = ''] = req.url.split('?')
     switch (request.enum) {
       case RoleRoutesEnum.GET_BY_ROLE_ID:
-        req.url = RoleRoutesEnum.GET_BY_ROLE_ID + req.url
+        req.url = `${start}${RoleRoutesEnum.GET_BY_ROLE_ID}?${queryStr}`
         break
       case RoleRoutesEnum.GET_MANY:
-        req.url = RoleRoutesEnum.GET_MANY + req.url
+        req.url = `${start}${RoleRoutesEnum.GET_MANY}?${queryStr}`
         break
     }
 

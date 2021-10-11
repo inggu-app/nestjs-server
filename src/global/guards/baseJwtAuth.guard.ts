@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common'
 import { DocumentType } from '@typegoose/typegoose'
 import { Reflector } from '@nestjs/core'
 import { bearerTokenRegExp } from '../regex'
@@ -7,6 +7,7 @@ import { UserAccessTokenData, UserService } from '../../modules/user/user.servic
 import { UserModel } from '../../modules/user/user.model'
 import { FunctionalityCodesEnum } from '../enums/functionalities.enum'
 import { Request } from 'express'
+import { AvailableFunctionality } from '../../modules/functionality/functionality.constants'
 
 @Injectable()
 export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
@@ -16,7 +17,7 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
     protected readonly jwtService: JwtService
   ) {}
 
-  async validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request): Promise<boolean> {
+  async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request): Promise<boolean> {
     return true
   }
 
@@ -35,14 +36,16 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
     if (!(await this.jwtService.verifyAsync(token))) throw new UnauthorizedException()
 
     const tokenData = this.jwtService.decode(token) as UserAccessTokenData
-    const user = await this.userService.getById(tokenData.id)
+    const user = await this.userService.getById(tokenData.id, { queryOptions: { populate: { path: 'roles' } } })
 
     if (!user) throw new UnauthorizedException()
+    const functionality = user.available.find(functionality => functionality.code === code)
+    if (!functionality) throw new ForbiddenException()
 
-    return this.validate(code, user, context.switchToHttp().getRequest<Request>())
+    return this.validate(functionality, user, context.switchToHttp().getRequest<Request>())
   }
 }
 
 export interface JwtAuthGuardValidate {
-  validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request): boolean | Promise<boolean>
+  validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request): boolean | Promise<boolean>
 }

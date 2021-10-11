@@ -9,7 +9,6 @@ import { AvailableFunctionality } from '../functionality/functionality.constants
 import {
   GroupCreateDataForFunctionality,
   GroupDeleteDataForFunctionality,
-  GroupFunctionalityCodesEnum,
   GroupGetByFacultyIdDataForFunctionality,
   GroupGetByGroupIdDataForFunctionality,
   GroupGetByUserIdDataForFunctionality,
@@ -41,15 +40,12 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
     super(reflector, userService, jwtService)
   }
 
-  async validate(functionalityCode: GroupFunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request) {
-    const functionality = user.available.find(functionality => functionality.code === functionalityCode)
-    if (!functionality) throw new ForbiddenException()
-
+  async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
     let castedFunctionality
     let requestBody
     let currentGroup
     let queryParams
-    switch (functionalityCode) {
+    switch (functionality.code) {
       case FunctionalityCodesEnum.GROUP__CREATE:
         castedFunctionality = functionality as AvailableFunctionality<GroupCreateDataForFunctionality>
 
@@ -66,9 +62,9 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.groupId)) break
         if (castedFunctionality.data.availableGroups.includes(queryParams.groupId)) return true
         currentGroup = await this.groupService.getById(queryParams.groupId, ['faculty'])
-        if (castedFunctionality.data.forbiddenFaculties.includes(currentGroup.faculty.toString())) break
+        if (castedFunctionality.data.forbiddenFaculties.includes(String(currentGroup.faculty))) break
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
-        if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString())) return true
+        if (castedFunctionality.data.availableFaculties.includes(String(currentGroup.faculty))) return true
         break
       case FunctionalityCodesEnum.GROUP__GET_BY_USER_ID:
         castedFunctionality = functionality as AvailableFunctionality<GroupGetByUserIdDataForFunctionality>
@@ -101,10 +97,10 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         if (castedFunctionality.data.forbiddenGroups.includes(requestBody.id)) break
         if (castedFunctionality.data.availableGroups.includes(requestBody.id)) return true
         currentGroup = await this.groupService.getById(requestBody.id, ['faculty'])
-        if (castedFunctionality.data.forbiddenFaculties.includes(currentGroup.faculty.toString())) break
+        if (castedFunctionality.data.forbiddenFaculties.includes(String(currentGroup.faculty))) break
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (
-          castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString()) &&
+          castedFunctionality.data.availableFaculties.includes(String(currentGroup.faculty)) &&
           castedFunctionality.data.availableFaculties.includes(requestBody.faculty)
         )
           return true
@@ -117,9 +113,9 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.id)) break
         if (castedFunctionality.data.availableGroups.includes(queryParams.id)) return true
         currentGroup = await this.groupService.getById(queryParams.id, ['faculty'])
-        if (castedFunctionality.data.forbiddenFaculties.includes(currentGroup.faculty.toString())) break
+        if (castedFunctionality.data.forbiddenFaculties.includes(String(currentGroup.faculty))) break
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
-        if (castedFunctionality.data.availableFaculties.includes(currentGroup.faculty.toString())) return true
+        if (castedFunctionality.data.availableFaculties.includes(String(currentGroup.faculty))) return true
 
         break
     }

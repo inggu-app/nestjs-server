@@ -21,6 +21,6 @@ import { RoleRoutesMiddleware } from './role.middleware'
 })
 export class RoleModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RoleRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(RoleRoutesMiddleware).forRoutes({ path: '/roles', method: RequestMethod.GET })
   }
 }

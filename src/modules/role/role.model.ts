@@ -3,7 +3,6 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { RoleFieldsEnum } from './role.constants'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
-import { AvailableFunctionality } from '../functionality/functionality.constants'
 
 type Role = {
   [key in RoleFieldsEnum]: any
@@ -18,15 +17,5 @@ export class RoleModel extends TimeStamps implements Role {
   title: string
 
   @prop()
-  functionalities: Functionality[]
-}
-
-class Functionality implements AvailableFunctionality {
-  @prop()
-  code: FunctionalityCodesEnum
-
-  @prop()
-  data: {
-    [key: string]: any
-  }
+  available: FunctionalityCodesEnum[]
 }

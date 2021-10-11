@@ -4,7 +4,7 @@ import { UserModel } from './user.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateUserDto } from './dto/createUser.dto'
 import { ModelBase, ObjectByInterface } from '../../global/types'
-import { Error, Types } from 'mongoose'
+import { Error, QueryOptions, Types } from 'mongoose'
 import { USER_WITH_ID_NOT_FOUND, USER_WITH_LOGIN_EXISTS } from '../../global/constants/errors.constants'
 import { UserField, UserFieldsEnum } from './user.constants'
 import generatePassword from '../../global/utils/generatePassword'
@@ -38,9 +38,11 @@ export class UserService {
     }
   }
 
-  async getById(id: Types.ObjectId, fields?: UserField[]) {
+  async getById(id: Types.ObjectId, options?: { fields?: UserField[]; queryOptions?: QueryOptions }) {
     await this.checkExists({ _id: id })
-    return (await this.userModel.findById(id, fieldsArrayToProjection(fields))) as DocumentType<UserModel>
+    return (await this.userModel
+      .findById(id, fieldsArrayToProjection(options?.fields), options?.queryOptions)
+      .exec()) as DocumentType<UserModel>
   }
 
   async update(dto: UpdateUserDto) {

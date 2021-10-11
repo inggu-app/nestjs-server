@@ -32,10 +32,7 @@ export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
   ) {
     super(reflector, userService, jwtService)
   }
-  async validate(functionalityCode: FunctionalityCodesEnum, user: DocumentType<UserModel>, request: Request) {
-    const functionality = user.available.find(functionality => functionality.code === functionalityCode)
-    if (!functionality) throw new ForbiddenException()
-
+  async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
     let castedFunctionality
     let requestBody
     let queryParams
