@@ -40,7 +40,7 @@ export class GroupController {
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
   private async getByGroupId(
     @MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
-    @Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum }) fields?: GroupField[]
+    @GetGroupFields() fields?: GroupField[]
   ) {
     return normalizeFields(await this.groupService.getById(groupId, fields), { fields })
   }
@@ -50,10 +50,7 @@ export class GroupController {
     title: 'Запросить по id ответственного',
   })
   @Get(GroupRoutesEnum.GET_BY_USER_ID)
-  private async getByUserId(
-    @MongoId(GroupGetQueryParametersEnum.USER_ID) userId: Types.ObjectId,
-    @Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum }) fields?: GroupField[]
-  ) {
+  private async getByUserId(@MongoId(GroupGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @GetGroupFields() fields?: GroupField[]) {
     return normalizeFields(await this.responsibleService.getAllGroupsByResponsible(userId, fields), { fields })
   }
 
@@ -64,7 +61,7 @@ export class GroupController {
   @Get(GroupRoutesEnum.GET_BY_FACULTY_ID)
   private async getByFacultyId(
     @MongoId(GroupGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
-    @Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum }) fields?: GroupField[]
+    @GetGroupFields() fields?: GroupField[]
   ) {
     return normalizeFields(await this.groupService.getByFacultyId(facultyId, fields), { fields })
   }
@@ -78,7 +75,7 @@ export class GroupController {
     @Query(GroupGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
     @Query(GroupGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
     @Query(GroupGetQueryParametersEnum.TITLE) title?: string,
-    @Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum }) fields?: GroupField[]
+    @GetGroupFields() fields?: GroupField[]
   ) {
     return {
       groups: normalizeFields(await this.groupService.getAll(page, count, title, fields), { fields }),
@@ -104,4 +101,8 @@ export class GroupController {
   delete(@MongoId('groupId') groupId: Types.ObjectId) {
     return this.groupService.delete(groupId)
   }
+}
+
+function GetGroupFields() {
+  return Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum })
 }

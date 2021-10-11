@@ -28,10 +28,7 @@ export class RoleController {
     title: 'Запросить роль по id',
   })
   @Get(RoleRoutesEnum.GET_BY_ROLE_ID)
-  getByRoleId(
-    @MongoId(RoleGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId,
-    @Fields({ fieldsEnum: RoleFieldsEnum, additionalFieldsEnum: RoleAdditionalFieldsEnum }) fields?: RoleField[]
-  ) {
+  getByRoleId(@MongoId(RoleGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId, @GetRoleFields() fields?: RoleField[]) {
     return this.roleService.getById(roleId, fields)
   }
 
@@ -40,7 +37,7 @@ export class RoleController {
     title: 'Запросить список ролей',
   })
   @Get(RoleRoutesEnum.GET_MANY)
-  getMany(@Fields({ fieldsEnum: RoleFieldsEnum, additionalFieldsEnum: RoleAdditionalFieldsEnum }) fields?: RoleField[]) {
+  getMany(@GetRoleFields() fields?: RoleField[]) {
     return this.roleService.getMany(fields)
   }
 
@@ -62,4 +59,8 @@ export class RoleController {
   delete(@MongoId('roleId') roleId: Types.ObjectId) {
     return this.roleService.deleteById(roleId)
   }
+}
+
+function GetRoleFields() {
+  return Fields({ fieldsEnum: RoleFieldsEnum, additionalFieldsEnum: RoleAdditionalFieldsEnum })
 }

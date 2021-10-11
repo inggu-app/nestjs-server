@@ -67,7 +67,7 @@ export class ScheduleController {
   async getByGroupId(
     @MongoId(ScheduleGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
     @Query(ScheduleGetQueryParametersEnum.UPDATED_AT, new ParseDatePipe({ required: false })) updatedAt?: Date,
-    @Fields({ fieldsEnum: LessonFieldsEnum, additionalFieldsEnum: ScheduleAdditionalFieldsEnum }) fields?: ScheduleField[]
+    @GetScheduleFields() fields?: ScheduleField[]
   ) {
     const group = await this.groupService.getById(groupId, ['lastScheduleUpdate'])
 
@@ -100,4 +100,8 @@ export class ScheduleController {
       updatedAt: group.lastScheduleUpdate,
     }
   }
+}
+
+function GetScheduleFields() {
+  return Fields({ fieldsEnum: LessonFieldsEnum, additionalFieldsEnum: ScheduleAdditionalFieldsEnum })
 }

@@ -39,11 +39,7 @@ export class NoteController {
     title: 'Получить заметку по id',
   })
   @Get(NoteRoutesEnum.GET_BY_NOTE_ID)
-  async getByNoteId(
-    @MongoId(NoteGetQueryParametersEnum.NOTE_ID) noteId: Types.ObjectId,
-    @Fields({ fieldsEnum: NoteFieldsEnum, additionalFieldsEnum: NoteAdditionalFieldsEnum, forbiddenFieldsEnum: NoteForbiddenFieldsEnum })
-    fields?: NoteField[]
-  ) {
+  async getByNoteId(@MongoId(NoteGetQueryParametersEnum.NOTE_ID) noteId: Types.ObjectId, @GetNoteFields() fields?: NoteField[]) {
     return normalizeFields(await this.noteService.getById(noteId, fields), {
       fields,
       forbiddenFields: NoteForbiddenFieldsEnum,
@@ -58,8 +54,7 @@ export class NoteController {
   async getByLessonId(
     @MongoId(NoteGetQueryParametersEnum.LESSON_ID) lessonId: Types.ObjectId,
     @Query(NoteGetQueryParametersEnum.WEEK, new CustomParseIntPipe()) week: number,
-    @Fields({ fieldsEnum: NoteFieldsEnum, additionalFieldsEnum: NoteAdditionalFieldsEnum, forbiddenFieldsEnum: NoteForbiddenFieldsEnum })
-    fields?: NoteField[]
+    @GetNoteFields() fields?: NoteField[]
   ) {
     return normalizeFields(await this.noteService.get(lessonId, week, fields), { fields, forbiddenFields: NoteForbiddenFieldsEnum })
   }
@@ -74,4 +69,12 @@ export class NoteController {
 
     return this.noteService.delete(noteId)
   }
+}
+
+function GetNoteFields() {
+  return Fields({
+    fieldsEnum: NoteFieldsEnum,
+    additionalFieldsEnum: NoteAdditionalFieldsEnum,
+    forbiddenFieldsEnum: NoteForbiddenFieldsEnum,
+  })
 }
