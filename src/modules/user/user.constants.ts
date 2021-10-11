@@ -39,12 +39,7 @@ export type UserField = keyof typeof UserFieldsEnum
 enumKeyValuesMatch(UserFieldsEnum)
 enumKeyValuesMatch(UserForbiddenFieldsEnum)
 
-export interface UserCreateDataForFunctionality {
-  availableFunctionalitiesType: FunctionalityAvailableTypeEnum // доступность функциональностей, который пользователь может назначить
-  availableFunctionalities: FunctionalityCodesEnum[] // список фукнциональностей, которые пользователь может назначить
-  availableRolesType: FunctionalityAvailableTypeEnum // доступность ролей, которые пользователь может назначить
-  availableRoles: MongoIdString[] // id ролей, которые пользователь может назначить
-}
+export interface UserCreateDataForFunctionality {}
 
 export interface UserGetByUserIdDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно получить

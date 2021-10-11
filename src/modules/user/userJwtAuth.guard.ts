@@ -6,13 +6,11 @@ import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { ForbiddenException } from '@nestjs/common'
 import { AvailableFunctionality } from '../functionality/functionality.constants'
 import {
-  UserCreateDataForFunctionality,
   UserDeleteDataForFunctionality,
   UserGetByUserIdDataForFunctionality,
   UserGetQueryParametersEnum,
   UserUpdateDataForFunctionality,
 } from './user.constants'
-import { CreateUserDto } from './dto/createUser.dto'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
@@ -28,35 +26,6 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
     let isCorrectRoles: boolean
     switch (functionality.code) {
       case FunctionalityCodesEnum.USER__CREATE:
-        castedFunctionality = functionality as AvailableFunctionality<UserCreateDataForFunctionality>
-
-        if (
-          castedFunctionality.data.availableRolesType === FunctionalityAvailableTypeEnum.ALL &&
-          castedFunctionality.data.availableFunctionalitiesType === FunctionalityAvailableTypeEnum.ALL
-        )
-          return true
-
-        isCorrectRoles = true
-        requestBody = UserJwtAuthGuard.getBody<CreateUserDto>(request)
-        for (const role of requestBody.roles) {
-          castedFunctionality = functionality as AvailableFunctionality<UserCreateDataForFunctionality>
-          if (!castedFunctionality.data.availableRoles.includes(role)) {
-            isCorrectRoles = false
-            break
-          }
-        }
-        if (!isCorrectRoles) break
-
-        isCorrectFunctionalities = true
-        for (const f of requestBody.available) {
-          castedFunctionality = functionality as AvailableFunctionality<UserCreateDataForFunctionality>
-          if (!castedFunctionality.data.availableFunctionalities.includes(f.code)) {
-            isCorrectFunctionalities = false
-            break
-          }
-        }
-        if (!isCorrectFunctionalities) break
-
         return true
       case FunctionalityCodesEnum.USER__GET_BY_USER_ID:
         castedFunctionality = functionality as AvailableFunctionality<UserGetByUserIdDataForFunctionality>
