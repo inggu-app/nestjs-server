@@ -22,10 +22,10 @@ export class UserModel extends TimeStamps implements User {
   @prop()
   login: string
 
-  @prop()
+  @prop({ default: [] })
   available: Available[]
 
-  @prop({ ref: () => RoleModel })
+  @prop({ ref: () => RoleModel, default: [] })
   roles: Ref<RoleModel, Types.ObjectId>[]
 
   @prop()

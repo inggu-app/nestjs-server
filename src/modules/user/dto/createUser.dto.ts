@@ -1,9 +1,4 @@
-import { IsArray, IsIn, IsMongoId, IsNotEmpty, IsObject, IsString, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
-import { getEnumValues } from '../../../global/utils/enumKeysValues'
-import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
-import { AvailableFunctionality } from '../../functionality/functionality.constants'
-import { MongoIdString } from '../../../global/types'
+import { IsNotEmpty, IsString } from 'class-validator'
 
 export class CreateUserDto {
   @IsString()
@@ -13,23 +8,4 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   login: string
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Functionality)
-  available: Functionality[]
-
-  @IsArray()
-  @IsMongoId({ each: true })
-  roles: MongoIdString[]
-}
-
-class Functionality implements AvailableFunctionality {
-  @IsIn(getEnumValues(FunctionalityCodesEnum))
-  code: FunctionalityCodesEnum
-
-  @IsObject()
-  data: {
-    [key: string]: any
-  }
 }
