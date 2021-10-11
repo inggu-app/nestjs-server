@@ -26,6 +26,7 @@ import { ResponsibleService } from '../responsible/responsible.service'
 import { Request } from 'express'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
@@ -33,11 +34,12 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
     protected readonly reflector: Reflector,
     @Inject(UserService) protected readonly userService: UserService,
     @Inject(JwtService) protected readonly jwtService: JwtService,
+    @Inject(ConfigService) protected readonly configService: ConfigService,
     @Inject(FunctionalityService) private readonly functionalitiesService: FunctionalityService,
     @Inject(GroupService) private readonly groupService: GroupService,
     @Inject(ResponsibleService) private readonly responsibleService: ResponsibleService
   ) {
-    super(reflector, userService, jwtService)
+    super(reflector, userService, jwtService, configService)
   }
 
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {

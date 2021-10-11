@@ -18,15 +18,17 @@ import { JwtService } from '@nestjs/jwt'
 import { GroupService } from '../group/group.service'
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
+import { ConfigService } from '@nestjs/config'
 
 export class ScheduleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   constructor(
     protected readonly reflector: Reflector,
     @Inject(UserService) protected readonly userService: UserService,
     @Inject(JwtService) protected readonly jwtService: JwtService,
+    @Inject(ConfigService) protected readonly configService: ConfigService,
     @Inject(GroupService) protected readonly groupService: GroupService
   ) {
-    super(reflector, userService, jwtService)
+    super(reflector, userService, jwtService, configService)
   }
 
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {

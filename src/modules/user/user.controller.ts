@@ -6,7 +6,14 @@ import { Types } from 'mongoose'
 import { UpdateUserDto } from './dto/updateUser.dto'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
-import { UserAdditionalFieldsEnum, UserField, UserFieldsEnum, UserForbiddenFieldsEnum, UserRoutesEnum } from './user.constants'
+import {
+  UserAdditionalFieldsEnum,
+  UserField,
+  UserFieldsEnum,
+  UserForbiddenFieldsEnum,
+  UserGetQueryParametersEnum,
+  UserRoutesEnum,
+} from './user.constants'
 import { Fields } from '../../global/decorators/Fields.decorator'
 
 @Controller()
@@ -29,7 +36,7 @@ export class UserController {
   })
   @Get(UserRoutesEnum.GET_BY_USER_ID)
   get(
-    @Query('userId', new ParseMongoIdPipe()) userId: Types.ObjectId,
+    @Query(UserGetQueryParametersEnum.USER_ID, new ParseMongoIdPipe()) userId: Types.ObjectId,
     @Fields({ fieldsEnum: UserFieldsEnum, additionalFieldsEnum: UserAdditionalFieldsEnum, forbiddenFieldsEnum: UserForbiddenFieldsEnum })
     fields?: UserField[]
   ) {

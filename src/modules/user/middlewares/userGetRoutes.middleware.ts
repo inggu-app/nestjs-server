@@ -15,9 +15,10 @@ export class UserGetRoutesMiddleware implements NestMiddleware {
       enum: UserRoutesEnum.GET_BY_USER_ID,
     })
 
+    const [start = '', queryStr = ''] = req.url.split('?')
     switch (request.enum) {
       case UserRoutesEnum.GET_BY_USER_ID:
-        req.url = UserRoutesEnum.GET_BY_USER_ID + req.url
+        req.url = `${start}${UserRoutesEnum.GET_BY_USER_ID}?${queryStr}`
         break
     }
     next()

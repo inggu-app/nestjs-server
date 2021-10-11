@@ -28,7 +28,7 @@ import getJWTConfig from '../../configs/jwt.config'
     RoleModule,
     FunctionalityModule,
     RouterModule.forRoutes(routesConfig),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     {
       ...JwtModule.registerAsync({
         imports: [ConfigModule],

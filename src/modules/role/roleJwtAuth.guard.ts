@@ -18,6 +18,7 @@ import { UpdateRoleDto } from './dto/updateRole.dto'
 
 export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
+    console.log(functionality)
     let castedFunctionality
     let queryParams
     let requestBody

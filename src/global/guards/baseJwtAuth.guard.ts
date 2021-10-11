@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common'
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common'
 import { DocumentType } from '@typegoose/typegoose'
 import { Reflector } from '@nestjs/core'
 import { bearerTokenRegExp } from '../regex'
@@ -8,13 +8,15 @@ import { UserModel } from '../../modules/user/user.model'
 import { FunctionalityCodesEnum } from '../enums/functionalities.enum'
 import { Request } from 'express'
 import { AvailableFunctionality } from '../../modules/functionality/functionality.constants'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
   constructor(
     protected readonly reflector: Reflector,
     protected readonly userService: UserService,
-    protected readonly jwtService: JwtService
+    protected readonly jwtService: JwtService,
+    protected readonly configService: ConfigService
   ) {}
 
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request): Promise<boolean> {
@@ -26,23 +28,35 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
   }
 
   async canActivate(context: ExecutionContext) {
-    const code = this.reflector.get<FunctionalityCodesEnum>('code', context.getHandler())
-
     const bearer = context.switchToHttp().getRequest().headers.authorization as string
-    if (!bearer || !bearerTokenRegExp.test(bearer)) throw new UnauthorizedException()
+    if (bearer && bearerTokenRegExp.test(bearer)) {
+      const token = bearer.split(' ')[1]
 
-    const token = bearer.split(' ')[1]
+      try {
+        if (await this.jwtService.verifyAsync(token, { secret: this.configService.get('JWT_SECRET_KEY') })) {
+          const tokenData = this.jwtService.decode(token) as UserAccessTokenData
+          const user = await this.userService.getById(tokenData.id, { queryOptions: { populate: { path: 'roles' } } })
 
-    if (!(await this.jwtService.verifyAsync(token))) throw new UnauthorizedException()
+          if (user) {
+            const code = this.reflector.get<FunctionalityCodesEnum>('code', context.getHandler())
+            const functionality = user.available.find(functionality => functionality.code === code)
 
-    const tokenData = this.jwtService.decode(token) as UserAccessTokenData
-    const user = await this.userService.getById(tokenData.id, { queryOptions: { populate: { path: 'roles' } } })
+            if (functionality) {
+              return this.validate(functionality, user, context.switchToHttp().getRequest<Request>())
+            }
+          }
+        }
+      } catch (e) {}
+    }
 
-    if (!user) throw new UnauthorizedException()
-    const functionality = user.available.find(functionality => functionality.code === code)
-    if (!functionality) throw new ForbiddenException()
+    const adminToken = context.switchToHttp().getRequest().headers.admin as string
+    try {
+      if (adminToken && (await this.jwtService.verifyAsync(adminToken, { secret: this.configService.get('ADMIN_JWT_SECRET_KEY') }))) {
+        return true
+      }
+    } catch (e) {}
 
-    return this.validate(functionality, user, context.switchToHttp().getRequest<Request>())
+    throw new ForbiddenException()
   }
 }
 

@@ -21,16 +21,18 @@ import { ScheduleService } from '../schedule/schedule.service'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
+import { ConfigService } from '@nestjs/config'
 
 export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   constructor(
     protected readonly reflector: Reflector,
     @Inject(UserService) protected readonly userService: UserService,
     @Inject(JwtService) protected readonly jwtService: JwtService,
+    @Inject(ConfigService) protected readonly configService: ConfigService,
     @Inject(NoteService) protected readonly noteService: NoteService,
     @Inject(ScheduleService) protected readonly scheduleService: ScheduleService
   ) {
-    super(reflector, userService, jwtService)
+    super(reflector, userService, jwtService, configService)
   }
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
     let castedFunctionality

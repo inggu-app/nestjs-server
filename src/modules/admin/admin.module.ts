@@ -11,7 +11,6 @@ import { AdminJwtStrategy } from '../../global/strategies/adminJwt.strategy'
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
