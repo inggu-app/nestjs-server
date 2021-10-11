@@ -24,6 +24,8 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
     let castedFunctionality
     let requestBody
     let queryParams
+    let isCorrectFunctionalities: boolean
+    let isCorrectRoles: boolean
     switch (functionality.code) {
       case FunctionalityCodesEnum.USER__CREATE:
         castedFunctionality = functionality as AvailableFunctionality<UserCreateDataForFunctionality>
@@ -34,7 +36,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         )
           return true
 
-        let isCorrectRoles = true
+        isCorrectRoles = true
         requestBody = UserJwtAuthGuard.getBody<CreateUserDto>(request)
         for (const role of requestBody.roles) {
           castedFunctionality = functionality as AvailableFunctionality<UserCreateDataForFunctionality>
@@ -45,7 +47,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         }
         if (!isCorrectRoles) break
 
-        let isCorrectFunctionalities = true
+        isCorrectFunctionalities = true
         for (const f of requestBody.available) {
           castedFunctionality = functionality as AvailableFunctionality<UserCreateDataForFunctionality>
           if (!castedFunctionality.data.availableFunctionalities.includes(f.code)) {
@@ -69,6 +71,8 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         castedFunctionality = functionality as AvailableFunctionality<UserUpdateDataForFunctionality>
 
         requestBody = UserJwtAuthGuard.getBody<UpdateUserDto>(request)
+        //=====================
+        // Проверяем доступна ли поля, которые пытается изменить пользователь, ему для изменения
         let isCorrectFields = true
         for (const key of objectKeys(requestBody)) {
           castedFunctionality = functionality as AvailableFunctionality<UserUpdateDataForFunctionality>
@@ -78,10 +82,53 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
           }
         }
         if (!isCorrectFields) break
-        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
+        //=====================
 
-        if (castedFunctionality.data.availableUsers.includes(requestBody.id)) return true
-        break
+        //=====================
+        // Проверяем доступны ли функциональности, которые пытается установить пользователь, ему для установки
+        isCorrectFunctionalities = true
+        if (requestBody.available) {
+          if (castedFunctionality.data.availableFunctionalitiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+            for (const functionality of requestBody.available) {
+              if (
+                castedFunctionality.data.forbiddenFunctionalities.includes(functionality.code) ||
+                !castedFunctionality.data.availableFunctionalities.includes(functionality.code)
+              ) {
+                isCorrectFunctionalities = false
+                break
+              }
+            }
+            if (!isCorrectFunctionalities) break
+          }
+        }
+        //=====================
+
+        //=====================
+        // Проверяем доступны ли роли, которые пытается установить пользователь, ему для установки
+        isCorrectRoles = true
+        if (requestBody.roles) {
+          if (castedFunctionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+            for (const role of requestBody.roles) {
+              if (castedFunctionality.data.forbiddenRoles.includes(role) || !castedFunctionality.data.availableRoles.includes(role)) {
+                isCorrectRoles = false
+                break
+              }
+            }
+            if (!isCorrectRoles) break
+          }
+        }
+        //=====================
+
+        //=====================
+        // Если пользователю не доступны все пользователи и обновляемого пользователя нет в списке
+        // доступных пользователей, то доступ запрещается
+        if (
+          castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.CUSTOM &&
+          !castedFunctionality.data.availableUsers.includes(requestBody.id)
+        )
+          break
+
+        return true
       case FunctionalityCodesEnum.USER__DELETE:
         castedFunctionality = functionality as AvailableFunctionality<UserDeleteDataForFunctionality>
 

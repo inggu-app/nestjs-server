@@ -55,6 +55,12 @@ export interface UserUpdateDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно обновить
   availableUsers: MongoIdString[] // id пользователей, которых можно обновить
   availableFields: (keyof typeof UpdateUserDtoKeysEnum)[] // поля пользователя, которые пользователь может редактировать
+  availableFunctionalitiesType: FunctionalityAvailableTypeEnum // доступность фукнциональностей, который пользователь может назначить
+  availableFunctionalities: FunctionalityCodesEnum[] // фукнциональности, которые пользователь может назначить
+  forbiddenFunctionalities: FunctionalityCodesEnum[] // функциональности, которые пользователь назначить НЕ может
+  availableRolesType: FunctionalityAvailableTypeEnum // доступность ролей, которые пользователь может назначить
+  availableRoles: MongoIdString[] // id ролей, которые пользователь может назначить
+  forbiddenRoles: MongoIdString[] // id ролей, которые пользоаватель назначить НЕ может
 }
 
 export interface UserDeleteDataForFunctionality {
