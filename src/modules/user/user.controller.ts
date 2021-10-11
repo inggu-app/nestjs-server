@@ -1,7 +1,6 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/createUser.dto'
-import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { UpdateUserDto } from './dto/updateUser.dto'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
@@ -16,6 +15,7 @@ import {
 } from './user.constants'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { LoginUserDto } from './dto/loginUser.dto'
+import { MongoId } from '../../global/decorators/MongoId.decorator'
 
 @Controller()
 export class UserController {
@@ -36,11 +36,7 @@ export class UserController {
     title: 'Получить пользователя по id',
   })
   @Get(UserRoutesEnum.GET_BY_USER_ID)
-  get(
-    @Query(UserGetQueryParametersEnum.USER_ID, new ParseMongoIdPipe()) userId: Types.ObjectId,
-    @Fields({ fieldsEnum: UserFieldsEnum, additionalFieldsEnum: UserAdditionalFieldsEnum, forbiddenFieldsEnum: UserForbiddenFieldsEnum })
-    fields?: UserField[]
-  ) {
+  get(@MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @GetUserFields() fields?: UserField[]) {
     return this.userService.getById(userId, { fields })
   }
 
@@ -59,7 +55,7 @@ export class UserController {
     title: 'Удалить пользователя',
   })
   @Delete(UserRoutesEnum.DELETE)
-  delete(@Query('userId', new ParseMongoIdPipe()) userId: Types.ObjectId) {
+  delete(@MongoId('userId') userId: Types.ObjectId) {
     return this.userService.delete(userId)
   }
 
@@ -68,4 +64,12 @@ export class UserController {
   login(@Body() dto: LoginUserDto) {
     return this.userService.login(dto)
   }
+}
+
+function GetUserFields() {
+  return Fields({
+    fieldsEnum: UserFieldsEnum,
+    additionalFieldsEnum: UserAdditionalFieldsEnum,
+    forbiddenFieldsEnum: UserForbiddenFieldsEnum,
+  })
 }

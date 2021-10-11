@@ -2,11 +2,11 @@ import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/co
 import { Types } from 'mongoose'
 import { INVALID_MONGO_ID } from '../constants/errors.constants'
 
-interface Options {
+export interface ParseMongoIdPipeOptions {
   required?: boolean
 }
 
-const defaultOptions: Options = {
+const defaultOptions: ParseMongoIdPipeOptions = {
   required: true,
 }
 
@@ -14,7 +14,7 @@ const defaultOptions: Options = {
 export class ParseMongoIdPipe implements PipeTransform<any, Types.ObjectId | undefined> {
   private readonly options = defaultOptions
 
-  constructor(options?: Options) {
+  constructor(options?: ParseMongoIdPipeOptions) {
     this.options = { ...defaultOptions, ...options }
   }
 

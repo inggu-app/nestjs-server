@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
-import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import {
-  GetScheduleEnum,
   LessonFieldsEnum,
   ScheduleAdditionalFieldsEnum,
   ScheduleField,
@@ -13,12 +11,12 @@ import {
   ScheduleRoutesEnum,
 } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
-import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import normalizeFields from '../../global/utils/normalizeFields'
-import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
+import { MongoId } from '../../global/decorators/MongoId.decorator'
+import { ParseDatePipe } from '../../global/pipes/date.pipe'
 
 @Controller()
 export class ScheduleController {
@@ -66,50 +64,40 @@ export class ScheduleController {
     title: 'Получить расписание',
   })
   @Get(ScheduleRoutesEnum.GET_BY_GROUP_ID)
-  async get(
-    @Query(ScheduleGetQueryParametersEnum.GROUP_ID, new ParseMongoIdPipe()) groupId: Types.ObjectId,
+  async getByGroupId(
+    @MongoId(ScheduleGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
     @Query(ScheduleGetQueryParametersEnum.UPDATED_AT, new ParseDatePipe({ required: false })) updatedAt?: Date,
     @Fields({ fieldsEnum: LessonFieldsEnum, additionalFieldsEnum: ScheduleAdditionalFieldsEnum }) fields?: ScheduleField[]
   ) {
-    const request = checkAlternativeQueryParameters<GetScheduleEnum>({
-      required: { groupId },
-      fields,
-      updatedAt,
-      enum: GetScheduleEnum.groupId,
+    const group = await this.groupService.getById(groupId, ['lastScheduleUpdate'])
+
+    if (updatedAt && updatedAt >= group.lastScheduleUpdate) {
+      return {
+        schedule: [],
+        updatedAt: group.lastScheduleUpdate,
+      }
+    }
+
+    const lessonsSchedule = await this.scheduleService.getByGroup(groupId, fields)
+    const callSchedule = await this.callScheduleService.getActiveCallSchedule()
+
+    const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
+      const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
+
+      return normalizeFields<ScheduleField[]>(
+        {
+          ...lesson.toObject(),
+
+          startTime: call?.start || new Date(0),
+          endTime: call?.end || new Date(0),
+        },
+        { fields }
+      )
     })
 
-    switch (request.enum) {
-      case GetScheduleEnum.groupId:
-        const group = await this.groupService.getById(groupId, ['lastScheduleUpdate'])
-
-        if (updatedAt && updatedAt >= group.lastScheduleUpdate) {
-          return {
-            schedule: [],
-            updatedAt: group.lastScheduleUpdate,
-          }
-        }
-
-        const lessonsSchedule = await this.scheduleService.getByGroup(groupId, request.fields)
-        const callSchedule = await this.callScheduleService.getActiveCallSchedule()
-
-        const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
-          const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
-
-          return normalizeFields<ScheduleField[]>(
-            {
-              ...lesson.toObject(),
-
-              startTime: call?.start || new Date(0),
-              endTime: call?.end || new Date(0),
-            },
-            { fields: request.fields }
-          )
-        })
-
-        return {
-          schedule: lessonsScheduleWithStartEnd,
-          updatedAt: group.lastScheduleUpdate,
-        }
+    return {
+      schedule: lessonsScheduleWithStartEnd,
+      updatedAt: group.lastScheduleUpdate,
     }
   }
 }

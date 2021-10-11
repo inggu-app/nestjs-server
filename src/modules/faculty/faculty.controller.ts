@@ -1,16 +1,22 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { FacultyService } from './faculty.service'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
-import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import { FacultyAdditionalFieldsEnum, FacultyField, FacultyFieldsEnum, FacultyRoutesEnum } from './faculty.constants'
+import {
+  FacultyAdditionalFieldsEnum,
+  FacultyField,
+  FacultyFieldsEnum,
+  FacultyGetQueryParametersEnum,
+  FacultyRoutesEnum,
+} from './faculty.constants'
 import normalizeFields from '../../global/utils/normalizeFields'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { Fields } from '../../global/decorators/Fields.decorator'
+import { MongoId } from '../../global/decorators/MongoId.decorator'
 
 @Controller()
 export class FacultyController {
@@ -32,8 +38,8 @@ export class FacultyController {
   })
   @Get(FacultyRoutesEnum.GET_BY_FACULTY_ID)
   async getByFacultyId(
-    @Query('facultyId', new ParseMongoIdPipe({ required: false })) facultyId: Types.ObjectId,
-    @Fields({ fieldsEnum: FacultyFieldsEnum, additionalFieldsEnum: FacultyAdditionalFieldsEnum }) fields?: FacultyField[]
+    @MongoId(FacultyGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
+    @GetFacultyFields() fields?: FacultyField[]
   ) {
     return normalizeFields(await this.facultyService.getById(facultyId, fields), { fields })
   }
@@ -44,10 +50,10 @@ export class FacultyController {
   })
   @Get(FacultyRoutesEnum.GET_MANY)
   async getMany(
-    @Query('page', new CustomParseIntPipe({ required: false })) page: number,
-    @Query('count', new CustomParseIntPipe({ required: false })) count: number,
-    @Query('title') title?: string,
-    @Fields({ fieldsEnum: FacultyFieldsEnum, additionalFieldsEnum: FacultyAdditionalFieldsEnum }) fields?: FacultyField[]
+    @Query(FacultyGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
+    @Query(FacultyGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
+    @Query(FacultyGetQueryParametersEnum.TITLE) title?: string,
+    @GetFacultyFields() fields?: FacultyField[]
   ) {
     return {
       faculties: normalizeFields(await this.facultyService.getAll(page, count, title, fields), { fields }),
@@ -70,9 +76,13 @@ export class FacultyController {
     title: 'Удалить факультет',
   })
   @Delete('/')
-  async delete(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
-    await this.facultyService.delete(id)
+  async delete(@MongoId('facultyId') facultyId: Types.ObjectId) {
+    await this.facultyService.delete(facultyId)
 
-    await this.groupService.deleteAllByFacultyId(id)
+    await this.groupService.deleteAllByFacultyId(facultyId)
   }
+}
+
+function GetFacultyFields() {
+  return Fields({ fieldsEnum: FacultyFieldsEnum, additionalFieldsEnum: FacultyAdditionalFieldsEnum })
 }

@@ -10,7 +10,6 @@ import {
   NoteGetQueryParametersEnum,
   NoteRoutesEnum,
 } from './note.constants'
-import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { DeviceId } from '../../global/types'
 import { INVALID_NOTE_DEVICE_ID } from '../../global/constants/errors.constants'
@@ -19,6 +18,7 @@ import normalizeFields from '../../global/utils/normalizeFields'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
+import { MongoId } from '../../global/decorators/MongoId.decorator'
 
 @Controller()
 export class NoteController {
@@ -40,7 +40,7 @@ export class NoteController {
   })
   @Get(NoteRoutesEnum.GET_BY_NOTE_ID)
   async getByNoteId(
-    @Query(NoteGetQueryParametersEnum.NOTE_ID, new ParseMongoIdPipe()) noteId: Types.ObjectId,
+    @MongoId(NoteGetQueryParametersEnum.NOTE_ID) noteId: Types.ObjectId,
     @Fields({ fieldsEnum: NoteFieldsEnum, additionalFieldsEnum: NoteAdditionalFieldsEnum, forbiddenFieldsEnum: NoteForbiddenFieldsEnum })
     fields?: NoteField[]
   ) {
@@ -56,7 +56,7 @@ export class NoteController {
   })
   @Get(NoteRoutesEnum.GET_BY_LESSON_ID)
   async getByLessonId(
-    @Query(NoteGetQueryParametersEnum.LESSON_ID, new ParseMongoIdPipe()) lessonId: Types.ObjectId,
+    @MongoId(NoteGetQueryParametersEnum.LESSON_ID) lessonId: Types.ObjectId,
     @Query(NoteGetQueryParametersEnum.WEEK, new CustomParseIntPipe()) week: number,
     @Fields({ fieldsEnum: NoteFieldsEnum, additionalFieldsEnum: NoteAdditionalFieldsEnum, forbiddenFieldsEnum: NoteForbiddenFieldsEnum })
     fields?: NoteField[]
@@ -65,16 +65,13 @@ export class NoteController {
   }
 
   @Delete(NoteRoutesEnum.DELETE)
-  async delete(
-    @Query('id', new ParseMongoIdPipe()) id: Types.ObjectId,
-    @Query('deviceId', new CustomParseStringPipe()) deviceId: DeviceId
-  ) {
-    const candidate = await this.noteService.getById(id, ['deviceId'])
+  async delete(@MongoId('noteId') noteId: Types.ObjectId, @Query('deviceId', new CustomParseStringPipe()) deviceId: DeviceId) {
+    const candidate = await this.noteService.getById(noteId, ['deviceId'])
 
     if (deviceId !== candidate.deviceId) {
-      throw new HttpException(INVALID_NOTE_DEVICE_ID(id, deviceId), HttpStatus.BAD_REQUEST)
+      throw new HttpException(INVALID_NOTE_DEVICE_ID(noteId, deviceId), HttpStatus.BAD_REQUEST)
     }
 
-    return this.noteService.delete(id)
+    return this.noteService.delete(noteId)
   }
 }

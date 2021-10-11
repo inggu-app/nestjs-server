@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
-import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
 import { ResponsibleService } from '../responsible/responsible.service'
@@ -12,6 +11,7 @@ import normalizeFields from '../../global/utils/normalizeFields'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { Fields } from '../../global/decorators/Fields.decorator'
+import { MongoId } from '../../global/decorators/MongoId.decorator'
 
 @Controller()
 export class GroupController {
@@ -39,7 +39,7 @@ export class GroupController {
   })
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
   private async getByGroupId(
-    @Query(GroupGetQueryParametersEnum.GROUP_ID, new ParseMongoIdPipe()) groupId: Types.ObjectId,
+    @MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
     @Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum }) fields?: GroupField[]
   ) {
     return normalizeFields(await this.groupService.getById(groupId, fields), { fields })
@@ -51,7 +51,7 @@ export class GroupController {
   })
   @Get(GroupRoutesEnum.GET_BY_USER_ID)
   private async getByUserId(
-    @Query(GroupGetQueryParametersEnum.USER_ID, new ParseMongoIdPipe()) userId: Types.ObjectId,
+    @MongoId(GroupGetQueryParametersEnum.USER_ID) userId: Types.ObjectId,
     @Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum }) fields?: GroupField[]
   ) {
     return normalizeFields(await this.responsibleService.getAllGroupsByResponsible(userId, fields), { fields })
@@ -63,7 +63,7 @@ export class GroupController {
   })
   @Get(GroupRoutesEnum.GET_BY_FACULTY_ID)
   private async getByFacultyId(
-    @Query(GroupGetQueryParametersEnum.FACULTY_ID, new ParseMongoIdPipe()) facultyId: Types.ObjectId,
+    @MongoId(GroupGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
     @Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum }) fields?: GroupField[]
   ) {
     return normalizeFields(await this.groupService.getByFacultyId(facultyId, fields), { fields })
@@ -101,7 +101,7 @@ export class GroupController {
     title: 'Удалить группу',
   })
   @Delete(GroupRoutesEnum.DELETE)
-  delete(@Query('id', new ParseMongoIdPipe()) id: Types.ObjectId) {
-    return this.groupService.delete(id)
+  delete(@MongoId('groupId') groupId: Types.ObjectId) {
+    return this.groupService.delete(groupId)
   }
 }

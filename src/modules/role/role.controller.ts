@@ -1,13 +1,13 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common'
 import { RoleService } from './role.service'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { RoleAdditionalFieldsEnum, RoleField, RoleFieldsEnum, RoleGetQueryParametersEnum, RoleRoutesEnum } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
-import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { UpdateRoleDto } from './dto/updateRole.dto'
+import { MongoId } from '../../global/decorators/MongoId.decorator'
 
 @Controller()
 export class RoleController {
@@ -29,7 +29,7 @@ export class RoleController {
   })
   @Get(RoleRoutesEnum.GET_BY_ROLE_ID)
   getByRoleId(
-    @Query(RoleGetQueryParametersEnum.ROLE_ID, new ParseMongoIdPipe()) roleId: Types.ObjectId,
+    @MongoId(RoleGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId,
     @Fields({ fieldsEnum: RoleFieldsEnum, additionalFieldsEnum: RoleAdditionalFieldsEnum }) fields?: RoleField[]
   ) {
     return this.roleService.getById(roleId, fields)
@@ -59,7 +59,7 @@ export class RoleController {
     title: 'Удалить роль',
   })
   @Delete(RoleRoutesEnum.DELETE)
-  delete(@Query('roleId', new ParseMongoIdPipe()) roleId: Types.ObjectId) {
+  delete(@MongoId('roleId') roleId: Types.ObjectId) {
     return this.roleService.deleteById(roleId)
   }
 }
