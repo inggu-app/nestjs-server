@@ -40,4 +40,5 @@ export const ROLE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Роль с id "$
 export const ROLE_WITH_TITLE_EXISTS = (title: string) => `Роль с названием "${title}" уже существует`
 
 export const USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Пользователь с id "${id}" не существует`
+export const USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Пользователь с логином "${login}" не существует`
 export const USER_WITH_LOGIN_EXISTS = (login: string) => `Пользователь с логином "${login}" уже существует`

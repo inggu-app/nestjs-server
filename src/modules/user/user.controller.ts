@@ -15,6 +15,7 @@ import {
   UserRoutesEnum,
 } from './user.constants'
 import { Fields } from '../../global/decorators/Fields.decorator'
+import { LoginUserDto } from './dto/loginUser.dto'
 
 @Controller()
 export class UserController {
@@ -60,5 +61,11 @@ export class UserController {
   @Delete(UserRoutesEnum.DELETE)
   delete(@Query('userId', new ParseMongoIdPipe()) userId: Types.ObjectId) {
     return this.userService.delete(userId)
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post(UserRoutesEnum.LOGIN)
+  login(@Body() dto: LoginUserDto) {
+    return this.userService.login(dto)
   }
 }

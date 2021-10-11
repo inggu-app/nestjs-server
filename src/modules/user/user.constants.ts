@@ -10,6 +10,7 @@ export enum UserRoutesEnum {
   GET_BY_USER_ID = '/by-user-id',
   UPDATE = '/',
   DELETE = '/',
+  LOGIN = '/login',
 }
 
 export enum UserGetQueryParametersEnum {
