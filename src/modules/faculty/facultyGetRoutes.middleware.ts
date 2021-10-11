@@ -6,7 +6,7 @@ import checkAlternativeQueryParameters from '../../global/utils/alternativeQuery
 import { FacultyGetQueryParametersEnum, FacultyRoutesEnum, GetFacultiesEnum } from './faculty.constants'
 
 @Injectable()
-export class FacultyRoutesMiddleware implements NestMiddleware {
+export class FacultyGetRoutesMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const query = parseRequestQueries(getEnumValues(FacultyGetQueryParametersEnum), req.url)
 

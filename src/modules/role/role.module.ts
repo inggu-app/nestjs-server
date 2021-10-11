@@ -3,7 +3,7 @@ import { RoleController } from './role.controller'
 import { RoleService } from './role.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { RoleModel } from './role.model'
-import { RoleRoutesMiddleware } from './role.middleware'
+import { RoleGetRoutesMiddleware } from './roleGetRoutes.middleware'
 
 @Module({
   controllers: [RoleController],
@@ -21,6 +21,6 @@ import { RoleRoutesMiddleware } from './role.middleware'
 })
 export class RoleModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RoleRoutesMiddleware).forRoutes({ path: '/roles', method: RequestMethod.GET })
+    consumer.apply(RoleGetRoutesMiddleware).forRoutes({ path: '/roles', method: RequestMethod.GET })
   }
 }

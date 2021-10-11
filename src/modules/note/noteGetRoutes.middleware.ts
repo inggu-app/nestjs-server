@@ -5,7 +5,7 @@ import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { Request } from 'express'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
-export class NoteRoutesMiddleware implements NestMiddleware {
+export class NoteGetRoutesMiddleware implements NestMiddleware {
   use(req: Request, res: any, next: () => void) {
     const query = parseRequestQueries(getEnumValues(NoteGetQueryParametersEnum), req.url)
 

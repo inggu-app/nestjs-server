@@ -5,7 +5,7 @@ import { GetScheduleEnum, ScheduleGetQueryParametersEnum, ScheduleRoutesEnum } f
 import { Request } from 'express'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
-export class ScheduleRoutesMiddleware implements NestMiddleware {
+export class ScheduleGetRoutesMiddleware implements NestMiddleware {
   use(req: Request, res: any, next: () => void) {
     const query = parseRequestQueries(getEnumValues(ScheduleGetQueryParametersEnum), req.url)
 

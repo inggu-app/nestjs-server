@@ -3,7 +3,7 @@ import { Request } from 'express'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 import { FunctionalityRoutesEnum } from './functionality.constants'
 
-export class FunctionalityRoutesMiddleware implements NestMiddleware {
+export class FunctionalityGetRoutesMiddleware implements NestMiddleware {
   use(req: Request, res: any, next: () => void) {
     const request = checkAlternativeQueryParameters({ enum: FunctionalityRoutesEnum.GET_MANY })
 

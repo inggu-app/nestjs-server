@@ -5,7 +5,7 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { NoteModel } from './note.model'
 import { ScheduleModule } from '../schedule/schedule.module'
-import { NoteRoutesMiddleware } from './note.middleware'
+import { NoteGetRoutesMiddleware } from './noteGetRoutes.middleware'
 
 @Module({
   providers: [NoteService],
@@ -22,6 +22,6 @@ import { NoteRoutesMiddleware } from './note.middleware'
 })
 export class NoteModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(NoteRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(NoteGetRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
   }
 }

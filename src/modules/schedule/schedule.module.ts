@@ -8,7 +8,7 @@ import { LessonModel } from './lesson.model'
 import { CallScheduleModule } from '../settings/callSchedule/callSchedule.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
-import { ScheduleRoutesMiddleware } from './schedule.middleware'
+import { ScheduleGetRoutesMiddleware } from './scheduleGetRoutes.middleware'
 
 @Module({
   controllers: [ScheduleController],
@@ -29,6 +29,6 @@ import { ScheduleRoutesMiddleware } from './schedule.middleware'
 })
 export class ScheduleModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ScheduleRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(ScheduleGetRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
   }
 }

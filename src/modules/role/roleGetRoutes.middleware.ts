@@ -5,7 +5,7 @@ import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { RoleGetQueryParametersEnum, RoleRoutesEnum } from './role.constants'
 import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
 
-export class RoleRoutesMiddleware implements NestMiddleware {
+export class RoleGetRoutesMiddleware implements NestMiddleware {
   use(req: Request, res: any, next: () => void) {
     const query = parseRequestQueries(getEnumValues(RoleGetQueryParametersEnum), req.url)
 

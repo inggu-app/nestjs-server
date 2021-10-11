@@ -5,7 +5,7 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { FacultyModule } from '../faculty/faculty.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
-import { GroupRoutesMiddleware } from './group.middleware'
+import { GroupGetRoutesMiddleware } from './groupGetRoutes.middleware'
 
 @Module({
   controllers: [GroupController],
@@ -26,6 +26,6 @@ import { GroupRoutesMiddleware } from './group.middleware'
 })
 export class GroupModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(GroupRoutesMiddleware).forRoutes('/groups', { path: '/', method: RequestMethod.GET })
+    consumer.apply(GroupGetRoutesMiddleware).forRoutes('/groups', { path: '/', method: RequestMethod.GET })
   }
 }

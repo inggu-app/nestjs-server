@@ -4,7 +4,7 @@ import { FacultyService } from './faculty.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { GroupModule } from '../group/group.module'
-import { FacultyRoutesMiddleware } from './faculty.middleware'
+import { FacultyGetRoutesMiddleware } from './facultyGetRoutes.middleware'
 
 @Module({
   controllers: [FacultyController],
@@ -24,6 +24,6 @@ import { FacultyRoutesMiddleware } from './faculty.middleware'
 })
 export class FacultyModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(FacultyRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(FacultyGetRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
   }
 }

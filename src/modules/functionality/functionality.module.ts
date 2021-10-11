@@ -1,7 +1,7 @@
 import { CacheModule, Global, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { FunctionalityService } from './functionality.service'
 import { FunctionalityController } from './functionality.controller'
-import { FunctionalityRoutesMiddleware } from './functionality.middleware'
+import { FunctionalityGetRoutesMiddleware } from './functionalityGetRoutes.middleware'
 
 @Global()
 @Module({
@@ -16,6 +16,6 @@ import { FunctionalityRoutesMiddleware } from './functionality.middleware'
 })
 export class FunctionalityModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(FunctionalityRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(FunctionalityGetRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
   }
 }
