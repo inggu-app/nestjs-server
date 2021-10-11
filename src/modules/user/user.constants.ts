@@ -54,13 +54,17 @@ export interface UserGetByUserIdDataForFunctionality {
 export interface UserUpdateDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно обновить
   availableUsers: MongoIdString[] // id пользователей, которых можно обновить
+  forbiddenUsers: MongoIdString[] // id пользователей, которых пользователь обновить НЕ может
+  availableRolesType: FunctionalityAvailableTypeEnum // доступность ролей, пользователей с которыми можно обновить
+  availableRoles: MongoIdString[] // id ролей, пользователей с которыми можно обновить
+  forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми нельзя обновить
   availableFields: (keyof typeof UpdateUserDtoKeysEnum)[] // поля пользователя, которые пользователь может редактировать
-  availableFunctionalitiesType: FunctionalityAvailableTypeEnum // доступность фукнциональностей, который пользователь может назначить
-  availableFunctionalities: FunctionalityCodesEnum[] // фукнциональности, которые пользователь может назначить
-  forbiddenFunctionalities: FunctionalityCodesEnum[] // функциональности, которые пользователь назначить НЕ может
-  availableRolesType: FunctionalityAvailableTypeEnum // доступность ролей, которые пользователь может назначить
-  availableRoles: MongoIdString[] // id ролей, которые пользователь может назначить
-  forbiddenRoles: MongoIdString[] // id ролей, которые пользоаватель назначить НЕ может
+  availableToSetFunctionalitiesType: FunctionalityAvailableTypeEnum // доступность фукнциональностей, который пользователь может назначить
+  availableToSetFunctionalities: FunctionalityCodesEnum[] // фукнциональности, которые пользователь может назначить
+  forbiddenToSetFunctionalities: FunctionalityCodesEnum[] // функциональности, которые пользователь назначить НЕ может
+  availableToSetRolesType: FunctionalityAvailableTypeEnum // доступность ролей, которые пользователь может назначить
+  availableToSetRoles: MongoIdString[] // id ролей, которые пользователь может назначить
+  forbiddenToSetRoles: MongoIdString[] // id ролей, которые пользоаватель назначить НЕ может
 }
 
 export interface UserDeleteDataForFunctionality {

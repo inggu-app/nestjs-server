@@ -88,11 +88,11 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         // Проверяем доступны ли функциональности, которые пытается установить пользователь, ему для установки
         isCorrectFunctionalities = true
         if (requestBody.available) {
-          if (castedFunctionality.data.availableFunctionalitiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+          if (castedFunctionality.data.availableToSetFunctionalitiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
             for (const functionality of requestBody.available) {
               if (
-                castedFunctionality.data.forbiddenFunctionalities.includes(functionality.code) ||
-                !castedFunctionality.data.availableFunctionalities.includes(functionality.code)
+                castedFunctionality.data.forbiddenToSetFunctionalities.includes(functionality.code) ||
+                !castedFunctionality.data.availableToSetFunctionalities.includes(functionality.code)
               ) {
                 isCorrectFunctionalities = false
                 break
@@ -107,9 +107,12 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         // Проверяем доступны ли роли, которые пытается установить пользователь, ему для установки
         isCorrectRoles = true
         if (requestBody.roles) {
-          if (castedFunctionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+          if (castedFunctionality.data.availableToSetRolesType === FunctionalityAvailableTypeEnum.CUSTOM) {
             for (const role of requestBody.roles) {
-              if (castedFunctionality.data.forbiddenRoles.includes(role) || !castedFunctionality.data.availableRoles.includes(role)) {
+              if (
+                castedFunctionality.data.forbiddenToSetRoles.includes(role) ||
+                !castedFunctionality.data.availableToSetRoles.includes(role)
+              ) {
                 isCorrectRoles = false
                 break
               }
@@ -120,15 +123,30 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         //=====================
 
         //=====================
-        // Если пользователю не доступны все пользователи и обновляемого пользователя нет в списке
-        // доступных пользователей, то доступ запрещается
-        if (
-          castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.CUSTOM &&
-          !castedFunctionality.data.availableUsers.includes(requestBody.id)
-        )
+        // Если пользователь пытается обновить специально запрещённых ему пользователей или пользователей с
+        // запрещёнными ему ролями, то доступ запрещается
+        if (castedFunctionality.data.forbiddenUsers.includes(requestBody.id)) break
+        const currentUser = await this.userService.getById(requestBody.id, { fields: ['roles'] })
+        if (castedFunctionality.data.forbiddenRoles.reduce((acc, role) => !!currentUser.roles.find(r => r.toString() === role), false))
           break
+        //=====================
 
-        return true
+        //=====================
+        // Если пользователю для обновления доступны любые пользователи или если обновляется специально разрешённый пользователь,
+        // то доступ разрешается
+        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
+        if (castedFunctionality.data.availableUsers.includes(requestBody.id)) return true
+        //=====================
+
+        //=====================
+        // Если пользователь пытается обновить пользователя, среди ролей которого есть хотя бы одно пересечение с ролями
+        // доступными изменяющему пользователю, то доступ разрешается
+        if (castedFunctionality.data.availableRolesType === FunctionalityAvailableTypeEnum.ALL) return true
+        if (castedFunctionality.data.availableRoles.reduce((acc, role) => !!currentUser.roles.find(r => r.toString() === role), false))
+          return true
+        //=====================
+
+        break
       case FunctionalityCodesEnum.USER__DELETE:
         castedFunctionality = functionality as AvailableFunctionality<UserDeleteDataForFunctionality>
 

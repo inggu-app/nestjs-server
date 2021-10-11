@@ -3,7 +3,7 @@ import { InjectModel } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateUserDto } from './dto/createUser.dto'
-import { ModelBase, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { Error, QueryOptions, Types } from 'mongoose'
 import { USER_WITH_ID_NOT_FOUND, USER_WITH_LOGIN_EXISTS } from '../../global/constants/errors.constants'
 import { UserField, UserFieldsEnum } from './user.constants'
@@ -13,6 +13,7 @@ import * as bcrypt from 'bcrypt'
 import { hashSalt } from '../../global/constants/other.constants'
 import { UpdateUserDto } from './dto/updateUser.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -38,7 +39,8 @@ export class UserService {
     }
   }
 
-  async getById(id: Types.ObjectId, options?: { fields?: UserField[]; queryOptions?: QueryOptions }) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: { fields?: UserField[]; queryOptions?: QueryOptions }) {
+    id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     return (await this.userModel
       .findById(id, fieldsArrayToProjection(options?.fields), options?.queryOptions)
