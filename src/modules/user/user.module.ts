@@ -4,6 +4,7 @@ import { UserService } from './user.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
 import { UserGetRoutesMiddleware } from './userGetRoutes.middleware'
+import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 
 @Global()
 @Module({
@@ -23,6 +24,6 @@ import { UserGetRoutesMiddleware } from './userGetRoutes.middleware'
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UserGetRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(UserGetRoutesMiddleware).forRoutes({ path: ModuleRoutesEnum.USER_MODULE, method: RequestMethod.GET })
   }
 }

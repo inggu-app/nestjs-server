@@ -6,6 +6,7 @@ import { GroupModel } from './group.model'
 import { FacultyModule } from '../faculty/faculty.module'
 import { ResponsibleModule } from '../responsible/responsible.module'
 import { GroupGetRoutesMiddleware } from './groupGetRoutes.middleware'
+import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 
 @Module({
   controllers: [GroupController],
@@ -26,6 +27,6 @@ import { GroupGetRoutesMiddleware } from './groupGetRoutes.middleware'
 })
 export class GroupModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(GroupGetRoutesMiddleware).forRoutes('/groups', { path: '/', method: RequestMethod.GET })
+    consumer.apply(GroupGetRoutesMiddleware).forRoutes(ModuleRoutesEnum.GROUP_MODULE, { path: '/', method: RequestMethod.GET })
   }
 }

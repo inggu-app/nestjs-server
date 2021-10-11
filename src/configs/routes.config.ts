@@ -14,18 +14,19 @@ import { NoteModule } from '../modules/note/note.module'
 import { UserModule } from '../modules/user/user.module'
 import { FunctionalityModule } from '../modules/functionality/functionality.module'
 import { RoleModule } from '../modules/role/role.module'
+import { ModuleRoutesEnum } from '../global/enums/moduleRoutes.enum'
 
 export const routesConfig: Routes = [
   {
-    path: '/schedule',
+    path: ModuleRoutesEnum.SCHEDULE_MODULE,
     module: ScheduleModule,
   },
   {
-    path: '/groups',
+    path: ModuleRoutesEnum.GROUP_MODULE,
     module: GroupModule,
   },
   {
-    path: '/faculties',
+    path: ModuleRoutesEnum.FACULTY_MODULE,
     module: FacultyModule,
   },
   {
@@ -37,19 +38,19 @@ export const routesConfig: Routes = [
     module: AdminModule,
   },
   {
-    path: '/notes',
+    path: ModuleRoutesEnum.NOTE_MODULE,
     module: NoteModule,
   },
   {
-    path: '/users',
+    path: ModuleRoutesEnum.USER_MODULE,
     module: UserModule,
   },
   {
-    path: '/roles',
+    path: ModuleRoutesEnum.ROLE_MODULE,
     module: RoleModule,
   },
   {
-    path: '/functionalities',
+    path: ModuleRoutesEnum.FUNCTIONALITY_MODULE,
     module: FunctionalityModule,
   },
   {

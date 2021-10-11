@@ -9,6 +9,7 @@ import { CallScheduleModule } from '../settings/callSchedule/callSchedule.module
 import { ResponsibleModule } from '../responsible/responsible.module'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { ScheduleGetRoutesMiddleware } from './scheduleGetRoutes.middleware'
+import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 
 @Module({
   controllers: [ScheduleController],
@@ -29,6 +30,6 @@ import { ScheduleGetRoutesMiddleware } from './scheduleGetRoutes.middleware'
 })
 export class ScheduleModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ScheduleGetRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(ScheduleGetRoutesMiddleware).forRoutes({ path: ModuleRoutesEnum.SCHEDULE_MODULE, method: RequestMethod.GET })
   }
 }

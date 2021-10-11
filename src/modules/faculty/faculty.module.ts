@@ -5,6 +5,7 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { GroupModule } from '../group/group.module'
 import { FacultyGetRoutesMiddleware } from './facultyGetRoutes.middleware'
+import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 
 @Module({
   controllers: [FacultyController],
@@ -24,6 +25,6 @@ import { FacultyGetRoutesMiddleware } from './facultyGetRoutes.middleware'
 })
 export class FacultyModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(FacultyGetRoutesMiddleware).forRoutes({ path: '/', method: RequestMethod.GET })
+    consumer.apply(FacultyGetRoutesMiddleware).forRoutes({ path: ModuleRoutesEnum.FACULTY_MODULE, method: RequestMethod.GET })
   }
 }
