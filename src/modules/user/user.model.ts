@@ -6,6 +6,7 @@ import { RoleModel } from '../role/role.model'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { AvailableFunctionality } from '../functionality/functionality.constants'
 import { Types } from 'mongoose'
+import { InterfaceModel } from '../interface/interface.model'
 
 type User = {
   [key in UserFieldsEnum]: any
@@ -21,6 +22,9 @@ export class UserModel extends TimeStamps implements User {
 
   @prop()
   login: string
+
+  @prop({ default: [], ref: () => InterfaceModel })
+  interfaces: Ref<InterfaceModel, Types.ObjectId>[]
 
   @prop({ default: [] })
   available: Available[]

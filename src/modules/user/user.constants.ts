@@ -60,7 +60,9 @@ export interface UserUpdateDataForFunctionality {
   forbiddenToSetFunctionalities: FunctionalityCodesEnum[] // функциональности, которые пользователь назначить НЕ может
   availableToSetRolesType: FunctionalityAvailableTypeEnum // доступность ролей, которые пользователь может назначить
   availableToSetRoles: MongoIdString[] // id ролей, которые пользователь может назначить
-  forbiddenToSetRoles: MongoIdString[] // id ролей, которые пользоаватель назначить НЕ может
+  forbiddenToSetRoles: MongoIdString[] // id ролей, которые пользователь назначить НЕ может
+  availableToSetInterfacesType: FunctionalityAvailableTypeEnum // доступность интерфейсов, которые может назначить пользователь
+  availableToSetInterfaces: MongoIdString[] // id интерфейсов, которые пользователь может назначить
 }
 
 export interface UserDeleteDataForFunctionality {

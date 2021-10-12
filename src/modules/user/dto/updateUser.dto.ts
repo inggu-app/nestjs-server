@@ -20,6 +20,11 @@ export class UpdateUserDto implements UpdateUserDtoType {
 
   @IsOptional()
   @IsArray()
+  @IsMongoId({ each: true })
+  interfaces: MongoIdString[]
+
+  @IsOptional()
+  @IsArray()
   @ValidateNested({ each: true })
   @Type(() => Functionality)
   available?: Functionality[]
@@ -59,6 +64,7 @@ export enum UpdateUserDtoKeysEnum {
   id = 'id',
   name = 'name',
   login = 'login',
+  interfaces = 'interfaces',
   available = 'available',
   roles = 'roles',
 }

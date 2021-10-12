@@ -24,6 +24,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
     let queryParams
     let isCorrectFunctionalities: boolean
     let isCorrectRoles: boolean
+    let isCorrectInterfaces: boolean
     switch (functionality.code) {
       case FunctionalityCodesEnum.USER__CREATE:
         return true
@@ -87,6 +88,22 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
               }
             }
             if (!isCorrectRoles) break
+          }
+        }
+        //=====================
+
+        //=====================
+        // Проверяем доступны ли интерфейсы, которые пытается установить пользователь, ему для установки
+        isCorrectInterfaces = true
+        if (requestBody.interfaces) {
+          if (castedFunctionality.data.availableToSetInterfacesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+            for (const intrfc of requestBody.interfaces) {
+              if (!castedFunctionality.data.availableToSetInterfaces.includes(intrfc)) {
+                isCorrectInterfaces = false
+                break
+              }
+            }
+            if (!isCorrectInterfaces) break
           }
         }
         //=====================
