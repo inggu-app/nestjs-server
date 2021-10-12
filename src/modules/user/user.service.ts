@@ -49,16 +49,20 @@ export class UserService {
   async getById(id: Types.ObjectId | MongoIdString, options?: { fields?: UserField[]; queryOptions?: QueryOptions }) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return (await this.userModel
-      .findById(id, fieldsArrayToProjection(options?.fields), options?.queryOptions)
-      .exec()) as DocumentType<UserModel>
+    return this.userModel.findById(
+      id,
+      fieldsArrayToProjection(options?.fields),
+      options?.queryOptions
+    ) as unknown as DocumentType<UserModel>
   }
 
   async getByLogin(login: string, options?: { fields?: UserField[]; queryOptions?: QueryOptions }) {
     await this.checkExists({ login }, new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND))
-    return (await this.userModel
-      .findOne({ login }, fieldsArrayToProjection(options?.fields), options?.queryOptions)
-      .exec()) as DocumentType<UserModel>
+    return this.userModel.findOne(
+      { login },
+      fieldsArrayToProjection(options?.fields),
+      options?.queryOptions
+    ) as unknown as DocumentType<UserModel>
   }
 
   async update(dto: UpdateUserDto) {
