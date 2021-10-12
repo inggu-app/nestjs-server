@@ -6,4 +6,5 @@ export enum ModuleRoutesEnum {
   USER_MODULE = '/users',
   ROLE_MODULE = '/roles',
   FUNCTIONALITY_MODULE = '/functionalities',
+  INTERFACE_MODULE = '/interface',
 }

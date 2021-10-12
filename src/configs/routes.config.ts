@@ -15,6 +15,7 @@ import { UserModule } from '../modules/user/user.module'
 import { FunctionalityModule } from '../modules/functionality/functionality.module'
 import { RoleModule } from '../modules/role/role.module'
 import { ModuleRoutesEnum } from '../global/enums/moduleRoutes.enum'
+import { InterfaceModule } from '../modules/interface/interface.module'
 
 export const routesConfig: Routes = [
   {
@@ -52,6 +53,10 @@ export const routesConfig: Routes = [
   {
     path: ModuleRoutesEnum.FUNCTIONALITY_MODULE,
     module: FunctionalityModule,
+  },
+  {
+    path: ModuleRoutesEnum.INTERFACE_MODULE,
+    module: InterfaceModule,
   },
   {
     path: '/settings',
