@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
@@ -27,6 +27,7 @@ import * as bcrypt from 'bcrypt'
 import { RoleService } from '../role/role.service'
 import { objectKeys } from '../../global/utils/objectKeys'
 import { difference } from 'underscore'
+import { InterfaceModel } from '../interface/interface.model'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -104,7 +105,15 @@ export class UserService {
   }
 
   async login(dto: LoginUserDto) {
-    const user = await this.getByLogin(dto.login)
+    const user = await this.getByLogin(dto.login, { queryOptions: { populate: 'interfaces' } })
+
+    if (
+      !user.interfaces.find(intrfc => {
+        intrfc = intrfc as InterfaceModel
+        return intrfc.code === dto.interfaceCode
+      })
+    )
+      throw new ForbiddenException()
 
     if (await bcrypt.compare(dto.password, user.hashedPassword)) {
       return {
