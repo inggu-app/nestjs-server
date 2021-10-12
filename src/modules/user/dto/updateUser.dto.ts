@@ -26,8 +26,9 @@ export class UpdateUserDto implements UpdateUserDtoType {
 
   @IsOptional()
   @IsArray()
+  @ValidateNested({ each: true })
   @Type(() => Role)
-  rolesData?: Role[]
+  roles?: Role[]
 }
 
 export class Functionality implements AvailableFunctionality {
@@ -59,5 +60,5 @@ export enum UpdateUserDtoKeysEnum {
   name = 'name',
   login = 'login',
   available = 'available',
-  rolesData = 'rolesData',
+  roles = 'roles',
 }

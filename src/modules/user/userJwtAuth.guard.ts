@@ -75,9 +75,9 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         //=====================
         // Проверяем доступны ли роли, которые пытается установить пользователь, ему для установки
         isCorrectRoles = true
-        if (requestBody.rolesData) {
+        if (requestBody.roles) {
           if (castedFunctionality.data.availableToSetRolesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-            for (const roleData of requestBody.rolesData) {
+            for (const roleData of requestBody.roles) {
               if (
                 castedFunctionality.data.forbiddenToSetRoles.includes(roleData.role) ||
                 !castedFunctionality.data.availableToSetRoles.includes(roleData.role)

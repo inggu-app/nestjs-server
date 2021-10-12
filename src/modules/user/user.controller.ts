@@ -31,7 +31,6 @@ export class UserController {
     return this.userService.create(dto)
   }
 
-  @Post()
   @Functionality({
     code: FunctionalityCodesEnum.USER__GET_BY_USER_ID,
     title: 'Получить пользователя по id',

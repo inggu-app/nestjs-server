@@ -7,8 +7,9 @@ import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { Error, QueryOptions, Types } from 'mongoose'
 import {
   INCORRECT_CREDENTIALS,
+  ROLE_EXTRA_FIELDS,
   ROLE_INCORRECT_FIELD_TYPE,
-  ROLE_INCORRECT_FIELDS,
+  ROLE_MISSING_FIELDS,
   USER_WITH_ID_NOT_FOUND,
   USER_WITH_LOGIN_EXISTS,
   USER_WITH_LOGIN_NOT_FOUND,
@@ -37,9 +38,7 @@ export class UserService {
     @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
     private readonly jwtService: JwtService,
     private readonly roleService: RoleService
-  ) {
-    console.log(difference([1, 2, 3, 4], [1, 2]))
-  }
+  ) {}
 
   async create(dto: CreateUserDto) {
     await this.checkExists({ login: dto.login }, new BadRequestException(USER_WITH_LOGIN_EXISTS(dto.login)), false)
@@ -79,13 +78,17 @@ export class UserService {
   async update(dto: UpdateUserDto) {
     await this.checkExists({ _id: dto.id })
 
-    if (dto.rolesData) {
-      for await (const roleData of dto.rolesData) {
+    if (dto.roles) {
+      for await (const roleData of dto.roles) {
         const role = await this.roleService.getById(roleData.role)
-        const fieldsDiff = difference(objectKeys(roleData.data), objectKeys(role.roleFields))
-        if (fieldsDiff.length) throw new HttpException(ROLE_INCORRECT_FIELDS(fieldsDiff), HttpStatus.BAD_REQUEST)
+        const extraFields = difference(objectKeys(roleData.data), objectKeys(role.roleFields))
+        if (extraFields.length) throw new BadRequestException(ROLE_EXTRA_FIELDS(extraFields))
+        const missingFields = difference(objectKeys(role.roleFields), objectKeys(roleData.data))
+        if (missingFields.length) throw new BadRequestException(ROLE_MISSING_FIELDS(missingFields))
         objectKeys(roleData.data).forEach(field => {
-          if (typeof roleData.data[field] !== typeof role.roleFields[field])
+          if (Array.isArray(role.roleFields[field])) {
+            if (!Array.isArray(roleData.data[field])) throw new HttpException(ROLE_INCORRECT_FIELD_TYPE(field), HttpStatus.BAD_REQUEST)
+          } else if (typeof roleData.data[field] !== typeof role.roleFields[field])
             throw new HttpException(ROLE_INCORRECT_FIELD_TYPE(field), HttpStatus.BAD_REQUEST)
         })
       }
@@ -123,21 +126,21 @@ export class UserService {
         const candidate = await this.userModel.exists(f)
 
         if (!candidate && checkExisting) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+          if (typeof error === 'function') throw error(f)
+          throw error
         } else if (candidate && !checkExisting) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+          if (typeof error === 'function') throw error(f)
+          throw error
         }
       }
     } else {
       const candidate = await this.userModel.exists(filter)
       if (!candidate && checkExisting) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+        if (typeof error === 'function') throw error(filter)
+        throw error
       } else if (candidate && !checkExisting) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+        if (typeof error === 'function') throw error(filter)
+        throw error
       }
     }
 

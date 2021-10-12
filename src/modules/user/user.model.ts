@@ -25,17 +25,14 @@ export class UserModel extends TimeStamps implements User {
   @prop({ default: [] })
   available: Available[]
 
-  @prop({ ref: () => RoleModel, default: [] })
-  roles: Ref<RoleModel, Types.ObjectId>[]
-
   @prop()
   hashedPassword: string
 
   @prop()
   hashedUniqueKey: string
 
-  @prop({ default: [] })
-  rolesData: RoleData[]
+  @prop({ default: [], type: () => RoleData })
+  roles: RoleData[]
 }
 
 class Available implements AvailableFunctionality {
