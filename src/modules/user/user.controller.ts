@@ -6,6 +6,10 @@ import { UpdateUserDto } from './dto/updateUser.dto'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import {
+  defaultUserCreateData,
+  defaultUserDeleteData,
+  defaultUserGetByUserIdData,
+  defaultUserUpdateData,
   UserAdditionalFieldsEnum,
   UserField,
   UserFieldsEnum,
@@ -24,6 +28,7 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.USER__CREATE,
+    default: defaultUserCreateData,
     title: 'Создать пользователя',
   })
   @Post(UserRoutesEnum.CREATE)
@@ -33,6 +38,7 @@ export class UserController {
 
   @Functionality({
     code: FunctionalityCodesEnum.USER__GET_BY_USER_ID,
+    default: defaultUserGetByUserIdData,
     title: 'Получить пользователя по id',
   })
   @Get(UserRoutesEnum.GET_BY_USER_ID)
@@ -43,6 +49,7 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.USER__UPDATE,
+    default: defaultUserUpdateData,
     title: 'Обновить пользователя',
   })
   @Patch(UserRoutesEnum.UPDATE)
@@ -52,6 +59,7 @@ export class UserController {
 
   @Functionality({
     code: FunctionalityCodesEnum.USER__DELETE,
+    default: defaultUserDeleteData,
     title: 'Удалить пользователя',
   })
   @Delete(UserRoutesEnum.DELETE)

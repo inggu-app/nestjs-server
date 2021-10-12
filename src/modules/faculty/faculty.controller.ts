@@ -6,6 +6,11 @@ import { GroupService } from '../group/group.service'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import {
+  defaultFacultyCreateData,
+  defaultFacultyDeleteData,
+  defaultFacultyGetByFacultyIdData,
+  defaultFacultyGetManyData,
+  defaultFacultyUpdateData,
   FacultyAdditionalFieldsEnum,
   FacultyField,
   FacultyFieldsEnum,
@@ -25,6 +30,7 @@ export class FacultyController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.FACULTY__CREATE,
+    default: defaultFacultyCreateData,
     title: 'Создать факультет',
   })
   @Post('/')
@@ -34,6 +40,7 @@ export class FacultyController {
 
   @Functionality({
     code: FunctionalityCodesEnum.FACULTY__GET_BY_FACULTY_ID,
+    default: defaultFacultyGetByFacultyIdData,
     title: 'Получить факультет по id',
   })
   @Get(FacultyRoutesEnum.GET_BY_FACULTY_ID)
@@ -46,6 +53,7 @@ export class FacultyController {
 
   @Functionality({
     code: FunctionalityCodesEnum.FACULTY__GET_MANY,
+    default: defaultFacultyGetManyData,
     title: 'Получить список факультетов',
   })
   @Get(FacultyRoutesEnum.GET_MANY)
@@ -64,6 +72,7 @@ export class FacultyController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.FACULTY__UPDATE,
+    default: defaultFacultyUpdateData,
     title: 'Обновить информацию по факультету',
   })
   @Patch(FacultyRoutesEnum.UPDATE)
@@ -73,6 +82,7 @@ export class FacultyController {
 
   @Functionality({
     code: FunctionalityCodesEnum.FACULTY__DELETE,
+    default: defaultFacultyDeleteData,
     title: 'Удалить факультет',
   })
   @Delete('/')

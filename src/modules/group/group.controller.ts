@@ -6,7 +6,20 @@ import { FacultyService } from '../faculty/faculty.service'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import { GroupAdditionalFieldsEnum, GroupField, GroupFieldsEnum, GroupGetQueryParametersEnum, GroupRoutesEnum } from './group.constants'
+import {
+  defaultGroupCreateData,
+  defaultGroupDeleteData,
+  defaultGroupGetByFacultyIdData,
+  defaultGroupGetByGroupIdData,
+  defaultGroupGetByUserIdData,
+  defaultGroupGetManyData,
+  defaultGroupUpdateData,
+  GroupAdditionalFieldsEnum,
+  GroupField,
+  GroupFieldsEnum,
+  GroupGetQueryParametersEnum,
+  GroupRoutesEnum,
+} from './group.constants'
 import normalizeFields from '../../global/utils/normalizeFields'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
@@ -24,6 +37,7 @@ export class GroupController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__CREATE,
+    default: defaultGroupCreateData,
     title: 'Создать группу',
   })
   @Post(GroupRoutesEnum.CREATE)
@@ -35,6 +49,7 @@ export class GroupController {
 
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID,
+    default: defaultGroupGetByGroupIdData,
     title: 'Запросить одну группу',
   })
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
@@ -47,6 +62,7 @@ export class GroupController {
 
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__GET_BY_USER_ID,
+    default: defaultGroupGetByUserIdData,
     title: 'Запросить по id ответственного',
   })
   @Get(GroupRoutesEnum.GET_BY_USER_ID)
@@ -56,6 +72,7 @@ export class GroupController {
 
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID,
+    default: defaultGroupGetByFacultyIdData,
     title: 'Запросить по id факультета',
   })
   @Get(GroupRoutesEnum.GET_BY_FACULTY_ID)
@@ -68,6 +85,7 @@ export class GroupController {
 
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__GET_MANY,
+    default: defaultGroupGetManyData,
     title: 'Запросить множество групп',
   })
   @Get(GroupRoutesEnum.GET_MANY)
@@ -86,6 +104,7 @@ export class GroupController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__UPDATE,
+    default: defaultGroupUpdateData,
     title: 'Обновить группу',
   })
   @Patch(GroupRoutesEnum.UPDATE)
@@ -95,6 +114,7 @@ export class GroupController {
 
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__DELETE,
+    default: defaultGroupDeleteData,
     title: 'Удалить группу',
   })
   @Delete(GroupRoutesEnum.DELETE)

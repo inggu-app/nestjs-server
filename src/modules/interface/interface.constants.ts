@@ -19,3 +19,15 @@ export enum InterfaceFieldsEnum {
 enumKeyValuesMatch(InterfaceFieldsEnum)
 
 export type InterfaceField = keyof typeof InterfaceFieldsEnum
+
+export interface InterfaceCreateDataForFunctionality {}
+export const defaultInterfaceCreateData: InterfaceCreateDataForFunctionality = {}
+
+export interface InterfaceGetByCodeDataForFunctionality {}
+export const defaultInterfaceGetByCodeData: InterfaceGetByCodeDataForFunctionality = {}
+
+export interface InterfaceUpdateDataForFunctionality {}
+export const defaultInterfaceUpdateData: InterfaceUpdateDataForFunctionality = {}
+
+export interface InterfaceDeleteDataForFunctionality {}
+export const defaultInterfaceDeleteData: InterfaceDeleteDataForFunctionality = {}

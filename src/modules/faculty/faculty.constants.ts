@@ -35,11 +35,17 @@ export type FacultyField = keyof typeof FacultyFieldsEnum
 enumKeyValuesMatch(FacultyFieldsEnum)
 
 export interface FacultyCreateDataForFunctionality {}
+export const defaultFacultyCreateData: FacultyCreateDataForFunctionality = {}
 
 export interface FacultyGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может получить
   availableFaculties: MongoIdString[] // id факультетов, которые может получить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
+}
+export const defaultFacultyGetByFacultyIdData: FacultyGetByFacultyIdDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
 }
 
 export interface FacultyGetManyDataForFunctionality {
@@ -47,15 +53,30 @@ export interface FacultyGetManyDataForFunctionality {
   availableFaculties: MongoIdString[] // id факультетов, которые может получить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
+export const defaultFacultyGetManyData: FacultyGetManyDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+}
 
 export interface FacultyUpdateDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может изменить
   availableFaculties: MongoIdString[] // id факультетов, которые может изменить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь изменить НЕ может
 }
+export const defaultFacultyUpdateData: FacultyUpdateDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+}
 
 export interface FacultyDeleteDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может удалить
   availableFaculties: MongoIdString[] // id факультетов, которые может удалить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь удалить НЕ может
+}
+export const defaultFacultyDeleteData: FacultyDeleteDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
 }

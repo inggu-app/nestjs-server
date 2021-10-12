@@ -2,7 +2,18 @@ import { Body, Controller, Delete, Get, Patch, Post, UsePipes, ValidationPipe } 
 import { RoleService } from './role.service'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
-import { RoleAdditionalFieldsEnum, RoleField, RoleFieldsEnum, RoleGetQueryParametersEnum, RoleRoutesEnum } from './role.constants'
+import {
+  defaultRoleCreateData,
+  defaultRoleDeleteData,
+  defaultRoleGetByRoleIdData,
+  defaultRoleGetManyData,
+  defaultRoleUpdateData,
+  RoleAdditionalFieldsEnum,
+  RoleField,
+  RoleFieldsEnum,
+  RoleGetQueryParametersEnum,
+  RoleRoutesEnum,
+} from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { Types } from 'mongoose'
 import { Fields } from '../../global/decorators/Fields.decorator'
@@ -16,6 +27,7 @@ export class RoleController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.ROLE__CREATE,
+    default: defaultRoleCreateData,
     title: 'Создать роль',
   })
   @Post(RoleRoutesEnum.CREATE)
@@ -25,6 +37,7 @@ export class RoleController {
 
   @Functionality({
     code: FunctionalityCodesEnum.ROLE__GET_BY_ROLE_ID,
+    default: defaultRoleGetByRoleIdData,
     title: 'Запросить роль по id',
   })
   @Get(RoleRoutesEnum.GET_BY_ROLE_ID)
@@ -34,6 +47,7 @@ export class RoleController {
 
   @Functionality({
     code: FunctionalityCodesEnum.ROLE__GET_MANY,
+    default: defaultRoleGetManyData,
     title: 'Запросить список ролей',
   })
   @Get(RoleRoutesEnum.GET_MANY)
@@ -44,6 +58,7 @@ export class RoleController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.ROLE__UPDATE,
+    default: defaultRoleUpdateData,
     title: 'Обновить роль',
   })
   @Patch(RoleRoutesEnum.UPDATE)
@@ -53,6 +68,7 @@ export class RoleController {
 
   @Functionality({
     code: FunctionalityCodesEnum.ROLE__DELETE,
+    default: defaultRoleDeleteData,
     title: 'Удалить роль',
   })
   @Delete(RoleRoutesEnum.DELETE)

@@ -48,11 +48,21 @@ export interface NoteCreateDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, занятиям которых пользователь может назначать заметки
   forbiddenGroups: MongoIdString[] // id групп, занятиям которых пользователь НЕ может назначать заметки
 }
+export const defaultNoteCreateData: NoteCreateDataForFunctionality = {
+  availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
+  availableGroups: [],
+  forbiddenGroups: [],
+}
 
 export interface NoteGetByNoteIdDataForFunctionality {
   availableGroupsType: FunctionalityAvailableTypeEnum // доступность групп, заметки занятий которых может получить пользователь
   availableGroups: MongoIdString[] // id групп, заметки занятий которых может получить пользователь
   forbiddenGroups: MongoIdString[] // id групп, заметки занятий которых НЕ может получить пользователь
+}
+export const defaultNoteGetByNoteIdData: NoteGetByNoteIdDataForFunctionality = {
+  availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
+  availableGroups: [],
+  forbiddenGroups: [],
 }
 
 export interface NoteGetByLessonIdDataForFunctionality {
@@ -60,9 +70,19 @@ export interface NoteGetByLessonIdDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, заметки занятий которых может получить пользователь
   forbiddenGroups: MongoIdString[] // id групп, заметки занятий которых НЕ может получить пользователь
 }
+export const defaultNoteGetByLessonIdData: NoteGetByLessonIdDataForFunctionality = {
+  availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
+  availableGroups: [],
+  forbiddenGroups: [],
+}
 
 export interface NoteDeleteDataForFunctionality {
   availableGroupsType: FunctionalityAvailableTypeEnum // доступность групп, заметки занятий которых может удалить пользователь
   availableGroups: MongoIdString[] // id групп, заметки занятий которых может удалить пользователь
   forbiddenGroups: MongoIdString[] // id групп, заметки занятий которых НЕ может удалить пользователь
+}
+export const defaultNoteDeleteData: NoteDeleteDataForFunctionality = {
+  availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
+  availableGroups: [],
+  forbiddenGroups: [],
 }

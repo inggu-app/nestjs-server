@@ -60,6 +60,11 @@ export interface GroupCreateDataForFunctionality {
   availableFaculties: MongoIdString[] // id факультетов, на которые пользователь может создать группу
   forbiddenFaculties: MongoIdString[] // id факультетов, на которые пользователь НЕ может создать группу
 }
+export const defaultGroupCreateData: GroupCreateDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+}
 
 export interface GroupGetByGroupIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, группы которых может получить пользователь
@@ -68,6 +73,13 @@ export interface GroupGetByGroupIdDataForFunctionality {
   availableGroups: MongoIdString[] // id отдельных групп, которые может получить пользователь
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
+export const defaultGroupGetByGroupIdData: GroupGetByGroupIdDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+  availableGroups: [],
+  forbiddenGroups: [],
+}
 
 export interface GroupGetByUserIdDataForFunctionality {
   // TODO: Нужно ли вообще запрашивать список групп для ответственного в этом модуле?
@@ -75,12 +87,23 @@ export interface GroupGetByUserIdDataForFunctionality {
   availableUsers: MongoIdString[] // id пользователей, список групп которых может получить пользователь
   forbiddenUsers: MongoIdString[] // id пользователей, список групп которых пользователь получить НЕ может
 }
+export const defaultGroupGetByUserIdData: GroupGetByUserIdDataForFunctionality = {
+  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
+  availableUsers: [],
+  forbiddenUsers: [],
+}
 
 export interface GroupGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетоВ, группы которых может получить пользователь
   availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, группы которых пользователь получить НЕ может
   forbiddenGroups: MongoIdString[] // id групп, которые пользователь получить не может
+}
+export const defaultGroupGetByFacultyIdData: GroupGetByFacultyIdDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+  forbiddenGroups: [],
 }
 
 export interface GroupGetManyDataForFunctionality {
@@ -90,6 +113,13 @@ export interface GroupGetManyDataForFunctionality {
   availableGroups: MongoIdString[] // id отдельных групп, которые может получить пользователь
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
+export const defaultGroupGetManyData: GroupGetManyDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+  availableGroups: [],
+  forbiddenGroups: [],
+}
 
 export interface GroupUpdateDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность  факультетов, группы которых может обновлять пользователь
@@ -98,6 +128,13 @@ export interface GroupUpdateDataForFunctionality {
   availableGroups: MongoIdString[] // id отдельных групп, которые может обновлять пользователь
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь обновлять НЕ может
 }
+export const defaultGroupUpdateData: GroupUpdateDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+  availableGroups: [],
+  forbiddenGroups: [],
+}
 
 export interface GroupDeleteDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, группы которых может удалять пользователь
@@ -105,4 +142,11 @@ export interface GroupDeleteDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, группы которых пользователь удалить не может
   availableGroups: MongoIdString[] // id отдельных групп, которые может удалять пользователь
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь удалять НЕ может
+}
+export const defaultGroupDeleteData: GroupDeleteDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  forbiddenFaculties: [],
+  availableGroups: [],
+  forbiddenGroups: [],
 }

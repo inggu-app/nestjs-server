@@ -35,23 +35,40 @@ enumKeyValuesMatch(RoleAdditionalFieldsEnum)
 export type RoleField = keyof typeof RoleFieldsEnum
 
 export interface RoleCreateDataForFunctionality {}
+export const defaultRoleCreateData: RoleCreateDataForFunctionality = {}
 
 export interface RoleGetByRoleIdDataForFunctionality {
   availableRolesType: FunctionalityAvailableTypeEnum // доступность загрузки списка ролей для пользователя
   availableRoles: MongoIdString[] // id ролей, которые пользователь может загрузить
+}
+export const defaultRoleGetByRoleIdData: RoleGetByRoleIdDataForFunctionality = {
+  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
+  availableRoles: [],
 }
 
 export interface RoleGetManyDataForFunctionality {
   availableRolesType: FunctionalityAvailableTypeEnum // доступность загрузки списка ролей для пользователя
   availableRoles: MongoIdString[] // id ролей, которые пользователь может загрузить
 }
+export const defaultRoleGetManyData: RoleGetManyDataForFunctionality = {
+  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
+  availableRoles: [],
+}
 
 export interface RoleUpdateDataForFunctionality {
   availableFunctionalitiesType: FunctionalityAvailableTypeEnum // доступность функциональностей, которые может добавить пользователь
   availableFunctionalities: FunctionalityCodesEnum[] // коды фукнциональностей, которые пользователь может изменить
 }
+export const defaultRoleUpdateData: RoleUpdateDataForFunctionality = {
+  availableFunctionalitiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFunctionalities: [],
+}
 
 export interface RoleDeleteDataForFunctionality {
   availableRolesType: FunctionalityAvailableTypeEnum // доступность ролей, которые может удалить пользователь
   availableRoles: MongoIdString[] // id ролей, которые пользователь может удалить
+}
+export const defaultRoleDeleteData: RoleDeleteDataForFunctionality = {
+  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
+  availableRoles: [],
 }

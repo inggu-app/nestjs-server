@@ -58,10 +58,22 @@ export interface ScheduleCreateDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, для которых пользователь может создавать или обновлять расписание
   forbiddenGroups: MongoIdString[] // id групп, для которых пользователь создавать или обновлять расписание НЕ может
 }
+export const defaultScheduleCreateData: ScheduleCreateDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  availableGroups: [],
+  forbiddenGroups: [],
+}
 
 export interface ScheduleGetByGroupIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, расписание групп которых пользователь может получить
   availableFaculties: MongoIdString[] // id факультетов, расписание групп которых пользователь может получить
   availableGroups: MongoIdString[] // id групп, расписание которых пользователь может получить
   forbiddenGroups: MongoIdString[] // id групп, расписание которых пользователь получить НЕ может
+}
+export const defaultScheduleGetByGroupIdData: ScheduleGetByGroupIdDataForFunctionality = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: [],
+  availableGroups: [],
+  forbiddenGroups: [],
 }

@@ -41,10 +41,15 @@ enumKeyValuesMatch(UserFieldsEnum)
 enumKeyValuesMatch(UserForbiddenFieldsEnum)
 
 export interface UserCreateDataForFunctionality {}
+export const defaultUserCreateData: UserCreateDataForFunctionality = {}
 
 export interface UserGetByUserIdDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно получить
   availableUsers: MongoIdString[] // id пользователей, которых можно получить
+}
+export const defaultUserGetByUserIdData: UserGetByUserIdDataForFunctionality = {
+  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
+  availableUsers: [],
 }
 
 export interface UserUpdateDataForFunctionality {
@@ -64,8 +69,29 @@ export interface UserUpdateDataForFunctionality {
   availableToSetInterfacesType: FunctionalityAvailableTypeEnum // доступность интерфейсов, которые может назначить пользователь
   availableToSetInterfaces: MongoIdString[] // id интерфейсов, которые пользователь может назначить
 }
+export const defaultUserUpdateData: UserUpdateDataForFunctionality = {
+  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
+  availableUsers: [],
+  forbiddenUsers: [],
+  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
+  availableRoles: [],
+  forbiddenRoles: [],
+  availableFields: [],
+  availableToSetFunctionalitiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableToSetFunctionalities: [],
+  forbiddenToSetFunctionalities: [],
+  availableToSetRolesType: FunctionalityAvailableTypeEnum.ALL,
+  availableToSetRoles: [],
+  forbiddenToSetRoles: [],
+  availableToSetInterfacesType: FunctionalityAvailableTypeEnum.ALL,
+  availableToSetInterfaces: [],
+}
 
 export interface UserDeleteDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно обновить
   availableUsers: MongoIdString[] // id пользователей, которых можно обновить
+}
+export const defaultUserDeleteData: UserDeleteDataForFunctionality = {
+  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
+  availableUsers: [],
 }

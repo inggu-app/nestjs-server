@@ -4,6 +4,8 @@ import { ScheduleService } from './schedule.service'
 import { Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import {
+  defaultScheduleCreateData,
+  defaultScheduleGetByGroupIdData,
   LessonFieldsEnum,
   ScheduleAdditionalFieldsEnum,
   ScheduleField,
@@ -29,6 +31,7 @@ export class ScheduleController {
   @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.SCHEDULE__CREATE,
+    default: defaultScheduleCreateData,
     title: 'Создать или обновить расписание',
   })
   @Post(ScheduleRoutesEnum.CREATE)
@@ -61,6 +64,7 @@ export class ScheduleController {
 
   @Functionality({
     code: FunctionalityCodesEnum.SCHEDULE__GET_BY_GROUP_ID,
+    default: defaultScheduleGetByGroupIdData,
     title: 'Получить расписание',
   })
   @Get(ScheduleRoutesEnum.GET_BY_GROUP_ID)
