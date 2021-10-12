@@ -7,6 +7,8 @@ import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { Error, QueryOptions, Types } from 'mongoose'
 import {
   INCORRECT_CREDENTIALS,
+  ROLE_INCORRECT_FIELD_TYPE,
+  ROLE_INCORRECT_FIELDS,
   USER_WITH_ID_NOT_FOUND,
   USER_WITH_LOGIN_EXISTS,
   USER_WITH_LOGIN_NOT_FOUND,
@@ -21,6 +23,9 @@ import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { LoginUserDto } from './dto/loginUser.dto'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
+import { RoleService } from '../role/role.service'
+import { objectKeys } from '../../global/utils/objectKeys'
+import { difference } from 'underscore'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -28,7 +33,13 @@ export interface UserAccessTokenData {
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(UserModel) private readonly userModel: ModelType<UserModel>, private readonly jwtService: JwtService) {}
+  constructor(
+    @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
+    private readonly jwtService: JwtService,
+    private readonly roleService: RoleService
+  ) {
+    console.log(difference([1, 2, 3, 4], [1, 2]))
+  }
 
   async create(dto: CreateUserDto) {
     await this.checkExists({ login: dto.login }, new BadRequestException(USER_WITH_LOGIN_EXISTS(dto.login)), false)
@@ -67,6 +78,18 @@ export class UserService {
 
   async update(dto: UpdateUserDto) {
     await this.checkExists({ _id: dto.id })
+
+    if (dto.rolesData) {
+      for await (const roleData of dto.rolesData) {
+        const role = await this.roleService.getById(roleData.role)
+        const fieldsDiff = difference(objectKeys(roleData.data), objectKeys(role.roleFields))
+        if (fieldsDiff.length) throw new HttpException(ROLE_INCORRECT_FIELDS(fieldsDiff), HttpStatus.BAD_REQUEST)
+        objectKeys(roleData.data).forEach(field => {
+          if (typeof roleData.data[field] !== typeof role.roleFields[field])
+            throw new HttpException(ROLE_INCORRECT_FIELD_TYPE(field), HttpStatus.BAD_REQUEST)
+        })
+      }
+    }
 
     await this.userModel.updateOne({ _id: dto.id }, dto)
   }

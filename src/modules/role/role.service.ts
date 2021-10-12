@@ -2,13 +2,15 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectModel } from 'nestjs-typegoose'
 import { RoleModel } from './role.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { ModelBase, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { Error, Types } from 'mongoose'
 import { ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { RoleField, RoleFieldsEnum } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import { stringToObjectId } from '../../global/utils/stringToObjectId'
+import { DocumentType } from '@typegoose/typegoose/lib/types'
 
 @Injectable()
 export class RoleService {
@@ -21,9 +23,10 @@ export class RoleService {
     return
   }
 
-  async getById(id: Types.ObjectId, fields?: RoleField[]) {
+  async getById(id: Types.ObjectId | MongoIdString, fields?: RoleField[]) {
+    id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return this.roleModel.findById({ _id: id }, fieldsArrayToProjection(fields))
+    return this.roleModel.findById({ _id: id }, fieldsArrayToProjection(fields)) as unknown as DocumentType<RoleModel>
   }
 
   async getByTitle(title: string, fields?: RoleField[]) {

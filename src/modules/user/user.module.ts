@@ -5,12 +5,14 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
 import { UserGetRoutesMiddleware } from './middlewares/userGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
+import { RoleModule } from '../role/role.module'
 
 @Global()
 @Module({
   controllers: [UserController],
   providers: [UserService],
   imports: [
+    RoleModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: UserModel,

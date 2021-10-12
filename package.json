@@ -27,6 +27,7 @@
     "@nestjs/passport": "^8.0.1",
     "@nestjs/platform-express": "^7.6.15",
     "@typegoose/typegoose": "^7.6.1",
+    "@types/underscore": "^1.11.3",
     "bcrypt": "^5.0.1",
     "cache-manager": "^3.4.4",
     "class-transformer": "^0.4.0",
@@ -39,7 +40,8 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.6.6"
+    "rxjs": "^6.6.6",
+    "underscore": "^1.13.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.6.0",

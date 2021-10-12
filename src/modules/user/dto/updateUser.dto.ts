@@ -26,13 +26,23 @@ export class UpdateUserDto implements UpdateUserDtoType {
 
   @IsOptional()
   @IsArray()
-  @IsMongoId({ each: true })
-  roles?: MongoIdString[]
+  @Type(() => Role)
+  rolesData?: Role[]
 }
 
 export class Functionality implements AvailableFunctionality {
   @IsEnum(FunctionalityCodesEnum)
   code: FunctionalityCodesEnum
+
+  @IsObject()
+  data: {
+    [key: string]: any
+  }
+}
+
+export class Role {
+  @IsMongoId()
+  role: MongoIdString
 
   @IsObject()
   data: {
@@ -49,5 +59,5 @@ export enum UpdateUserDtoKeysEnum {
   name = 'name',
   login = 'login',
   available = 'available',
-  roles = 'roles',
+  rolesData = 'rolesData',
 }

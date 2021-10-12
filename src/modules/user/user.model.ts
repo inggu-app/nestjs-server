@@ -33,11 +33,24 @@ export class UserModel extends TimeStamps implements User {
 
   @prop()
   hashedUniqueKey: string
+
+  @prop({ default: [] })
+  rolesData: RoleData[]
 }
 
 class Available implements AvailableFunctionality {
   @prop()
   code: FunctionalityCodesEnum
+
+  @prop()
+  data: {
+    [key: string]: any
+  }
+}
+
+class RoleData {
+  @prop({ ref: () => RoleModel })
+  role: Ref<RoleModel, Types.ObjectId>
 
   @prop()
   data: {

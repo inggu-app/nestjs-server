@@ -38,6 +38,8 @@ export const INVALID_NOTE_DEVICE_ID = (id: Types.ObjectId, deviceId: DeviceId) =
 
 export const ROLE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Роль с id "${id}" не существует`
 export const ROLE_WITH_TITLE_EXISTS = (title: string) => `Роль с названием "${title}" уже существует`
+export const ROLE_INCORRECT_FIELDS = (fields: (string | number)[]) => `Лишние поля в роли: ${fields.join(', ')}`
+export const ROLE_INCORRECT_FIELD_TYPE = (field: string | number) => `Для поля ${field} задан неправильный тип`
 
 export const USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Пользователь с id "${id}" не существует`
 export const USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Пользователь с логином "${login}" не существует`
