@@ -55,6 +55,7 @@ export class ViewService {
           { path: 'views', select: options?.fields },
           { path: 'roles.role', populate: { path: 'views', select: options?.fields } },
         ],
+        projection: { views: 1, roles: 1 },
       },
     })
 
