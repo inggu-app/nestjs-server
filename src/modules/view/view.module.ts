@@ -1,15 +1,17 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
+import { forwardRef, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { ViewController } from './view.controller'
 import { ViewService } from './view.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { ViewModel } from './view.model'
 import { ViewGetRoutesMiddleware } from './viewGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
+import { UserModule } from '../user/user.module'
 
 @Module({
   controllers: [ViewController],
   providers: [ViewService],
   imports: [
+    forwardRef(() => UserModule),
     TypegooseModule.forFeature([
       {
         typegooseClass: ViewModel,

@@ -1,4 +1,13 @@
-import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  ForbiddenException,
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
@@ -38,9 +47,9 @@ export interface UserAccessTokenData {
 export class UserService {
   constructor(
     @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
+    @Inject(forwardRef(() => ViewService)) private readonly viewService: ViewService,
     private readonly jwtService: JwtService,
-    private readonly roleService: RoleService,
-    private readonly viewService: ViewService
+    private readonly roleService: RoleService
   ) {}
 
   async create(dto: CreateUserDto) {

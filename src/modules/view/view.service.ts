@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { ViewModel } from './view.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
@@ -11,10 +11,15 @@ import { VIEW_WITH_CODE_EXISTS, VIEW_WITH_CODE_NOT_FOUND, VIEW_WITH_ID_NOT_FOUND
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { DocumentType } from '@typegoose/typegoose'
 import { UpdateViewDto } from './dto/updateView.dto'
+import { UserService } from '../user/user.service'
+import { RoleModel } from '../role/role.model'
 
 @Injectable()
 export class ViewService {
-  constructor(@InjectModel(ViewModel) private readonly viewModel: ModelType<ViewModel>) {}
+  constructor(
+    @InjectModel(ViewModel) private readonly viewModel: ModelType<ViewModel>,
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService
+  ) {}
 
   async create(dto: CreateViewDto) {
     await this.checkExists({ code: dto.code }, { error: new BadRequestException(VIEW_WITH_CODE_EXISTS(dto.code)), checkExisting: false })
@@ -41,6 +46,35 @@ export class ViewService {
       fieldsArrayToProjection(options?.fields),
       options?.queryOptions
     ) as unknown as DocumentType<ViewModel>
+  }
+
+  async getByUserId(userId: Types.ObjectId | MongoIdString, options?: { fields?: ViewField[]; queryOptions?: QueryOptions }) {
+    const user = await this.userService.getById(userId, {
+      queryOptions: {
+        populate: [
+          { path: 'views', select: options?.fields },
+          { path: 'roles.role', populate: { path: 'views', select: options?.fields } },
+        ],
+      },
+    })
+
+    return [
+      ...user.roles
+        .map(role => role.role)
+        .map(role => {
+          role = role as RoleModel
+          return role.views
+        })
+        .flat()
+        .filter(view =>
+          user.views.find(v => {
+            view = view as ViewModel
+            v = v as ViewModel
+            return v.id !== view.id
+          })
+        ),
+      ...user.views,
+    ]
   }
 
   async update(dto: UpdateViewDto) {

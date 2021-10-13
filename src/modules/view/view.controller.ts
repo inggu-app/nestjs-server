@@ -1,12 +1,13 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { ViewService } from './view.service'
-import { ViewField, ViewFieldsEnum, ViewGetQueryParametersEnum, ViewRoutesEnum } from './view.constants'
+import { ViewAdditionalFieldsEnum, ViewField, ViewFieldsEnum, ViewGetQueryParametersEnum, ViewRoutesEnum } from './view.constants'
 import { CreateViewDto } from './dto/createView.dto'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
 import { UpdateViewDto } from './dto/updateView.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { Types } from 'mongoose'
+import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class ViewController {
@@ -23,6 +24,11 @@ export class ViewController {
     return this.viewService.getByCode(code, { fields })
   }
 
+  @Get(ViewRoutesEnum.GET_BY_USER_ID)
+  async getByUserId(@MongoId(ViewGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @ViewGetFields() fields?: ViewField[]) {
+    return normalizeFields(await this.viewService.getByUserId(userId, { fields }), { fields })
+  }
+
   @UsePipes(new ValidationPipe())
   @Patch(ViewRoutesEnum.UPDATE)
   update(@Body() dto: UpdateViewDto) {
@@ -36,5 +42,5 @@ export class ViewController {
 }
 
 function ViewGetFields() {
-  return Fields({ fieldsEnum: ViewFieldsEnum })
+  return Fields({ fieldsEnum: ViewFieldsEnum, additionalFieldsEnum: ViewAdditionalFieldsEnum })
 }
