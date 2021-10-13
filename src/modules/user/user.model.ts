@@ -7,6 +7,7 @@ import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { AvailableFunctionality } from '../functionality/functionality.constants'
 import { Types } from 'mongoose'
 import { InterfaceModel } from '../interface/interface.model'
+import { ViewModel } from '../view/view.model'
 
 type User = {
   [key in UserFieldsEnum]: any
@@ -37,6 +38,9 @@ export class UserModel extends TimeStamps implements User {
 
   @prop({ default: [], type: () => RoleData })
   roles: RoleData[]
+
+  @prop({ default: [], ref: () => ViewModel })
+  views: Ref<ViewModel, Types.ObjectId>[]
 }
 
 class Available implements AvailableFunctionality {

@@ -6,6 +6,7 @@ import { UserModel } from './user.model'
 import { UserGetRoutesMiddleware } from './middlewares/userGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 import { RoleModule } from '../role/role.module'
+import { ViewModule } from '../view/view.module'
 
 @Global()
 @Module({
@@ -13,6 +14,7 @@ import { RoleModule } from '../role/role.module'
   providers: [UserService],
   imports: [
     RoleModule,
+    ViewModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: UserModel,

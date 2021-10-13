@@ -34,6 +34,11 @@ export class UpdateUserDto implements UpdateUserDtoType {
   @ValidateNested({ each: true })
   @Type(() => Role)
   roles?: Role[]
+
+  @IsOptional()
+  @IsArray()
+  @IsMongoId({ each: true })
+  views?: MongoIdString[]
 }
 
 export class Functionality implements AvailableFunctionality {
@@ -67,4 +72,5 @@ export enum UpdateUserDtoKeysEnum {
   interfaces = 'interfaces',
   available = 'available',
   roles = 'roles',
+  views = 'views',
 }

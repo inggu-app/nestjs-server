@@ -23,6 +23,7 @@ export enum UserFieldsEnum {
   login = 'login',
   available = 'available',
   roles = 'roles',
+  views = 'views',
   hashedPassword = 'hashedPassword',
   hashedUniqueKey = 'hashedUniqueKey',
 }

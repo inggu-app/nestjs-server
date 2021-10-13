@@ -28,6 +28,7 @@ import { RoleService } from '../role/role.service'
 import { objectKeys } from '../../global/utils/objectKeys'
 import { difference } from 'underscore'
 import { InterfaceModel } from '../interface/interface.model'
+import { ViewService } from '../view/view.service'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -38,7 +39,8 @@ export class UserService {
   constructor(
     @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
     private readonly jwtService: JwtService,
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
+    private readonly viewService: ViewService
   ) {}
 
   async create(dto: CreateUserDto) {
@@ -93,6 +95,10 @@ export class UserService {
             throw new HttpException(ROLE_INCORRECT_FIELD_TYPE(field), HttpStatus.BAD_REQUEST)
         })
       }
+    }
+
+    if (dto.views) {
+      for await (const viewId of dto.views) await this.viewService.checkExists({ _id: viewId })
     }
 
     await this.userModel.updateOne({ _id: dto.id }, dto)
