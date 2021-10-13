@@ -22,8 +22,8 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
       this.fields = ['id', ...(objectKeys(options.fieldsEnum) as string[])]
       if (options.additionalFieldsEnum) {
         this.fields = [...this.fields, ...(objectKeys(options.additionalFieldsEnum) as string[])]
-        this.availableFields = this.fields
       }
+      this.availableFields = [...this.fields]
       if (options.forbiddenFieldsEnum)
         this.availableFields = this.fields.filter(field => (options.forbiddenFieldsEnum ? !(field in options.forbiddenFieldsEnum) : false))
     }
@@ -46,7 +46,7 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
 
     receivedFields.forEach(receivedField => {
       if (!this.availableFields.includes(receivedField)) {
-        throw new HttpException(NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER(receivedField), HttpStatus.BAD_REQUEST)
+        throw new HttpException(NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER(receivedField, this.availableFields), HttpStatus.BAD_REQUEST)
       }
     })
 
