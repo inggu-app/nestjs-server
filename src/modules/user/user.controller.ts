@@ -20,6 +20,10 @@ import {
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { LoginUserDto } from './dto/loginUser.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
+import normalizeFields from '../../global/utils/normalizeFields'
+import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
+import { objectWithKeys } from '../../global/utils/objectWithKeys'
+import { getEnumValues } from '../../global/utils/enumKeysValues'
 
 @Controller()
 export class UserController {
@@ -42,8 +46,23 @@ export class UserController {
     title: 'Получить пользователя по id',
   })
   @Get(UserRoutesEnum.GET_BY_USER_ID)
-  get(@MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @GetUserFields() fields?: UserField[]) {
+  getByUserId(@MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @GetUserFields() fields?: UserField[]) {
     return this.userService.getById(userId, { fields })
+  }
+
+  @Get(UserRoutesEnum.GET_BY_ROLE_ID)
+  async getByRoleId(
+    @MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId,
+    @MongoId(UserGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId,
+    @GetUserFields({ forbiddenFields: ['roles'] }) fields?: UserField[]
+  ) {
+    return {
+      ...normalizeFields(await this.userService.getById(userId, { fields: fieldsArrayToProjection(fields, undefined, ['roles']) }), {
+        fields,
+        forbiddenFields: ['roles', ...getEnumValues(UserForbiddenFieldsEnum)],
+      }),
+      ...(await this.userService.getByRoleId(userId, roleId)),
+    }
   }
 
   @UsePipes(new ValidationPipe())
@@ -74,10 +93,13 @@ export class UserController {
   }
 }
 
-function GetUserFields() {
+function GetUserFields(options: { forbiddenFields?: string[] } = { forbiddenFields: [] }) {
   return Fields({
     fieldsEnum: UserFieldsEnum,
     additionalFieldsEnum: UserAdditionalFieldsEnum,
-    forbiddenFieldsEnum: UserForbiddenFieldsEnum,
+    forbiddenFieldsEnum: {
+      ...UserForbiddenFieldsEnum,
+      ...(options.forbiddenFields ? objectWithKeys(options.forbiddenFields, ...options.forbiddenFields) : {}),
+    },
   })
 }

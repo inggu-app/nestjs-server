@@ -19,6 +19,7 @@ import {
   ROLE_EXTRA_FIELDS,
   ROLE_INCORRECT_FIELD_TYPE,
   ROLE_MISSING_FIELDS,
+  USER_HAS_NO_ROLE_WITH_ID,
   USER_WITH_ID_NOT_FOUND,
   USER_WITH_LOGIN_EXISTS,
   USER_WITH_LOGIN_NOT_FOUND,
@@ -68,23 +69,45 @@ export class UserService {
     }
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, options?: { fields?: UserField[]; queryOptions?: QueryOptions }) {
+  async getById(
+    id: Types.ObjectId | MongoIdString,
+    options?: { fields?: UserField[] | ReturnType<typeof fieldsArrayToProjection>; queryOptions?: QueryOptions }
+  ) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     return this.userModel.findById(
       id,
-      fieldsArrayToProjection(options?.fields),
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     ) as unknown as DocumentType<UserModel>
   }
 
-  async getByLogin(login: string, options?: { fields?: UserField[]; queryOptions?: QueryOptions }) {
+  async getByLogin(
+    login: string,
+    options?: { fields?: UserField[] | ReturnType<typeof fieldsArrayToProjection>; queryOptions?: QueryOptions }
+  ) {
     await this.checkExists({ login }, new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND))
     return this.userModel.findOne(
       { login },
-      fieldsArrayToProjection(options?.fields),
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     ) as unknown as DocumentType<UserModel>
+  }
+
+  async getByRoleId(
+    userId: Types.ObjectId | MongoIdString,
+    roleId: Types.ObjectId | MongoIdString,
+    options?: { fields?: UserField[]; queryOptions?: QueryOptions }
+  ) {
+    await this.roleService.checkExists({ _id: roleId })
+    const user = await this.getById(userId, {
+      fields: fieldsArrayToProjection(options?.fields, ['roles']),
+      queryOptions: options?.queryOptions,
+    })
+    const neededRole = user.roles.find(role => role.role.toString() == roleId.toString())
+    if (!neededRole) throw new BadRequestException(USER_HAS_NO_ROLE_WITH_ID(roleId))
+
+    return neededRole.data
   }
 
   async update(dto: UpdateUserDto) {

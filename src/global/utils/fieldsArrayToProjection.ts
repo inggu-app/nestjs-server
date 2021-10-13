@@ -22,7 +22,7 @@ export default function fieldsArrayToProjection<T extends string[]>(
   }
 
   fields.forEach(field => {
-    if (field != 'id') {
+    if (field != 'id' && !forbiddenFields?.includes(field)) {
       projection[field] = 1
     }
   })

@@ -8,6 +8,7 @@ import { UpdateUserDtoKeysEnum } from './dto/updateUser.dto'
 export enum UserRoutesEnum {
   CREATE = '/',
   GET_BY_USER_ID = '/by-user-id',
+  GET_BY_ROLE_ID = '/by-role-id',
   UPDATE = '/',
   DELETE = '/',
   LOGIN = '/login',
@@ -15,6 +16,7 @@ export enum UserRoutesEnum {
 
 export enum UserGetQueryParametersEnum {
   USER_ID = 'userId',
+  ROLE_ID = 'roleId',
   FIELDS = 'fields',
 }
 

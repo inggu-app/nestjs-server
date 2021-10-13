@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import { EmptyEnum } from './other.constants'
-import { DeviceId } from '../types'
+import { DeviceId, MongoIdString } from '../types'
 import { getEnumValues } from '../utils/enumKeysValues'
 
 export const INVALID_MONGO_ID = 'Некорретный id'
@@ -46,6 +46,7 @@ export const ROLE_INCORRECT_FIELD_TYPE = (field: string | number) => `Для п�
 export const USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Пользователь с id "${id}" не существует`
 export const USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Пользователь с логином "${login}" не существует`
 export const USER_WITH_LOGIN_EXISTS = (login: string) => `Пользователь с логином "${login}" уже существует`
+export const USER_HAS_NO_ROLE_WITH_ID = (roleId: Types.ObjectId | MongoIdString) => `Пользователь не имеет роли с id ${roleId}`
 
 export const INTERFACE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Интерфейс с id ${id} не найден`
 export const INTERFACE_WITH_CODE_NOT_FOUND = (code: string) => `Интерфейс с кодом ${code} не найден`

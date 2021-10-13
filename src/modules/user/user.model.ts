@@ -53,7 +53,7 @@ class Available implements AvailableFunctionality {
   }
 }
 
-class RoleData {
+export class RoleData {
   @prop({ ref: () => RoleModel })
   role: Ref<RoleModel, Types.ObjectId>
 
