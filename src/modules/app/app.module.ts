@@ -16,6 +16,8 @@ import { RoleModule } from '../role/role.module'
 import { FunctionalityModule } from '../functionality/functionality.module'
 import { JwtModule } from '@nestjs/jwt'
 import getJWTConfig from '../../configs/jwt.config'
+import { InterfaceModule } from '../interface/interface.module'
+import { ViewModule } from '../view/view.module'
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import getJWTConfig from '../../configs/jwt.config'
     UserModule,
     RoleModule,
     FunctionalityModule,
+    InterfaceModule,
+    ViewModule,
     RouterModule.forRoutes(routesConfig),
     ConfigModule.forRoot({ isGlobal: true }),
     {

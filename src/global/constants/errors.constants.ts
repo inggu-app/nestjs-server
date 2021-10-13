@@ -49,3 +49,7 @@ export const USER_WITH_LOGIN_EXISTS = (login: string) => `Пользовател
 export const INTERFACE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Интерфейс с id ${id} не найден`
 export const INTERFACE_WITH_CODE_NOT_FOUND = (code: string) => `Интерфейс с кодом ${code} не найден`
 export const INTERFACE_WITH_CODE_EXISTS = (code: string) => `Интерфейс с кодом ${code} уже существует`
+
+export const VIEW_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Отображение с id ${id} не найдено`
+export const VIEW_WITH_CODE_NOT_FOUND = (code: string) => `Отображение с кодом ${code} не найдено`
+export const VIEW_WITH_CODE_EXISTS = (code: string) => `Отображение с кодом ${code} уже существует`
