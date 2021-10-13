@@ -53,3 +53,5 @@ export const INTERFACE_WITH_CODE_EXISTS = (code: string) => `Интерфейс 
 export const VIEW_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Отображение с id ${id} не найдено`
 export const VIEW_WITH_CODE_NOT_FOUND = (code: string) => `Отображение с кодом ${code} не найдено`
 export const VIEW_WITH_CODE_EXISTS = (code: string) => `Отображение с кодом ${code} уже существует`
+
+export const FUNCTIONALITY_WITH_CODE_NOT_FOUND = (code: string) => `Функциональность с кодом ${code}`

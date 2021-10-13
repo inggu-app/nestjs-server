@@ -17,7 +17,7 @@ export class ViewService {
   constructor(@InjectModel(ViewModel) private readonly viewModel: ModelType<ViewModel>) {}
 
   async create(dto: CreateViewDto) {
-    await this.checkExists({ code: dto.code }, new BadRequestException(VIEW_WITH_CODE_EXISTS(dto.code)), false)
+    await this.checkExists({ code: dto.code }, { error: new BadRequestException(VIEW_WITH_CODE_EXISTS(dto.code)), checkExisting: false })
     await this.viewModel.create(dto)
     return
   }
@@ -34,7 +34,7 @@ export class ViewService {
   }
 
   async getByCode(code: string, options?: { fields?: ViewField[]; queryOptions?: QueryOptions }) {
-    await this.checkExists({ code }, new BadRequestException(VIEW_WITH_CODE_NOT_FOUND(code)))
+    await this.checkExists({ code }, { error: new BadRequestException(VIEW_WITH_CODE_NOT_FOUND(code)) })
 
     return this.viewModel.findOne(
       { code },
@@ -56,30 +56,31 @@ export class ViewService {
 
   async checkExists(
     filter: ObjectByInterface<typeof ViewFieldsEnum, ModelBase> | ObjectByInterface<typeof ViewFieldsEnum, ModelBase>[],
-    error: ((filter: ObjectByInterface<typeof ViewFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(VIEW_WITH_ID_NOT_FOUND(f._id)),
-    checkExisting = true
+    options: { error?: ((filter: ObjectByInterface<typeof ViewFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(VIEW_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.viewModel.exists(f)
 
-        if (!candidate && checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
-        } else if (candidate && !checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
       const candidate = await this.viewModel.exists(filter)
-      if (!candidate && checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
-      } else if (candidate && !checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 

@@ -5,11 +5,15 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { RoleModel } from './role.model'
 import { RoleGetRoutesMiddleware } from './roleGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
+import { ViewModule } from '../view/view.module'
+import { FunctionalityModule } from '../functionality/functionality.module'
 
 @Module({
   controllers: [RoleController],
   providers: [RoleService],
   imports: [
+    ViewModule,
+    FunctionalityModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: RoleModel,

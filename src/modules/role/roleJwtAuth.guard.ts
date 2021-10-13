@@ -41,7 +41,7 @@ export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         if (castedFunctionality.data.availableFunctionalitiesType === FunctionalityAvailableTypeEnum.ALL) return true
         let isCorrect = true
         requestBody = RoleJwtAuthGuard.getBody<UpdateRoleDto>(request) as UpdateRoleDto
-        requestBody.available.forEach(f => {
+        requestBody.available?.forEach(f => {
           castedFunctionality = functionality as AvailableFunctionality<RoleUpdateDataForFunctionality>
           if (!castedFunctionality.data.availableFunctionalities.includes(f)) isCorrect = false
         })
