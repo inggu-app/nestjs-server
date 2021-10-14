@@ -10,7 +10,7 @@ import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
@@ -32,10 +32,12 @@ export class GroupService {
     return this.groupModel.create(dto)
   }
 
-  async getById(groupId: MongoIdString | Types.ObjectId, fields?: GroupField[]) {
+  async getById(groupId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions<GroupField>) {
     groupId = stringToObjectId(groupId)
 
-    const candidate = await this.groupModel.findById(groupId, fieldsArrayToProjection(fields)).exec()
+    const candidate = await this.groupModel
+      .findById(groupId, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .exec()
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
@@ -44,9 +46,13 @@ export class GroupService {
     return candidate
   }
 
-  getAll(page: number, count: number, title?: string, fields?: GroupField[]) {
+  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<GroupField>) {
     return this.groupModel
-      .find(title ? { title: { $regex: title, $options: 'i' } } : {}, fieldsArrayToProjection(fields))
+      .find(
+        title ? { title: { $regex: title, $options: 'i' } } : {},
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+        options?.queryOptions
+      )
       .skip((page - 1) * count)
       .limit(count)
       .exec()
@@ -56,19 +62,28 @@ export class GroupService {
     return this.groupModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {}).exec()
   }
 
-  async getByFacultyId(facultyId: Types.ObjectId, fields?: GroupField[]) {
+  async getByFacultyId(facultyId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<GroupField>) {
+    facultyId = stringToObjectId(facultyId)
     await this.facultyService.checkExists({ _id: facultyId })
 
-    return this.groupModel.find({ faculty: facultyId }, fieldsArrayToProjection(fields)).exec()
+    return this.groupModel
+      .find(
+        { faculty: facultyId },
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+        options?.queryOptions
+      )
+      .exec()
   }
 
-  async delete(id: Types.ObjectId) {
+  async delete(id: Types.ObjectId | MongoIdString) {
+    id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.groupModel.deleteOne({ _id: id }).exec()
     await this.responsibleService.deleteGroupsFromAllResponsibles([id])
   }
 
-  async deleteAllByFacultyId(facultyId: Types.ObjectId) {
+  async deleteAllByFacultyId(facultyId: Types.ObjectId | MongoIdString) {
+    facultyId = stringToObjectId(facultyId)
     const groups = await this.groupModel.find({ faculty: facultyId }).exec()
     const groupsIds: Types.ObjectId[] = groups.map(group => group.id)
 

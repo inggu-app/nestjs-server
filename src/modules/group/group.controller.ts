@@ -60,7 +60,7 @@ export class GroupController {
     @GetGroupFields() fields?: GroupField[]
   ) {
     console.log(request.user)
-    return normalizeFields(await this.groupService.getById(groupId, fields), { fields })
+    return normalizeFields(await this.groupService.getById(groupId, { fields }), { fields })
   }
 
   @Functionality({
@@ -83,7 +83,7 @@ export class GroupController {
     @MongoId(GroupGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
     @GetGroupFields() fields?: GroupField[]
   ) {
-    return normalizeFields(await this.groupService.getByFacultyId(facultyId, fields), { fields })
+    return normalizeFields(await this.groupService.getByFacultyId(facultyId, { fields }), { fields })
   }
 
   @Functionality({
@@ -99,7 +99,7 @@ export class GroupController {
     @GetGroupFields() fields?: GroupField[]
   ) {
     return {
-      groups: normalizeFields(await this.groupService.getAll(page, count, title, fields), { fields }),
+      groups: normalizeFields(await this.groupService.getAll(page, count, title, { fields }), { fields }),
       count: await this.groupService.countAll(title),
     }
   }

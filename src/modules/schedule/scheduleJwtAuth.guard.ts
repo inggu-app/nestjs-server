@@ -44,7 +44,7 @@ export class ScheduleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGua
         if (castedFunctionality.data.forbiddenGroups.includes(requestBody.group)) break
         if (castedFunctionality.data.availableGroups.includes(requestBody.group)) return true
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
-        group = await this.groupService.getById(requestBody.group, ['faculty'])
+        group = await this.groupService.getById(requestBody.group, { fields: ['faculty'] })
         if (castedFunctionality.data.availableFaculties.includes(group.faculty.toString())) return true
         break
       case FunctionalityCodesEnum.SCHEDULE__GET_BY_GROUP_ID:
@@ -55,7 +55,7 @@ export class ScheduleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGua
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.groupId)) break
         if (castedFunctionality.data.availableGroups.includes(queryParams.groupId)) return true
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
-        group = await this.groupService.getById(queryParams.groupId, ['faculty'])
+        group = await this.groupService.getById(queryParams.groupId, { fields: ['faculty'] })
         if (castedFunctionality.data.availableFaculties.includes(group.faculty.toString())) return true
         break
     }

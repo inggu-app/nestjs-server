@@ -73,7 +73,7 @@ export class ScheduleController {
     @Query(ScheduleGetQueryParametersEnum.UPDATED_AT, new ParseDatePipe({ required: false })) updatedAt?: Date,
     @GetScheduleFields() fields?: ScheduleField[]
   ) {
-    const group = await this.groupService.getById(groupId, ['lastScheduleUpdate'])
+    const group = await this.groupService.getById(groupId, { fields: ['lastScheduleUpdate'] })
 
     if (updatedAt && updatedAt >= group.lastScheduleUpdate) {
       return {

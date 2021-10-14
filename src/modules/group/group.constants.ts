@@ -89,12 +89,14 @@ export interface GroupGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетоВ, группы которых может получить пользователь
   availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, группы которых пользователь получить НЕ может
-  forbiddenGroups: MongoIdString[] // id групп, которые пользователь получить не может
+  availableGroups: MongoIdString[] // id групп, которые пользователь может получить
+  forbiddenGroups: MongoIdString[] // id групп, которые пользователь получить НЕ может
 }
 export const defaultGroupGetByFacultyIdData: FunctionalityDefault<GroupGetByFacultyIdDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
   availableFaculties: TypesEnum.MONGO_ID_ARRAY,
   forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
   forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }
 
