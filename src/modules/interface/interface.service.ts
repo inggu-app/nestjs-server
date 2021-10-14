@@ -3,8 +3,8 @@ import { InjectModel } from 'nestjs-typegoose'
 import { InterfaceModel } from './interface.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateInterfaceDto } from './dto/createInterface.dto'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
-import { Error, QueryOptions, Types } from 'mongoose'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
+import { Error, Types } from 'mongoose'
 import {
   INTERFACE_WITH_CODE_EXISTS,
   INTERFACE_WITH_CODE_NOT_FOUND,
@@ -25,21 +25,21 @@ export class InterfaceService {
     return this.interfaceModel.create(dto)
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, options?: { fields: InterfaceField[]; queryOptions?: QueryOptions }) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<InterfaceField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     return this.interfaceModel.findById(
       id,
-      fieldsArrayToProjection(options?.fields),
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     ) as unknown as DocumentType<InterfaceModel>
   }
 
-  async getByCode(code: string, options?: { fields?: InterfaceField[]; queryOptions?: QueryOptions }) {
+  async getByCode(code: string, options?: ServiceGetOptions<InterfaceField>) {
     await this.checkExists({ code }, new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(code)))
     return this.interfaceModel.findOne(
       { code },
-      fieldsArrayToProjection(options?.fields),
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     ) as unknown as DocumentType<InterfaceModel>
   }

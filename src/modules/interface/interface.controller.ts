@@ -47,13 +47,14 @@ export class InterfaceController {
     return this.interfaceService.getByCode(code, { fields })
   }
 
+  @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.INTERFACE__UPDATE,
     default: defaultInterfaceUpdateData,
     title: 'Обновить интерфейс по коду',
   })
   @Patch(InterfaceRoutesEnum.UPDATE)
-  update(dto: UpdateInterfaceDto) {
+  update(@Body() dto: UpdateInterfaceDto) {
     return this.interfaceService.update(dto)
   }
 
