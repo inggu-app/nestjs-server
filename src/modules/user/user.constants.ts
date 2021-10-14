@@ -4,6 +4,8 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { MongoIdString } from '../../global/types'
 import { UpdateUserDtoKeysEnum } from './dto/updateUser.dto'
+import { FunctionalityDefault } from '../functionality/functionality.constants'
+import { TypesEnum } from '../../global/enums/types.enum'
 
 export enum UserRoutesEnum {
   CREATE = '/',
@@ -44,15 +46,15 @@ enumKeyValuesMatch(UserFieldsEnum)
 enumKeyValuesMatch(UserForbiddenFieldsEnum)
 
 export interface UserCreateDataForFunctionality {}
-export const defaultUserCreateData: UserCreateDataForFunctionality = {}
+export const defaultUserCreateData: FunctionalityDefault<UserCreateDataForFunctionality> = {}
 
 export interface UserGetByUserIdDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно получить
   availableUsers: MongoIdString[] // id пользователей, которых можно получить
 }
-export const defaultUserGetByUserIdData: UserGetByUserIdDataForFunctionality = {
+export const defaultUserGetByUserIdData: FunctionalityDefault<UserGetByUserIdDataForFunctionality> = {
   availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: [],
+  availableUsers: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface UserUpdateDataForFunctionality {
@@ -72,29 +74,29 @@ export interface UserUpdateDataForFunctionality {
   availableToSetInterfacesType: FunctionalityAvailableTypeEnum // доступность интерфейсов, которые может назначить пользователь
   availableToSetInterfaces: MongoIdString[] // id интерфейсов, которые пользователь может назначить
 }
-export const defaultUserUpdateData: UserUpdateDataForFunctionality = {
+export const defaultUserUpdateData: FunctionalityDefault<UserUpdateDataForFunctionality> = {
   availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: [],
-  forbiddenUsers: [],
+  availableUsers: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
   availableRolesType: FunctionalityAvailableTypeEnum.ALL,
-  availableRoles: [],
-  forbiddenRoles: [],
-  availableFields: [],
+  availableRoles: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
+  availableFields: TypesEnum.MONGO_ID_ARRAY,
   availableToSetFunctionalitiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableToSetFunctionalities: [],
-  forbiddenToSetFunctionalities: [],
+  availableToSetFunctionalities: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenToSetFunctionalities: TypesEnum.MONGO_ID_ARRAY,
   availableToSetRolesType: FunctionalityAvailableTypeEnum.ALL,
-  availableToSetRoles: [],
-  forbiddenToSetRoles: [],
+  availableToSetRoles: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenToSetRoles: TypesEnum.MONGO_ID_ARRAY,
   availableToSetInterfacesType: FunctionalityAvailableTypeEnum.ALL,
-  availableToSetInterfaces: [],
+  availableToSetInterfaces: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface UserDeleteDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно обновить
   availableUsers: MongoIdString[] // id пользователей, которых можно обновить
 }
-export const defaultUserDeleteData: UserDeleteDataForFunctionality = {
+export const defaultUserDeleteData: FunctionalityDefault<UserDeleteDataForFunctionality> = {
   availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: [],
+  availableUsers: TypesEnum.MONGO_ID_ARRAY,
 }

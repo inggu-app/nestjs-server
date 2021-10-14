@@ -21,7 +21,6 @@ import { JwtType, RESPONSIBLE_ACCESS_TOKEN_DATA } from '../../global/utils/check
 import { GroupService } from '../group/group.service'
 import { GroupField } from '../group/group.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
-import checkPageCount from '../../global/utils/checkPageCount'
 import { ModelBase, ObjectByInterface } from '../../global/types'
 
 export interface ResponsibleAccessTokenData extends JwtType<typeof RESPONSIBLE_ACCESS_TOKEN_DATA> {
@@ -135,13 +134,8 @@ export class ResponsibleService {
 
   async getAllByGroup(groupId: Types.ObjectId, page?: number, count?: number, fields?: ResponsibleField[]) {
     await this.groupService.checkExists({ _id: groupId })
-    const checkedPageCount = checkPageCount(page, count)
 
     const responsibles = this.responsibleModel.find({ groups: { $in: [groupId] } }, fieldsArrayToProjection(fields))
-
-    if (checkedPageCount.page !== undefined) {
-      return responsibles.skip((checkedPageCount.page - 1) * checkedPageCount.count).limit(checkedPageCount.count)
-    }
 
     return responsibles
   }

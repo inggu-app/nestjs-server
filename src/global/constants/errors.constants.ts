@@ -2,13 +2,13 @@ import { Types } from 'mongoose'
 import { EmptyEnum } from './other.constants'
 import { DeviceId, MongoIdString } from '../types'
 import { getEnumValues } from '../utils/enumKeysValues'
+import { FunctionalityCodesEnum } from '../enums/functionalities.enum'
 
 export const INVALID_MONGO_ID = 'Некорретный id'
 export const INVALID_DATE = 'Дата должна быть в формате yyyy-MM-ddThh:mm:ss.SSSZ'
 export const INVALID_OS = 'Некорректная операционная система'
 export const INVALID_APP_VERSION = 'Некорректный формат версии. Необходимый формат: d.d.d'
 export const INCORRECT_CREDENTIALS = 'Неправильные логин или пароль'
-export const INCORRECT_PAGE_COUNT_QUERIES = 'Параметры должны либо одновременно иметь или не иметь значение -1'
 export const INCORRECT_INT = 'Некорректное значение целого числа'
 export const INCORRECT_STRING = 'Некорректное значение строки'
 export const FIELDS_QUERY_PARAMETER_IS_EMPTY = 'Поле fields не должно быть пустым'
@@ -23,7 +23,7 @@ export const ADMIN_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Админ с id
 export const ADMIN_WITH_LOGIN_EXISTS = (login: string) => `Админ с логином "${login}" уже существует`
 
 export const FACULTY_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Факультета с id "${id}" не существует`
-export const FACULTY_WITH_TITLE_EXISTS = (title: string) => `Факультет названием "${title}" уже существует`
+export const FACULTY_WITH_TITLE_EXISTS = (title: string) => `Факультет с названием "${title}" уже существует`
 
 export const GROUP_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Группа с id "${id}" не существует`
 export const GROUP_WITH_TITLE_EXISTS = (title: string) => `Группа с названием "${title}" уже существует`
@@ -57,3 +57,8 @@ export const VIEW_WITH_CODE_NOT_FOUND = (code: string) => `Отображени�
 export const VIEW_WITH_CODE_EXISTS = (code: string) => `Отображение с кодом ${code} уже существует`
 
 export const FUNCTIONALITY_WITH_CODE_NOT_FOUND = (code: string) => `Функциональность с кодом ${code}`
+export const FUNCTIONALITY_EXTRA_FIELDS = (functionalityCode: FunctionalityCodesEnum, fields: (string | number)[]) =>
+  `Лишние поля в функциональности: ${fields.join(', ')}`
+export const FUNCTIONALITY_MISSING_FIELDS = (functionalityCode: FunctionalityCodesEnum, fields: (string | number)[]) =>
+  `Недостающие поля в функциональности: ${fields.join(', ')}`
+export const FUNCTIONALITY_INCORRECT_FIELD_TYPE = (field: string | number) => `Для поля ${field} задан неправильный тип`

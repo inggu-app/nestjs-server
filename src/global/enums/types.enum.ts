@@ -1,4 +1,12 @@
 export enum TypesEnum {
-  STRING = 'string',
-  NUMBER = 'number',
+  STRING,
+  NUMBER,
+  BOOLEAN,
+  MONGO_ID,
+  OBJECT,
+  STRING_ARRAY,
+  NUMBER_ARRAY,
+  BOOLEAN_ARRAY,
+  MONGO_ID_ARRAY,
+  OBJECT_ARRAY,
 }

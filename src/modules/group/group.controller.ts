@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Req, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { Types } from 'mongoose'
@@ -25,6 +25,7 @@ import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
+import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
 
 @Controller()
 export class GroupController {
@@ -53,10 +54,12 @@ export class GroupController {
     title: 'Запросить одну группу',
   })
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
-  private async getByGroupId(
+  async getByGroupId(
     @MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
+    @Req() request: CustomRequest,
     @GetGroupFields() fields?: GroupField[]
   ) {
+    console.log(request.user)
     return normalizeFields(await this.groupService.getById(groupId, fields), { fields })
   }
 

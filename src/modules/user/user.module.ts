@@ -7,6 +7,7 @@ import { UserGetRoutesMiddleware } from './userGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 import { RoleModule } from '../role/role.module'
 import { ViewModule } from '../view/view.module'
+import { FunctionalityModule } from '../functionality/functionality.module'
 
 @Global()
 @Module({
@@ -14,6 +15,7 @@ import { ViewModule } from '../view/view.module'
   providers: [UserService],
   imports: [
     RoleModule,
+    FunctionalityModule,
     forwardRef(() => ViewModule),
     TypegooseModule.forFeature([
       {

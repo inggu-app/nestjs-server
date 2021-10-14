@@ -1,4 +1,5 @@
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
+import { FunctionalityDefault } from '../functionality/functionality.constants'
 
 export enum InterfaceRoutesEnum {
   CREATE = '/',
@@ -21,13 +22,13 @@ enumKeyValuesMatch(InterfaceFieldsEnum)
 export type InterfaceField = keyof typeof InterfaceFieldsEnum
 
 export interface InterfaceCreateDataForFunctionality {}
-export const defaultInterfaceCreateData: InterfaceCreateDataForFunctionality = {}
+export const defaultInterfaceCreateData: FunctionalityDefault<InterfaceCreateDataForFunctionality> = {}
 
 export interface InterfaceGetByCodeDataForFunctionality {}
-export const defaultInterfaceGetByCodeData: InterfaceGetByCodeDataForFunctionality = {}
+export const defaultInterfaceGetByCodeData: FunctionalityDefault<InterfaceGetByCodeDataForFunctionality> = {}
 
 export interface InterfaceUpdateDataForFunctionality {}
-export const defaultInterfaceUpdateData: InterfaceUpdateDataForFunctionality = {}
+export const defaultInterfaceUpdateData: FunctionalityDefault<InterfaceGetByCodeDataForFunctionality> = {}
 
 export interface InterfaceDeleteDataForFunctionality {}
-export const defaultInterfaceDeleteData: InterfaceDeleteDataForFunctionality = {}
+export const defaultInterfaceDeleteData: FunctionalityDefault<InterfaceDeleteDataForFunctionality> = {}

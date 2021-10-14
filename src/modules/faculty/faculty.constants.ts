@@ -2,6 +2,8 @@ import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { MongoIdString } from '../../global/types'
+import { TypesEnum } from '../../global/enums/types.enum'
+import { FunctionalityDefault } from '../functionality/functionality.constants'
 
 export enum FacultyRoutesEnum {
   CREATE = '/',
@@ -35,17 +37,17 @@ export type FacultyField = keyof typeof FacultyFieldsEnum
 enumKeyValuesMatch(FacultyFieldsEnum)
 
 export interface FacultyCreateDataForFunctionality {}
-export const defaultFacultyCreateData: FacultyCreateDataForFunctionality = {}
+export const defaultFacultyCreateData: FunctionalityDefault<FacultyCreateDataForFunctionality> = {}
 
 export interface FacultyGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может получить
   availableFaculties: MongoIdString[] // id факультетов, которые может получить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
-export const defaultFacultyGetByFacultyIdData: FacultyGetByFacultyIdDataForFunctionality = {
+export const defaultFacultyGetByFacultyIdData: FunctionalityDefault<FacultyGetByFacultyIdDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: [],
-  forbiddenFaculties: [],
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface FacultyGetManyDataForFunctionality {
@@ -53,10 +55,10 @@ export interface FacultyGetManyDataForFunctionality {
   availableFaculties: MongoIdString[] // id факультетов, которые может получить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
-export const defaultFacultyGetManyData: FacultyGetManyDataForFunctionality = {
+export const defaultFacultyGetManyData: FunctionalityDefault<FacultyGetManyDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: [],
-  forbiddenFaculties: [],
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface FacultyUpdateDataForFunctionality {
@@ -64,10 +66,10 @@ export interface FacultyUpdateDataForFunctionality {
   availableFaculties: MongoIdString[] // id факультетов, которые может изменить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь изменить НЕ может
 }
-export const defaultFacultyUpdateData: FacultyUpdateDataForFunctionality = {
+export const defaultFacultyUpdateData: FunctionalityDefault<FacultyUpdateDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: [],
-  forbiddenFaculties: [],
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface FacultyDeleteDataForFunctionality {
@@ -75,8 +77,8 @@ export interface FacultyDeleteDataForFunctionality {
   availableFaculties: MongoIdString[] // id факультетов, которые может удалить пользователь
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь удалить НЕ может
 }
-export const defaultFacultyDeleteData: FacultyDeleteDataForFunctionality = {
+export const defaultFacultyDeleteData: FunctionalityDefault<FacultyDeleteDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: [],
-  forbiddenFaculties: [],
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
 }

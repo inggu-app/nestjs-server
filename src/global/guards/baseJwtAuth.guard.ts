@@ -10,6 +10,10 @@ import { Request } from 'express'
 import { AvailableFunctionality } from '../../modules/functionality/functionality.constants'
 import { ConfigService } from '@nestjs/config'
 
+export interface CustomRequest<Body = any> extends Omit<Request<any, any, Body>, 'user'> {
+  user: DocumentType<UserModel>
+}
+
 @Injectable()
 export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
   constructor(
@@ -42,6 +46,7 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
             const functionality = user.available.find(functionality => functionality.code === code)
 
             if (functionality) {
+              context.switchToHttp().getRequest<CustomRequest>().user = user
               return this.validate(functionality, user, context.switchToHttp().getRequest<Request>())
             }
           }

@@ -1,6 +1,8 @@
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { MongoIdString } from '../../global/types'
+import { FunctionalityDefault } from '../functionality/functionality.constants'
+import { TypesEnum } from '../../global/enums/types.enum'
 
 export enum NoteRoutesEnum {
   CREATE = '/',
@@ -48,10 +50,10 @@ export interface NoteCreateDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, занятиям которых пользователь может назначать заметки
   forbiddenGroups: MongoIdString[] // id групп, занятиям которых пользователь НЕ может назначать заметки
 }
-export const defaultNoteCreateData: NoteCreateDataForFunctionality = {
+export const defaultNoteCreateData: FunctionalityDefault<NoteCreateDataForFunctionality> = {
   availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
-  availableGroups: [],
-  forbiddenGroups: [],
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface NoteGetByNoteIdDataForFunctionality {
@@ -59,10 +61,10 @@ export interface NoteGetByNoteIdDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, заметки занятий которых может получить пользователь
   forbiddenGroups: MongoIdString[] // id групп, заметки занятий которых НЕ может получить пользователь
 }
-export const defaultNoteGetByNoteIdData: NoteGetByNoteIdDataForFunctionality = {
+export const defaultNoteGetByNoteIdData: FunctionalityDefault<NoteGetByNoteIdDataForFunctionality> = {
   availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
-  availableGroups: [],
-  forbiddenGroups: [],
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface NoteGetByLessonIdDataForFunctionality {
@@ -70,10 +72,10 @@ export interface NoteGetByLessonIdDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, заметки занятий которых может получить пользователь
   forbiddenGroups: MongoIdString[] // id групп, заметки занятий которых НЕ может получить пользователь
 }
-export const defaultNoteGetByLessonIdData: NoteGetByLessonIdDataForFunctionality = {
+export const defaultNoteGetByLessonIdData: FunctionalityDefault<NoteGetByLessonIdDataForFunctionality> = {
   availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
-  availableGroups: [],
-  forbiddenGroups: [],
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface NoteDeleteDataForFunctionality {
@@ -81,8 +83,8 @@ export interface NoteDeleteDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, заметки занятий которых может удалить пользователь
   forbiddenGroups: MongoIdString[] // id групп, заметки занятий которых НЕ может удалить пользователь
 }
-export const defaultNoteDeleteData: NoteDeleteDataForFunctionality = {
+export const defaultNoteDeleteData: FunctionalityDefault<NoteDeleteDataForFunctionality> = {
   availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
-  availableGroups: [],
-  forbiddenGroups: [],
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }

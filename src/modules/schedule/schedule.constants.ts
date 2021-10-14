@@ -2,6 +2,8 @@ import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { MongoIdString } from '../../global/types'
+import { FunctionalityDefault } from '../functionality/functionality.constants'
+import { TypesEnum } from '../../global/enums/types.enum'
 
 export enum ScheduleRoutesEnum {
   CREATE = '/',
@@ -58,11 +60,11 @@ export interface ScheduleCreateDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, для которых пользователь может создавать или обновлять расписание
   forbiddenGroups: MongoIdString[] // id групп, для которых пользователь создавать или обновлять расписание НЕ может
 }
-export const defaultScheduleCreateData: ScheduleCreateDataForFunctionality = {
+export const defaultScheduleCreateData: FunctionalityDefault<ScheduleCreateDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: [],
-  availableGroups: [],
-  forbiddenGroups: [],
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface ScheduleGetByGroupIdDataForFunctionality {
@@ -71,9 +73,9 @@ export interface ScheduleGetByGroupIdDataForFunctionality {
   availableGroups: MongoIdString[] // id групп, расписание которых пользователь может получить
   forbiddenGroups: MongoIdString[] // id групп, расписание которых пользователь получить НЕ может
 }
-export const defaultScheduleGetByGroupIdData: ScheduleGetByGroupIdDataForFunctionality = {
+export const defaultScheduleGetByGroupIdData: FunctionalityDefault<ScheduleGetByGroupIdDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: [],
-  availableGroups: [],
-  forbiddenGroups: [],
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }

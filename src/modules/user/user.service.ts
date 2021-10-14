@@ -15,6 +15,9 @@ import { CreateUserDto } from './dto/createUser.dto'
 import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { Error, QueryOptions, Types } from 'mongoose'
 import {
+  FUNCTIONALITY_EXTRA_FIELDS,
+  FUNCTIONALITY_INCORRECT_FIELD_TYPE,
+  FUNCTIONALITY_MISSING_FIELDS,
   INCORRECT_CREDENTIALS,
   ROLE_EXTRA_FIELDS,
   ROLE_INCORRECT_FIELD_TYPE,
@@ -39,6 +42,10 @@ import { objectKeys } from '../../global/utils/objectKeys'
 import { difference } from 'underscore'
 import { InterfaceModel } from '../interface/interface.model'
 import { ViewService } from '../view/view.service'
+import { FunctionalityService } from '../functionality/functionality.service'
+import { checkTypes } from '../../global/utils/checkTypes'
+import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
+import { TypesEnum } from '../../global/enums/types.enum'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -50,7 +57,8 @@ export class UserService {
     @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
     @Inject(forwardRef(() => ViewService)) private readonly viewService: ViewService,
     private readonly jwtService: JwtService,
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
+    private readonly functionalityService: FunctionalityService
   ) {}
 
   async create(dto: CreateUserDto) {
@@ -121,16 +129,33 @@ export class UserService {
         const missingFields = difference(objectKeys(role.roleFields), objectKeys(roleData.data))
         if (missingFields.length) throw new BadRequestException(ROLE_MISSING_FIELDS(missingFields))
         objectKeys(roleData.data).forEach(field => {
-          if (Array.isArray(role.roleFields[field])) {
-            if (!Array.isArray(roleData.data[field])) throw new HttpException(ROLE_INCORRECT_FIELD_TYPE(field), HttpStatus.BAD_REQUEST)
-          } else if (typeof roleData.data[field] !== typeof role.roleFields[field])
-            throw new HttpException(ROLE_INCORRECT_FIELD_TYPE(field), HttpStatus.BAD_REQUEST)
+          if (!checkTypes(roleData.data[field], role.roleFields[field])) throw new BadRequestException(ROLE_INCORRECT_FIELD_TYPE(field))
         })
       }
     }
 
     if (dto.views) {
       for await (const viewId of dto.views) await this.viewService.checkExists({ _id: viewId })
+    }
+
+    if (dto.available) {
+      for (const f of dto.available) {
+        const functionality = this.functionalityService.getByCode(f.code)
+        const extraFields = difference(objectKeys(f.data), objectKeys(functionality.default))
+        if (extraFields.length) throw new BadRequestException(FUNCTIONALITY_EXTRA_FIELDS(f.code, extraFields))
+        const missingFields = difference(objectKeys(functionality.default), objectKeys(f.data))
+        if (missingFields.length) throw new BadRequestException(FUNCTIONALITY_MISSING_FIELDS(f.code, missingFields))
+        objectKeys(f.data).forEach(field => {
+          if (
+            functionality.default[field] === FunctionalityAvailableTypeEnum.ALL ||
+            functionality.default[field] === FunctionalityAvailableTypeEnum.CUSTOM
+          ) {
+            if (f.data[field] !== FunctionalityAvailableTypeEnum.ALL && f.data[field] !== FunctionalityAvailableTypeEnum.CUSTOM)
+              throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+          } else if (!checkTypes(f.data[field], functionality.default[field] as TypesEnum))
+            throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+        })
+      }
     }
 
     await this.userModel.updateOne({ _id: dto.id }, dto)

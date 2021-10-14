@@ -41,17 +41,16 @@ export class FunctionalityService {
     return
   }
 
-  async getByCode(code: RegisterFunctionality['code']) {
-    const currentFunctionalities = await this._get()
-
-    return currentFunctionalities?.find(f => f.code === code)
+  getByCode(code: RegisterFunctionality['code']) {
+    this.checkExists({ code })
+    return FunctionalityService.initializableFunctionalities.find(f => f.code === code) as RegisterFunctionality
   }
 
   async getMany() {
     return (await this._get()) || []
   }
 
-  private async _get(): Promise<RegisterFunctionality[] | undefined> {
+  private _get(): Promise<RegisterFunctionality[] | undefined> {
     return this.cacheManager.get(FUNCTIONALITIES_CACHE_KEY)
   }
 
@@ -59,7 +58,7 @@ export class FunctionalityService {
     await this.cacheManager.set(FUNCTIONALITIES_CACHE_KEY, functionalities)
   }
 
-  async checkExists(
+  checkExists(
     filter: ObjectByInterface<typeof FunctionalityFieldsEnum> | ObjectByInterface<typeof FunctionalityFieldsEnum>[],
     options: { error?: ((filter: ObjectByInterface<typeof FunctionalityFieldsEnum>) => Error) | Error; checkExisting?: boolean } = {
       error: f => new NotFoundException(FUNCTIONALITY_WITH_CODE_NOT_FOUND(f.code)),
@@ -67,7 +66,7 @@ export class FunctionalityService {
     }
   ) {
     if (Array.isArray(filter)) {
-      for await (const f of filter) {
+      for (const f of filter) {
         const candidate = FunctionalityService.initializableFunctionalities.find(functionality => functionality.code === f.code)
 
         if (!candidate && options.checkExisting) {

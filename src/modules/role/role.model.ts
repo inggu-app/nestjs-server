@@ -5,6 +5,7 @@ import { RoleFieldsEnum } from './role.constants'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { ViewModel } from '../view/view.model'
 import { Types } from 'mongoose'
+import { TypesEnum } from '../../global/enums/types.enum'
 
 type Role = {
   [key in RoleFieldsEnum]: any
@@ -26,6 +27,6 @@ export class RoleModel extends TimeStamps implements Role {
 
   @prop()
   roleFields: {
-    [key: string]: any
+    [key: string]: TypesEnum
   }
 }
