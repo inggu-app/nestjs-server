@@ -12,7 +12,7 @@ import { InjectModel } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateUserDto } from './dto/createUser.dto'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { Error, QueryOptions, Types } from 'mongoose'
 import {
   FUNCTIONALITY_EXTRA_FIELDS,
@@ -90,10 +90,7 @@ export class UserService {
     ) as unknown as DocumentType<UserModel>
   }
 
-  async getByLogin(
-    login: string,
-    options?: { fields?: UserField[] | ReturnType<typeof fieldsArrayToProjection>; queryOptions?: QueryOptions }
-  ) {
+  async getByLogin(login: string, options?: ServiceGetOptions<UserField>) {
     await this.checkExists({ login }, new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND))
     return this.userModel.findOne(
       { login },

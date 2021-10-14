@@ -8,7 +8,7 @@ import { Error, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
@@ -21,9 +21,15 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
-  async getById(facultyId: MongoIdString | Types.ObjectId, fields?: FacultyField[]) {
+  async getById(facultyId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions<FacultyField>) {
     facultyId = stringToObjectId(facultyId)
-    const candidate = await this.facultyModel.findById(facultyId, fieldsArrayToProjection(fields)).exec()
+    const candidate = await this.facultyModel
+      .findById(
+        facultyId,
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+        options?.queryOptions
+      )
+      .exec()
 
     if (!candidate) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
@@ -32,9 +38,13 @@ export class FacultyService {
     return candidate
   }
 
-  getAll(page: number, count: number, title?: string, fields?: FacultyField[]) {
+  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<FacultyField>) {
     return this.facultyModel
-      .find(title ? { title: { $regex: title, $options: 'i' } } : {}, fieldsArrayToProjection(fields))
+      .find(
+        title ? { title: { $regex: title, $options: 'i' } } : {},
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+        options?.queryOptions
+      )
       .skip((page - 1) * count)
       .limit(count)
       .exec()
@@ -58,7 +68,8 @@ export class FacultyService {
     return this.facultyModel.findById(dto.id).exec()
   }
 
-  async delete(id: Types.ObjectId) {
+  async delete(id: Types.ObjectId | MongoIdString) {
+    id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.facultyModel.deleteOne({ _id: id }).exec()
   }

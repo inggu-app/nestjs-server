@@ -53,11 +53,11 @@ export class FacultyJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuar
       case FunctionalityCodesEnum.FACULTY__DELETE:
         castedFunctionality = functionality as AvailableFunctionality<FacultyDeleteDataForFunctionality>
 
-        queryParams = parseRequestQueries(['id'], request.url)
-        if (!queryParams.id) return true
-        if (castedFunctionality.data.forbiddenFaculties.includes(queryParams.id)) break
+        queryParams = parseRequestQueries(['facultyId'], request.url)
+        if (!queryParams.facultyId) return true
+        if (castedFunctionality.data.forbiddenFaculties.includes(queryParams.facultyId)) break
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
-        if (castedFunctionality.data.availableFaculties.includes(queryParams.id)) return true
+        if (castedFunctionality.data.availableFaculties.includes(queryParams.facultyId)) return true
         break
     }
     throw new ForbiddenException()

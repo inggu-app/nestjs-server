@@ -48,7 +48,7 @@ export class FacultyController {
     @MongoId(FacultyGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
     @GetFacultyFields() fields?: FacultyField[]
   ) {
-    return normalizeFields(await this.facultyService.getById(facultyId, fields), { fields })
+    return normalizeFields(await this.facultyService.getById(facultyId, { fields }), { fields })
   }
 
   @Functionality({
@@ -64,7 +64,7 @@ export class FacultyController {
     @GetFacultyFields() fields?: FacultyField[]
   ) {
     return {
-      faculties: normalizeFields(await this.facultyService.getAll(page, count, title, fields), { fields }),
+      faculties: normalizeFields(await this.facultyService.getAll(page, count, title, { fields }), { fields }),
       count: await this.facultyService.countAll(title),
     }
   }
