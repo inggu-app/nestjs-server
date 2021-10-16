@@ -10,12 +10,8 @@ export class ViewGetRoutesMiddleware implements NestMiddleware {
     const query = parseRequestQueries(getEnumValues(ViewGetQueryParametersEnum), req.url)
 
     const request = checkAlternativeQueryParameters<ViewRoutesEnum>(
-      {
-        required: { code: query.code },
-        fields: query.fields,
-        enum: ViewRoutesEnum.GET_BY_CODE,
-      },
-      { required: { userId: query.userId }, fields: query.fields, enum: ViewRoutesEnum.GET_BY_USER_ID }
+      { required: { code: query.code }, fields: query.fields, enum: ViewRoutesEnum.GET_BY_CODE },
+      { required: { userId: query.userId }, intrfc: query.interface, fields: query.fields, enum: ViewRoutesEnum.GET_BY_USER_ID }
     )
 
     const [start = '', queryStr = ''] = req.url.split('?')

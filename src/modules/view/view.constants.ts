@@ -16,11 +16,13 @@ export enum ViewGetQueryParametersEnum {
   CODE = 'code',
   FIELDS = 'fields',
   USER_ID = 'userId',
+  INTERFACE = 'interface',
 }
 
 export enum ViewFieldsEnum {
   code = 'code',
   description = 'description',
+  interface = 'interface',
 }
 
 export const ViewAdditionalFieldsEnum = {

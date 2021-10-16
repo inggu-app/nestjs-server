@@ -19,6 +19,7 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
       },
     ]),
   ],
+  exports: [InterfaceService],
 })
 export class InterfaceModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

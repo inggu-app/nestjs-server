@@ -7,23 +7,32 @@ import { Error, Types } from 'mongoose'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { ViewField, ViewFieldsEnum } from './view.constants'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
-import { VIEW_WITH_CODE_EXISTS, VIEW_WITH_CODE_NOT_FOUND, VIEW_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
+import {
+  INTERFACE_WITH_CODE_NOT_FOUND,
+  VIEW_WITH_CODE_EXISTS,
+  VIEW_WITH_CODE_NOT_FOUND,
+  VIEW_WITH_ID_NOT_FOUND,
+} from '../../global/constants/errors.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { DocumentType } from '@typegoose/typegoose'
 import { UpdateViewDto } from './dto/updateView.dto'
 import { UserService } from '../user/user.service'
 import { RoleModel } from '../role/role.model'
+import { InterfaceModel } from '../interface/interface.model'
+import { InterfaceService } from '../interface/interface.service'
 
 @Injectable()
 export class ViewService {
   constructor(
     @InjectModel(ViewModel) private readonly viewModel: ModelType<ViewModel>,
-    @Inject(forwardRef(() => UserService)) private readonly userService: UserService
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
+    private readonly interfaceService: InterfaceService
   ) {}
 
   async create(dto: CreateViewDto) {
     await this.checkExists({ code: dto.code }, { error: new BadRequestException(VIEW_WITH_CODE_EXISTS(dto.code)), checkExisting: false })
-    await this.viewModel.create(dto)
+    const intrfc = await this.interfaceService.getByCode(dto.interface)
+    await this.viewModel.create({ ...dto, interface: intrfc.id })
     return
   }
 
@@ -48,18 +57,18 @@ export class ViewService {
     ) as unknown as DocumentType<ViewModel>
   }
 
-  async getByUserId(userId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<ViewField>) {
+  async getByUserId(userId: Types.ObjectId | MongoIdString, intrfc?: string, options?: ServiceGetOptions<ViewField>) {
     const user = await this.userService.getById(userId, {
       queryOptions: {
         populate: [
-          { path: 'views', select: options?.fields },
-          { path: 'roles.role', populate: { path: 'views', select: options?.fields } },
+          { path: 'views', select: options?.fields, populate: { path: 'interface' } },
+          { path: 'roles.role', populate: { path: 'views', select: options?.fields, populate: { path: 'interface' } } },
         ],
         projection: { views: 1, roles: 1 },
       },
     })
 
-    return [
+    let views = [
       ...user.roles
         .map(role => role.role)
         .map(role => {
@@ -76,10 +85,20 @@ export class ViewService {
         ),
       ...user.views,
     ]
+
+    if (intrfc)
+      views = views.filter(view => {
+        view = view as ViewModel
+        view.interface = view.interface as InterfaceModel
+        return view.interface.code === intrfc
+      })
+
+    return views
   }
 
   async update(dto: UpdateViewDto) {
     await this.checkExists({ code: dto.code })
+    await this.interfaceService.checkExists({ code: dto.interface }, new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(dto.interface)))
     await this.viewModel.updateOne({ code: dto.code }, { $set: dto })
   }
 

@@ -4,7 +4,7 @@ import { InterfaceModel } from './interface.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateInterfaceDto } from './dto/createInterface.dto'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
-import { Error, Types } from 'mongoose'
+import { Error, FilterQuery, Types } from 'mongoose'
 import {
   INTERFACE_WITH_CODE_EXISTS,
   INTERFACE_WITH_CODE_NOT_FOUND,
@@ -58,7 +58,7 @@ export class InterfaceService {
   }
 
   async checkExists(
-    filter: ObjectByInterface<typeof InterfaceFieldsEnum, ModelBase> | ObjectByInterface<typeof InterfaceFieldsEnum, ModelBase>[],
+    filter: FilterQuery<DocumentType<InterfaceModel>>,
     error: ((filter: ObjectByInterface<typeof InterfaceFieldsEnum, ModelBase>) => Error) | Error = f =>
       new NotFoundException(INTERFACE_WITH_ID_NOT_FOUND(f._id)),
     checkExisting = true
@@ -69,17 +69,17 @@ export class InterfaceService {
 
         if (!candidate && checkExisting) {
           if (typeof error === 'function') throw error(f)
-          throw Error
+          throw error
         } else if (candidate && !checkExisting) {
           if (typeof error === 'function') throw error(f)
-          throw Error
+          throw error
         }
       }
     } else {
       const candidate = await this.interfaceModel.exists(filter)
       if (!candidate && checkExisting) {
         if (typeof error === 'function') throw error(filter)
-        throw Error
+        throw error
       } else if (candidate && !checkExisting) {
         if (typeof error === 'function') throw error(filter)
         throw error

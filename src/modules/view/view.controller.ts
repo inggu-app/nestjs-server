@@ -53,8 +53,12 @@ export class ViewController {
     title: 'Получить список отображение для пользователя',
   })
   @Get(ViewRoutesEnum.GET_BY_USER_ID)
-  async getByUserId(@MongoId(ViewGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @ViewGetFields() fields?: ViewField[]) {
-    return normalizeFields(await this.viewService.getByUserId(userId, { fields }), { fields })
+  async getByUserId(
+    @MongoId(ViewGetQueryParametersEnum.USER_ID) userId: Types.ObjectId,
+    @Query(ViewGetQueryParametersEnum.INTERFACE) intrfc?: string,
+    @ViewGetFields() fields?: ViewField[]
+  ) {
+    return normalizeFields(await this.viewService.getByUserId(userId, intrfc, { fields }), { fields })
   }
 
   @UsePipes(new ValidationPipe())

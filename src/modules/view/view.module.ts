@@ -6,12 +6,14 @@ import { ViewModel } from './view.model'
 import { ViewGetRoutesMiddleware } from './viewGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 import { UserModule } from '../user/user.module'
+import { InterfaceModule } from '../interface/interface.module'
 
 @Module({
   controllers: [ViewController],
   providers: [ViewService],
   imports: [
     forwardRef(() => UserModule),
+    InterfaceModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: ViewModel,
