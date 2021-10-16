@@ -57,12 +57,14 @@ export enum WeeksTypeEnum {
 export interface ScheduleCreateDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, группам которых пользователь может создавать или обновлять расписание
   availableFaculties: MongoIdString[] // id факультетов, группам которых пользователь может создавать или обновлять расписание
+  forbiddenFaculties: MongoIdString[] // id факультетов, группам которых пользователь НЕ может создавать или обновлять расписание
   availableGroups: MongoIdString[] // id групп, для которых пользователь может создавать или обновлять расписание
   forbiddenGroups: MongoIdString[] // id групп, для которых пользователь создавать или обновлять расписание НЕ может
 }
 export const defaultScheduleCreateData: FunctionalityDefault<ScheduleCreateDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
   availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
   availableGroups: TypesEnum.MONGO_ID_ARRAY,
   forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }
@@ -70,12 +72,14 @@ export const defaultScheduleCreateData: FunctionalityDefault<ScheduleCreateDataF
 export interface ScheduleGetByGroupIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, расписание групп которых пользователь может получить
   availableFaculties: MongoIdString[] // id факультетов, расписание групп которых пользователь может получить
+  forbiddenFaculties: MongoIdString[] // id факультетов, расписание групп которых пользователь НЕ может получить
   availableGroups: MongoIdString[] // id групп, расписание которых пользователь может получить
   forbiddenGroups: MongoIdString[] // id групп, расписание которых пользователь получить НЕ может
 }
 export const defaultScheduleGetByGroupIdData: FunctionalityDefault<ScheduleGetByGroupIdDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
   availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
   availableGroups: TypesEnum.MONGO_ID_ARRAY,
   forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }

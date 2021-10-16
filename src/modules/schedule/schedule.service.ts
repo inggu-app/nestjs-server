@@ -7,7 +7,7 @@ import { ModelType } from '@typegoose/typegoose/lib/types'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { LessonFieldsEnum, ScheduleField } from './schedule.constants'
 import { LESSON_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
@@ -19,14 +19,22 @@ export class ScheduleService {
     return this.lessonModel.create(lessons)
   }
 
-  getByGroup(groupId: Types.ObjectId | MongoIdString, fields?: ScheduleField[]) {
+  getByGroup(groupId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<ScheduleField>) {
     groupId = stringToObjectId(groupId)
-    return this.lessonModel.find({ group: groupId }, fieldsArrayToProjection(fields, ['number'])).exec()
+    return this.lessonModel
+      .find(
+        { group: groupId },
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields, ['number']) : options?.fields,
+        options?.queryOptions
+      )
+      .exec()
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, fields?: ScheduleField[]) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<ScheduleField>) {
     id = stringToObjectId(id)
-    const candidate = await this.lessonModel.findById(id, fieldsArrayToProjection(fields)).exec()
+    const candidate = await this.lessonModel
+      .findById(id, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .exec()
 
     if (!candidate) {
       throw new HttpException(LESSON_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
