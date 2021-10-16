@@ -46,12 +46,16 @@ enumKeyValuesMatch(NoteAdditionalFieldsEnum)
 enumKeyValuesMatch(NoteForbiddenFieldsEnum)
 
 export interface NoteCreateDataForFunctionality {
-  availableGroupsType: FunctionalityAvailableTypeEnum // доступность групп, занятиям которых пользователь может назначать заметки
+  availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, занятиям групп которых пользователь может добавлять заметки
+  availableFaculties: MongoIdString[] // id факультетов, занятиям групп которых пользователь может добавлять заметки
+  forbiddenFaculties: MongoIdString[] // id факультетов, занятиям групп которых пользователь НЕ может добавлять заметки
   availableGroups: MongoIdString[] // id групп, занятиям которых пользователь может назначать заметки
   forbiddenGroups: MongoIdString[] // id групп, занятиям которых пользователь НЕ может назначать заметки
 }
 export const defaultNoteCreateData: FunctionalityDefault<NoteCreateDataForFunctionality> = {
-  availableGroupsType: FunctionalityAvailableTypeEnum.ALL,
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
   availableGroups: TypesEnum.MONGO_ID_ARRAY,
   forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }

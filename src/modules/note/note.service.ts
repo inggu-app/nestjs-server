@@ -8,7 +8,7 @@ import { NoteField, NoteFieldsEnum } from './note.constants'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ScheduleService } from '../schedule/schedule.service'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
@@ -24,15 +24,23 @@ export class NoteService {
     return this.noteModel.create(dto)
   }
 
-  async get(lesson: Types.ObjectId, week: number, fields?: NoteField[]) {
+  async get(lesson: Types.ObjectId | MongoIdString, week: number, options?: ServiceGetOptions<NoteField>) {
     await this.scheduleService.checkExists({ _id: lesson })
 
-    return this.noteModel.find({ lesson, week }, fieldsArrayToProjection(fields)).exec()
+    return this.noteModel
+      .find(
+        { lesson, week },
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+        options?.queryOptions
+      )
+      .exec()
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, fields?: NoteField[]) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<NoteField>) {
     id = stringToObjectId(id)
-    const candidate = await this.noteModel.findById(id, fieldsArrayToProjection(fields)).exec()
+    const candidate = await this.noteModel
+      .findById(id, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .exec()
 
     if (!candidate) {
       throw new HttpException(NOTE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -41,7 +49,7 @@ export class NoteService {
     return candidate
   }
 
-  async delete(id: Types.ObjectId) {
+  async delete(id: Types.ObjectId | MongoIdString) {
     await this.checkExists({ _id: id })
     return this.noteModel.findByIdAndDelete(id).exec()
   }
