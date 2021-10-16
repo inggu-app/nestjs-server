@@ -3,13 +3,15 @@ import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FacultyField, FacultyFieldsEnum } from './faculty.constants'
-import { Error, Types } from 'mongoose'
+import { FacultyField, FacultyFieldsEnum, FacultyGetManyDataForFunctionality } from './faculty.constants'
+import { Error, FilterQuery, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
+import { DocumentType } from '@typegoose/typegoose'
+import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 
 @Injectable()
 export class FacultyService {
@@ -38,20 +40,32 @@ export class FacultyService {
     return candidate
   }
 
-  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<FacultyField>) {
+  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<FacultyField, FacultyGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<FacultyModel>> = {}
+    if (title) filter.title = { $regex: title, $options: 'i' }
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenFaculties }
+      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
+      }
+    }
     return this.facultyModel
-      .find(
-        title ? { title: { $regex: title, $options: 'i' } } : {},
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-        options?.queryOptions
-      )
+      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
-  countAll(title?: string) {
-    return this.facultyModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {}).exec()
+  countAll(title?: string, options?: ServiceGetOptions<FacultyField, FacultyGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<FacultyModel>> = {}
+    if (title) filter.title = { $regex: title, $options: 'i' }
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenFaculties }
+      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
+      }
+    }
+    if (options?.user) return this.facultyModel.countDocuments(filter).exec()
   }
 
   async update(dto: UpdateFacultyDto) {

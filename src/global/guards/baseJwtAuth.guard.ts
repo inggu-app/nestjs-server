@@ -10,8 +10,9 @@ import { Request } from 'express'
 import { AvailableFunctionality } from '../../modules/functionality/functionality.constants'
 import { ConfigService } from '@nestjs/config'
 
-export interface CustomRequest<Body = any> extends Omit<Request<any, any, Body>, 'user'> {
-  user: DocumentType<UserModel>
+export interface CustomRequest<Body = any, FunctionalityType = { [key: string]: any }> extends Omit<Request<any, any, Body>, 'user'> {
+  user: DocumentType<UserModel> | undefined
+  functionality: AvailableFunctionality<FunctionalityType>
 }
 
 @Injectable()
@@ -47,6 +48,7 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
 
             if (functionality) {
               context.switchToHttp().getRequest<CustomRequest>().user = user
+              context.switchToHttp().getRequest<CustomRequest>().functionality = functionality
               return this.validate(functionality, user, context.switchToHttp().getRequest<Request>())
             }
           }

@@ -21,11 +21,6 @@ export enum FacultyGetQueryParametersEnum {
   FIELDS = 'fields',
 }
 
-export enum GetFacultiesEnum {
-  facultyId,
-  many,
-}
-
 export enum FacultyFieldsEnum {
   title = 'title',
 }

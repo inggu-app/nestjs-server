@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common'
 import { FacultyService } from './faculty.service'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { Types } from 'mongoose'
@@ -14,6 +14,7 @@ import {
   FacultyAdditionalFieldsEnum,
   FacultyField,
   FacultyFieldsEnum,
+  FacultyGetManyDataForFunctionality,
   FacultyGetQueryParametersEnum,
   FacultyRoutesEnum,
 } from './faculty.constants'
@@ -22,6 +23,7 @@ import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
+import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
 
 @Controller()
 export class FacultyController {
@@ -60,12 +62,13 @@ export class FacultyController {
   async getMany(
     @Query(FacultyGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
     @Query(FacultyGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
+    @Req() { functionality }: CustomRequest<any, FacultyGetManyDataForFunctionality>,
     @Query(FacultyGetQueryParametersEnum.TITLE) title?: string,
     @GetFacultyFields() fields?: FacultyField[]
   ) {
     return {
-      faculties: normalizeFields(await this.facultyService.getAll(page, count, title, { fields }), { fields }),
-      count: await this.facultyService.countAll(title),
+      faculties: normalizeFields(await this.facultyService.getAll(page, count, title, { fields, functionality }), { fields }),
+      count: await this.facultyService.countAll(title, { functionality }),
     }
   }
 

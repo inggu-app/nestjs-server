@@ -25,7 +25,7 @@ export class FacultyJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuar
     switch (functionality.code) {
       case FunctionalityCodesEnum.FACULTY__CREATE:
         return true
-      case FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID:
+      case FunctionalityCodesEnum.FACULTY__GET_BY_FACULTY_ID:
         castedFunctionality = functionality as AvailableFunctionality<FacultyGetByFacultyIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(FacultyGetQueryParametersEnum), request.url)
