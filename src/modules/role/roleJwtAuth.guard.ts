@@ -15,6 +15,7 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { UpdateRoleDto } from './dto/updateRole.dto'
+import { objectKeys } from '../../global/utils/objectKeys'
 
 export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
@@ -38,15 +39,35 @@ export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
       case FunctionalityCodesEnum.ROLE__UPDATE:
         castedFunctionality = functionality as AvailableFunctionality<RoleUpdateDataForFunctionality>
 
+        requestBody = RoleJwtAuthGuard.getBody<UpdateRoleDto>(request) as UpdateRoleDto
+        if (
+          castedFunctionality.data.availableRolesType !== FunctionalityAvailableTypeEnum.ALL &&
+          !castedFunctionality.data.availableRoles.includes(requestBody.id)
+        )
+          break
+
+        //=====================
+        // Проверяем доступна ли поля, которые пытается изменить пользователь, ему для изменения
+        let isCorrectFields = true
+        for (const key of objectKeys(requestBody)) {
+          castedFunctionality = functionality as AvailableFunctionality<RoleUpdateDataForFunctionality>
+          if (!castedFunctionality.data.availableFields.includes(key) && key !== 'id') {
+            isCorrectFields = false
+            break
+          }
+        }
+        if (!isCorrectFields) break
+        //=====================
+
         if (castedFunctionality.data.availableFunctionalitiesType === FunctionalityAvailableTypeEnum.ALL) return true
         let isCorrect = true
-        requestBody = RoleJwtAuthGuard.getBody<UpdateRoleDto>(request) as UpdateRoleDto
         requestBody.available?.forEach(f => {
           castedFunctionality = functionality as AvailableFunctionality<RoleUpdateDataForFunctionality>
           if (!castedFunctionality.data.availableFunctionalities.includes(f)) isCorrect = false
         })
         if (!isCorrect) break
-        break
+
+        return true
       case FunctionalityCodesEnum.ROLE__DELETE:
         castedFunctionality = functionality as AvailableFunctionality<RoleDeleteDataForFunctionality>
 

@@ -5,6 +5,7 @@ import { MongoIdString } from '../../global/types'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { FunctionalityDefault } from '../functionality/functionality.constants'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { UpdateRoleDtoKeysEnum } from './dto/updateRole.dto'
 
 export enum RoleRoutesEnum {
   CREATE = '/',
@@ -58,10 +59,16 @@ export const defaultRoleGetManyData: FunctionalityDefault<RoleGetManyDataForFunc
 }
 
 export interface RoleUpdateDataForFunctionality {
+  availableRolesType: FunctionalityAvailableTypeEnum // доступность ролей, которые пользователь может изменить
+  availableRoles: MongoIdString[] // id ролей, которые пользователь может изменить
+  availableFields: (keyof typeof UpdateRoleDtoKeysEnum)[]
   availableFunctionalitiesType: FunctionalityAvailableTypeEnum // доступность функциональностей, которые может добавить пользователь
   availableFunctionalities: FunctionalityCodesEnum[] // коды фукнциональностей, которые пользователь может изменить
 }
 export const defaultRoleUpdateData: FunctionalityDefault<RoleUpdateDataForFunctionality> = {
+  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
+  availableRoles: TypesEnum.MONGO_ID_ARRAY,
+  availableFields: TypesEnum.STRING_ARRAY,
   availableFunctionalitiesType: FunctionalityAvailableTypeEnum.ALL,
   availableFunctionalities: TypesEnum.MONGO_ID_ARRAY,
 }

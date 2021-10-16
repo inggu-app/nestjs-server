@@ -81,7 +81,7 @@ export const defaultUserUpdateData: FunctionalityDefault<UserUpdateDataForFuncti
   availableRolesType: FunctionalityAvailableTypeEnum.ALL,
   availableRoles: TypesEnum.MONGO_ID_ARRAY,
   forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
-  availableFields: TypesEnum.MONGO_ID_ARRAY,
+  availableFields: TypesEnum.STRING_ARRAY,
   availableToSetFunctionalitiesType: FunctionalityAvailableTypeEnum.ALL,
   availableToSetFunctionalities: TypesEnum.MONGO_ID_ARRAY,
   forbiddenToSetFunctionalities: TypesEnum.MONGO_ID_ARRAY,
