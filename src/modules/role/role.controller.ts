@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Req, UsePipes, ValidationPipe } from '@nestjs/common'
 import { RoleService } from './role.service'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
@@ -11,6 +11,7 @@ import {
   RoleAdditionalFieldsEnum,
   RoleField,
   RoleFieldsEnum,
+  RoleGetManyDataForFunctionality,
   RoleGetQueryParametersEnum,
   RoleRoutesEnum,
 } from './role.constants'
@@ -19,6 +20,7 @@ import { Types } from 'mongoose'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
+import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
 
 @Controller()
 export class RoleController {
@@ -42,7 +44,7 @@ export class RoleController {
   })
   @Get(RoleRoutesEnum.GET_BY_ROLE_ID)
   getByRoleId(@MongoId(RoleGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId, @GetRoleFields() fields?: RoleField[]) {
-    return this.roleService.getById(roleId, fields)
+    return this.roleService.getById(roleId, { fields })
   }
 
   @Functionality({
@@ -51,8 +53,8 @@ export class RoleController {
     title: 'Запросить список ролей',
   })
   @Get(RoleRoutesEnum.GET_MANY)
-  getMany(@GetRoleFields() fields?: RoleField[]) {
-    return this.roleService.getMany(fields)
+  getMany(@Req() { functionality }: CustomRequest<any, RoleGetManyDataForFunctionality>, @GetRoleFields() fields?: RoleField[]) {
+    return this.roleService.getMany({ fields, functionality })
   }
 
   @UsePipes(new ValidationPipe())

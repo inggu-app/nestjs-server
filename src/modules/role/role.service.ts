@@ -1,18 +1,18 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { RoleModel } from './role.model'
-import { ModelType } from '@typegoose/typegoose/lib/types'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
-import { Error, Types } from 'mongoose'
+import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
+import { Error, FilterQuery, Types } from 'mongoose'
 import { ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { RoleField, RoleFieldsEnum } from './role.constants'
+import { RoleField, RoleFieldsEnum, RoleGetManyDataForFunctionality } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
-import { DocumentType } from '@typegoose/typegoose/lib/types'
 import { ViewService } from '../view/view.service'
 import { FunctionalityService } from '../functionality/functionality.service'
+import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 
 @Injectable()
 export class RoleService {
@@ -29,19 +29,39 @@ export class RoleService {
     return
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, fields?: RoleField[]) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<RoleField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return this.roleModel.findById({ _id: id }, fieldsArrayToProjection(fields)) as unknown as DocumentType<RoleModel>
+    return this.roleModel.findById(
+      { _id: id },
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+      options?.queryOptions
+    ) as unknown as DocumentType<RoleModel>
   }
 
-  async getByTitle(title: string, fields?: RoleField[]) {
+  async getByTitle(title: string, options?: ServiceGetOptions<RoleField>) {
     await this.checkExists({ title })
-    return this.roleModel.findOne({ title }, fieldsArrayToProjection(fields))
+    return this.roleModel.findOne(
+      { title },
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+      options?.queryOptions
+    )
   }
 
-  async getMany(fields?: RoleField[]) {
-    return this.roleModel.find({}, fieldsArrayToProjection(fields))
+  async getMany(options?: ServiceGetOptions<RoleField, RoleGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<RoleModel>> = {}
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenRoles }
+      if (options.functionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = { $in: options.functionality.data.availableRoles, $nin: options.functionality.data.forbiddenRoles }
+      }
+    }
+
+    return this.roleModel.find(
+      filter,
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+      options?.queryOptions
+    )
   }
 
   async update(dto: UpdateRoleDto) {

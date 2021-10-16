@@ -28,7 +28,7 @@ export interface InterfaceGetByCodeDataForFunctionality {}
 export const defaultInterfaceGetByCodeData: FunctionalityDefault<InterfaceGetByCodeDataForFunctionality> = {}
 
 export interface InterfaceUpdateDataForFunctionality {}
-export const defaultInterfaceUpdateData: FunctionalityDefault<InterfaceGetByCodeDataForFunctionality> = {}
+export const defaultInterfaceUpdateData: FunctionalityDefault<InterfaceUpdateDataForFunctionality> = {}
 
 export interface InterfaceDeleteDataForFunctionality {}
 export const defaultInterfaceDeleteData: FunctionalityDefault<InterfaceDeleteDataForFunctionality> = {}

@@ -52,10 +52,12 @@ export const defaultRoleGetByRoleIdData: FunctionalityDefault<RoleGetByRoleIdDat
 export interface RoleGetManyDataForFunctionality {
   availableRolesType: FunctionalityAvailableTypeEnum // доступность загрузки списка ролей для пользователя
   availableRoles: MongoIdString[] // id ролей, которые пользователь может загрузить
+  forbiddenRoles: MongoIdString[] // id ролей, которые пользователь НЕ может загрузить
 }
 export const defaultRoleGetManyData: FunctionalityDefault<RoleGetManyDataForFunctionality> = {
   availableRolesType: FunctionalityAvailableTypeEnum.ALL,
   availableRoles: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface RoleUpdateDataForFunctionality {
