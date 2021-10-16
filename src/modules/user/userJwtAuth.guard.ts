@@ -7,6 +7,7 @@ import { ForbiddenException } from '@nestjs/common'
 import { AvailableFunctionality } from '../functionality/functionality.constants'
 import {
   UserDeleteDataForFunctionality,
+  UserGetByRoleIdDataForFunctionality,
   UserGetByUserIdDataForFunctionality,
   UserGetQueryParametersEnum,
   UserUpdateDataForFunctionality,
@@ -16,6 +17,7 @@ import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { UpdateUserDto } from './dto/updateUser.dto'
 import { objectKeys } from '../../global/utils/objectKeys'
+import { Types } from 'mongoose'
 
 export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
@@ -25,17 +27,74 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
     let isCorrectFunctionalities: boolean
     let isCorrectRoles: boolean
     let isCorrectInterfaces: boolean
+    let currentUser: DocumentType<UserModel>
     switch (functionality.code) {
       case FunctionalityCodesEnum.USER__CREATE:
         return true
       case FunctionalityCodesEnum.USER__GET_BY_USER_ID:
         castedFunctionality = functionality as AvailableFunctionality<UserGetByUserIdDataForFunctionality>
 
-        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
-
         queryParams = parseRequestQueries(getEnumValues(UserGetQueryParametersEnum), request.url)
         if (!queryParams.userId) return true
+        if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
+        currentUser = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
+        if (
+          castedFunctionality.data.forbiddenRoles.reduce(
+            (acc, role) =>
+              !!currentUser.roles.find(r => {
+                r.role = r.role as Types.ObjectId
+                return r.role.toString() === role
+              }),
+            false
+          )
+        )
+          break
+        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
+
         if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true
+        if (
+          castedFunctionality.data.availableRoles.reduce(
+            (acc, role) =>
+              !!currentUser.roles.find(r => {
+                r.role = r.role as Types.ObjectId
+                return r.role.toString() === role
+              }),
+            false
+          )
+        )
+          return true
+        break
+      case FunctionalityCodesEnum.USER__GET_BY_ROLE_ID:
+        castedFunctionality = functionality as AvailableFunctionality<UserGetByRoleIdDataForFunctionality>
+
+        queryParams = parseRequestQueries(getEnumValues(UserGetQueryParametersEnum), request.url)
+        if (!queryParams.userId || !queryParams.roleId) return true
+        if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
+        currentUser = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
+        if (
+          castedFunctionality.data.forbiddenRoles.reduce(
+            (acc, role) =>
+              !!currentUser.roles.find(r => {
+                r.role = r.role as Types.ObjectId
+                return r.role.toString() === role
+              }),
+            false
+          )
+        )
+          break
+        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
+        if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true
+        if (
+          castedFunctionality.data.availableRoles.reduce(
+            (acc, role) =>
+              !!currentUser.roles.find(r => {
+                r.role = r.role as Types.ObjectId
+                return r.role.toString() === role
+              }),
+            false
+          )
+        )
+          return true
         break
       case FunctionalityCodesEnum.USER__UPDATE:
         castedFunctionality = functionality as AvailableFunctionality<UserUpdateDataForFunctionality>
@@ -112,7 +171,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         // Если пользователь пытается обновить специально запрещённых ему пользователей или пользователей с
         // запрещёнными ему ролями, то доступ запрещается
         if (castedFunctionality.data.forbiddenUsers.includes(requestBody.id)) break
-        const currentUser = await this.userService.getById(requestBody.id, { fields: ['roles'] })
+        currentUser = await this.userService.getById(requestBody.id, { fields: ['roles'] })
         if (castedFunctionality.data.forbiddenRoles.reduce((acc, role) => !!currentUser.roles.find(r => r.toString() === role), false))
           break
         //=====================
@@ -136,10 +195,14 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
       case FunctionalityCodesEnum.USER__DELETE:
         castedFunctionality = functionality as AvailableFunctionality<UserDeleteDataForFunctionality>
 
-        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
         queryParams = parseRequestQueries(['userId'], request.url)
         if (!queryParams.userId) return true
+        if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
+        const user = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
+        if (castedFunctionality.data.forbiddenRoles.reduce((acc, role) => !!user.roles.find(r => r.toString() === role), false)) break
+        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true
+        if (castedFunctionality.data.availableRoles.reduce((acc, role) => !!user.roles.find(r => r.toString() === role), true)) return true
         break
     }
 

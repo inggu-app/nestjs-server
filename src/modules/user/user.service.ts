@@ -13,7 +13,7 @@ import { UserModel } from './user.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateUserDto } from './dto/createUser.dto'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
-import { Error, QueryOptions, Types } from 'mongoose'
+import { Error, Types } from 'mongoose'
 import {
   FUNCTIONALITY_EXTRA_FIELDS,
   FUNCTIONALITY_INCORRECT_FIELD_TYPE,
@@ -77,10 +77,7 @@ export class UserService {
     }
   }
 
-  async getById(
-    id: Types.ObjectId | MongoIdString,
-    options?: { fields?: UserField[] | ReturnType<typeof fieldsArrayToProjection>; queryOptions?: QueryOptions }
-  ) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<UserField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     return this.userModel.findById(
@@ -102,11 +99,11 @@ export class UserService {
   async getByRoleId(
     userId: Types.ObjectId | MongoIdString,
     roleId: Types.ObjectId | MongoIdString,
-    options?: { fields?: UserField[]; queryOptions?: QueryOptions }
+    options?: ServiceGetOptions<UserField>
   ) {
     await this.roleService.checkExists({ _id: roleId })
     const user = await this.getById(userId, {
-      fields: fieldsArrayToProjection(options?.fields, ['roles']),
+      fields: Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields, ['roles']) : { ...options?.fields, roles: 1 },
       queryOptions: options?.queryOptions,
     })
     const neededRole = user.roles.find(role => role.role.toString() == roleId.toString())

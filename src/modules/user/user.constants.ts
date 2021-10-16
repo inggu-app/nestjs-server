@@ -51,10 +51,33 @@ export const defaultUserCreateData: FunctionalityDefault<UserCreateDataForFuncti
 export interface UserGetByUserIdDataForFunctionality {
   availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно получить
   availableUsers: MongoIdString[] // id пользователей, которых можно получить
+  forbiddenUsers: MongoIdString[] // id пользователей, которых нельзя получить
+  availableRoles: MongoIdString[] // id ролей, пользователей с которыми можно получить
+  forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми нельзя получить
 }
 export const defaultUserGetByUserIdData: FunctionalityDefault<UserGetByUserIdDataForFunctionality> = {
   availableUsersType: FunctionalityAvailableTypeEnum.ALL,
   availableUsers: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
+  availableRoles: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
+}
+
+export interface UserGetByRoleIdDataForFunctionality {
+  availableUsersType: FunctionalityAvailableTypeEnum.ALL // доступность пользователей, которых можно загрузить
+  availableUsers: MongoIdString[] // id пользователей, которых можно получить
+  forbiddenUsers: MongoIdString[] // id пользователей, которых нельзя получить
+  availableRolesType: FunctionalityAvailableTypeEnum.ALL // доступность ролей, пользователей с которорыми можно получить
+  availableRoles: MongoIdString[] // id ролей, пользователей с которыми можно получить
+  forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми нельзя получить
+}
+export const defaultUserGetByRoleIdData: FunctionalityDefault<UserGetByRoleIdDataForFunctionality> = {
+  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
+  availableUsers: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
+  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
+  availableRoles: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
 }
 
 export interface UserUpdateDataForFunctionality {
@@ -93,10 +116,16 @@ export const defaultUserUpdateData: FunctionalityDefault<UserUpdateDataForFuncti
 }
 
 export interface UserDeleteDataForFunctionality {
-  availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно обновить
-  availableUsers: MongoIdString[] // id пользователей, которых можно обновить
+  availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно удалить
+  availableUsers: MongoIdString[] // id пользователей, которых можно удалить
+  forbiddenUsers: MongoIdString[] // id пользователей, который пользователь удалить НЕ может
+  availableRoles: MongoIdString[] // id ролей, пользователей с которыми можно удалить
+  forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми пользователь удалить не может
 }
 export const defaultUserDeleteData: FunctionalityDefault<UserDeleteDataForFunctionality> = {
   availableUsersType: FunctionalityAvailableTypeEnum.ALL,
   availableUsers: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
+  availableRoles: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
 }

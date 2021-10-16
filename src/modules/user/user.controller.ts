@@ -8,6 +8,7 @@ import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import {
   defaultUserCreateData,
   defaultUserDeleteData,
+  defaultUserGetByRoleIdData,
   defaultUserGetByUserIdData,
   defaultUserUpdateData,
   UserAdditionalFieldsEnum,
@@ -50,6 +51,11 @@ export class UserController {
     return this.userService.getById(userId, { fields })
   }
 
+  @Functionality({
+    code: FunctionalityCodesEnum.USER__GET_BY_ROLE_ID,
+    default: defaultUserGetByRoleIdData,
+    title: 'Получить пользователя по id роли',
+  })
   @Get(UserRoutesEnum.GET_BY_ROLE_ID)
   async getByRoleId(
     @MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId,
