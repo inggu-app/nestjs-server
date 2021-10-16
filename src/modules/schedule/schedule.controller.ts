@@ -47,7 +47,7 @@ export class ScheduleController {
       }
     }
 
-    const allLessons = await this.scheduleService.getByGroup(dto.group, ['id'])
+    const allLessons = await this.scheduleService.getByGroup(dto.group, { fields: ['id'] })
     const extraLessons = allLessons.filter(lesson => !existLessons.find(l => l.id === lesson.id))
     await this.scheduleService.delete(
       dto.group,
@@ -82,7 +82,7 @@ export class ScheduleController {
       }
     }
 
-    const lessonsSchedule = await this.scheduleService.getByGroup(groupId, fields)
+    const lessonsSchedule = await this.scheduleService.getByGroup(groupId, { fields })
     const callSchedule = await this.callScheduleService.getActiveCallSchedule()
 
     const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {

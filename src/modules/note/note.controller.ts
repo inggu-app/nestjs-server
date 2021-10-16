@@ -46,7 +46,7 @@ export class NoteController {
   })
   @Get(NoteRoutesEnum.GET_BY_NOTE_ID)
   async getByNoteId(@MongoId(NoteGetQueryParametersEnum.NOTE_ID) noteId: Types.ObjectId, @GetNoteFields() fields?: NoteField[]) {
-    return normalizeFields(await this.noteService.getById(noteId, fields), {
+    return normalizeFields(await this.noteService.getById(noteId, { fields }), {
       fields,
       forbiddenFields: NoteForbiddenFieldsEnum,
     })
@@ -63,7 +63,7 @@ export class NoteController {
     @Query(NoteGetQueryParametersEnum.WEEK, new CustomParseIntPipe()) week: number,
     @GetNoteFields() fields?: NoteField[]
   ) {
-    return normalizeFields(await this.noteService.get(lessonId, week, fields), { fields, forbiddenFields: NoteForbiddenFieldsEnum })
+    return normalizeFields(await this.noteService.get(lessonId, week, { fields }), { fields, forbiddenFields: NoteForbiddenFieldsEnum })
   }
 
   @Functionality({
@@ -73,7 +73,7 @@ export class NoteController {
   })
   @Delete(NoteRoutesEnum.DELETE)
   async delete(@MongoId('noteId') noteId: Types.ObjectId, @Query('deviceId', new CustomParseStringPipe()) deviceId: DeviceId) {
-    const candidate = await this.noteService.getById(noteId, ['deviceId'])
+    const candidate = await this.noteService.getById(noteId, { fields: ['deviceId'] })
 
     if (deviceId !== candidate.deviceId) {
       throw new HttpException(INVALID_NOTE_DEVICE_ID(noteId, deviceId), HttpStatus.BAD_REQUEST)

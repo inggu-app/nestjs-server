@@ -22,6 +22,7 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ConfigService } from '@nestjs/config'
+import { GroupModel } from '../group/group.model'
 
 export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   constructor(
@@ -44,46 +45,44 @@ export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
       case FunctionalityCodesEnum.NOTE__CREATE:
         castedFunctionality = functionality as AvailableFunctionality<NoteCreateDataForFunctionality>
 
-        if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
-
         requestBody = NoteJwtAuthGuard.getBody<CreateNoteDto>(request)
-        lesson = await this.scheduleService.getById(requestBody.lesson, ['group'])
-        if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.toString())) break
-        if (castedFunctionality.data.availableGroups.includes(lesson.group.toString())) return true
+        lesson = await this.scheduleService.getById(requestBody.lesson, { fields: ['group'], queryOptions: { populate: 'group' } })
+        lesson.group = lesson.group as GroupModel
+        if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.id.toString())) break
+        if (castedFunctionality.data.forbiddenFaculties.includes(lesson.group.faculty.toString())) break
+        if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
+        if (castedFunctionality.data.availableFaculties.includes(lesson.group.faculty.toString())) return true
+        if (castedFunctionality.data.availableGroups.includes(lesson.group.id.toString())) return true
         break
       case FunctionalityCodesEnum.NOTE__GET_BY_NOTE_ID:
         castedFunctionality = functionality as AvailableFunctionality<NoteGetByNoteIdDataForFunctionality>
-
-        if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
-
         queryParams = parseRequestQueries(getEnumValues(NoteGetQueryParametersEnum), request.url)
         if (!queryParams.noteId) return true
-        note = await this.noteService.getById(queryParams.noteId, ['lesson'])
-        lesson = await this.scheduleService.getById(note.lesson, ['group'])
+        note = await this.noteService.getById(queryParams.noteId, { fields: ['lesson'] })
+        lesson = await this.scheduleService.getById(note.lesson, { fields: ['group'] })
         if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.toString())) break
+        if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableGroups.includes(lesson.group.toString())) return true
         break
       case FunctionalityCodesEnum.NOTE__GET_BY_LESSON_ID:
         castedFunctionality = functionality as AvailableFunctionality<NoteGetByLessonIdDataForFunctionality>
 
-        if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
-
         queryParams = parseRequestQueries(getEnumValues(NoteGetQueryParametersEnum), request.url)
         if (!queryParams.lessonId) return true
-        lesson = await this.scheduleService.getById(queryParams.lessonId, ['group'])
+        lesson = await this.scheduleService.getById(queryParams.lessonId, { fields: ['group'] })
         if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.toString())) break
+        if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableGroups.includes(lesson.group.toString())) return true
         break
       case FunctionalityCodesEnum.NOTE__DELETE:
         castedFunctionality = functionality as AvailableFunctionality<NoteDeleteDataForFunctionality>
 
-        if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
-
-        queryParams = parseRequestQueries(['id'], request.url)
-        if (!queryParams.id) return true
-        note = await this.noteService.getById(queryParams.id, ['lesson'])
-        lesson = await this.scheduleService.getById(note.lesson, ['group'])
+        queryParams = parseRequestQueries(['noteId'], request.url)
+        if (!queryParams.noteId) return true
+        note = await this.noteService.getById(queryParams.noteId, { fields: ['lesson'] })
+        lesson = await this.scheduleService.getById(note.lesson, { fields: ['group'] })
         if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.toString())) break
+        if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableGroups.includes(lesson.group.toString())) return true
         break
     }

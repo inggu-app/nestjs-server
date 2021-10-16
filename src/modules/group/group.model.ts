@@ -4,11 +4,13 @@ import { Types } from 'mongoose'
 import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { GroupFieldsEnum } from './group.constants'
+import { CustomModelBase } from '../../global/types'
 
 type Group = {
   [key in GroupFieldsEnum]: any
 }
 
+export interface GroupModel extends CustomModelBase {}
 export interface GroupModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<GroupModel>(),
