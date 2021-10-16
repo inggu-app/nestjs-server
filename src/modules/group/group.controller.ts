@@ -17,6 +17,7 @@ import {
   GroupAdditionalFieldsEnum,
   GroupField,
   GroupFieldsEnum,
+  GroupGetByFacultyIdDataForFunctionality,
   GroupGetQueryParametersEnum,
   GroupRoutesEnum,
 } from './group.constants'
@@ -54,12 +55,7 @@ export class GroupController {
     title: 'Запросить одну группу',
   })
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
-  async getByGroupId(
-    @MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
-    @Req() request: CustomRequest,
-    @GetGroupFields() fields?: GroupField[]
-  ) {
-    console.log(request.user)
+  async getByGroupId(@MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId, @GetGroupFields() fields?: GroupField[]) {
     return normalizeFields(await this.groupService.getById(groupId, { fields }), { fields })
   }
 
@@ -81,9 +77,10 @@ export class GroupController {
   @Get(GroupRoutesEnum.GET_BY_FACULTY_ID)
   private async getByFacultyId(
     @MongoId(GroupGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
+    @Req() { functionality }: CustomRequest<any, GroupGetByFacultyIdDataForFunctionality>,
     @GetGroupFields() fields?: GroupField[]
   ) {
-    return normalizeFields(await this.groupService.getByFacultyId(facultyId, { fields }), { fields })
+    return normalizeFields(await this.groupService.getByFacultyId(facultyId, { fields, functionality }), { fields })
   }
 
   @Functionality({

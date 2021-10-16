@@ -2,9 +2,10 @@ import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundExce
 import { InjectModel } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
+import { DocumentType } from '@typegoose/typegoose'
 import { CreateGroupDto } from './dto/createGroup.dto'
-import { Error, Types } from 'mongoose'
-import { GroupField, GroupFieldsEnum } from './group.constants'
+import { Error, FilterQuery, Types } from 'mongoose'
+import { GroupField, GroupFieldsEnum, GroupGetByFacultyIdDataForFunctionality, GroupGetManyDataForFunctionality } from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
@@ -12,6 +13,7 @@ import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
+import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 
 @Injectable()
 export class GroupService {
@@ -46,32 +48,54 @@ export class GroupService {
     return candidate
   }
 
-  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<GroupField>) {
+  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<GroupField, GroupGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<GroupModel>> = {}
+    if (title) filter.title = { $regex: title, $options: 'i' }
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenGroups }
+      filter.faculty = { $nin: options.functionality.data.forbiddenFaculties }
+      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = { $in: options.functionality.data.availableGroups, $nin: options.functionality.data.forbiddenGroups }
+        filter.faculty = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
+      }
+    }
     return this.groupModel
-      .find(
-        title ? { title: { $regex: title, $options: 'i' } } : {},
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-        options?.queryOptions
-      )
+      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
-  countAll(title?: string) {
-    return this.groupModel.countDocuments(title ? { title: { $regex: title, $options: 'i' } } : {}).exec()
+  countAll(title?: string, options?: ServiceGetOptions<GroupField, GroupGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<GroupModel>> = {}
+    if (title) filter.title = { $regex: title, $options: 'i' }
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenGroups }
+      filter.faculty = { $nin: options.functionality.data.forbiddenFaculties }
+      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = { $in: options.functionality.data.availableGroups, $nin: options.functionality.data.forbiddenGroups }
+        filter.faculty = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
+      }
+    }
+    return this.groupModel.countDocuments(filter).exec()
   }
 
-  async getByFacultyId(facultyId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<GroupField>) {
+  async getByFacultyId(
+    facultyId: Types.ObjectId | MongoIdString,
+    options?: ServiceGetOptions<GroupField, GroupGetByFacultyIdDataForFunctionality>
+  ) {
     facultyId = stringToObjectId(facultyId)
     await this.facultyService.checkExists({ _id: facultyId })
+    const filter: FilterQuery<DocumentType<GroupModel>> = { faculty: facultyId }
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenGroups }
+      if (options?.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = { $in: options.functionality.data.availableGroups, $nin: options.functionality.data.forbiddenGroups }
+      }
+    }
 
     return this.groupModel
-      .find(
-        { faculty: facultyId },
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-        options?.queryOptions
-      )
+      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
       .exec()
   }
 
