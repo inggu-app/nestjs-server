@@ -3,8 +3,8 @@ import { InjectModel } from 'nestjs-typegoose'
 import { ViewModel } from './view.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateViewDto } from './dto/createView.dto'
-import { Error, QueryOptions, Types } from 'mongoose'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { Error, Types } from 'mongoose'
+import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { ViewField, ViewFieldsEnum } from './view.constants'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { VIEW_WITH_CODE_EXISTS, VIEW_WITH_CODE_NOT_FOUND, VIEW_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
@@ -27,28 +27,28 @@ export class ViewService {
     return
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, options?: { fields?: ViewField[]; queryOptions?: QueryOptions }) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<ViewField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
 
     return this.viewModel.findById(
       id,
-      fieldsArrayToProjection(options?.fields),
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     ) as unknown as DocumentType<ViewModel>
   }
 
-  async getByCode(code: string, options?: { fields?: ViewField[]; queryOptions?: QueryOptions }) {
+  async getByCode(code: string, options?: ServiceGetOptions<ViewField>) {
     await this.checkExists({ code }, { error: new BadRequestException(VIEW_WITH_CODE_NOT_FOUND(code)) })
 
     return this.viewModel.findOne(
       { code },
-      fieldsArrayToProjection(options?.fields),
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     ) as unknown as DocumentType<ViewModel>
   }
 
-  async getByUserId(userId: Types.ObjectId | MongoIdString, options?: { fields?: ViewField[]; queryOptions?: QueryOptions }) {
+  async getByUserId(userId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<ViewField>) {
     const user = await this.userService.getById(userId, {
       queryOptions: {
         populate: [

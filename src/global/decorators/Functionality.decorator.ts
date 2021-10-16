@@ -11,6 +11,7 @@ import { RoleJwtAuthGuard } from '../../modules/role/roleJwtAuth.guard'
 import { UserJwtAuthGuard } from '../../modules/user/userJwtAuth.guard'
 import { InterfaceJwtAuthGuard } from '../../modules/interface/interfaceJwtAuth.guard'
 import { FunctionalityJwtAuthGuard } from '../../modules/functionality/functionalityJwtAuth.guard'
+import { ViewJwtAuthGuard } from '../../modules/view/viewJwtAuth.guard'
 
 interface FunctionalityDecoratorOptions extends RegisterFunctionality {}
 
@@ -61,6 +62,12 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
       return InterfaceJwtAuthGuard
     case FunctionalityCodesEnum.FUNCTIONALITIES__GET:
       return FunctionalityJwtAuthGuard
+    case FunctionalityCodesEnum.VIEW__CREATE:
+    case FunctionalityCodesEnum.VIEW__GET_BY_CODE:
+    case FunctionalityCodesEnum.VIEW__GET_BY_USER_ID:
+    case FunctionalityCodesEnum.VIEW__UPDATE:
+    case FunctionalityCodesEnum.VIEW__DELETE:
+      return ViewJwtAuthGuard
     default:
       return BaseJwtAuthGuard
   }
