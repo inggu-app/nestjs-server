@@ -1,16 +1,11 @@
-import { IsArray, IsEnum, IsObject, IsString } from 'class-validator'
-import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
+import { IsNotEmpty, IsString } from 'class-validator'
 
 export class CreateRoleDto {
   @IsString()
+  @IsNotEmpty()
   title: string
 
-  @IsArray()
-  @IsEnum(FunctionalityCodesEnum, { each: true })
-  available: FunctionalityCodesEnum[]
-
-  @IsObject()
-  roleFields: {
-    [key: string]: any
-  }
+  @IsString()
+  @IsNotEmpty()
+  code: string
 }

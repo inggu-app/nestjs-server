@@ -23,7 +23,7 @@ export class RoleService {
   ) {}
 
   async create(dto: CreateRoleDto) {
-    await this.checkExists({ title: dto.title }, new BadRequestException(ROLE_WITH_TITLE_EXISTS(dto.title)), false)
+    await this.checkExists({ title: dto.title, code: dto.code }, new BadRequestException(ROLE_WITH_TITLE_EXISTS(dto.title)), false)
     await this.roleModel.create(dto)
 
     return
