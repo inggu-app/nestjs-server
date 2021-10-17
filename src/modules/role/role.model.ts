@@ -19,6 +19,9 @@ export class RoleModel extends TimeStamps implements Role {
   @prop()
   title: string
 
+  @prop()
+  code: string
+
   @prop({ default: [], ref: () => ViewModel })
   views: Ref<ViewModel, Types.ObjectId>[]
 

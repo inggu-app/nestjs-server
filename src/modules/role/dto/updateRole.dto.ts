@@ -11,6 +11,10 @@ export class UpdateRoleDto implements UpdateRoleDtoType {
   title?: string
 
   @IsOptional()
+  @IsString()
+  code?: string
+
+  @IsOptional()
   @IsArray()
   @IsEnum(FunctionalityCodesEnum, { each: true })
   available?: FunctionalityCodesEnum[]
@@ -34,6 +38,7 @@ export type UpdateRoleDtoType = {
 export enum UpdateRoleDtoKeysEnum {
   id = 'id',
   title = 'title',
+  code = 'code',
   available = 'available',
   roleFields = 'roleFields',
   views = 'views',

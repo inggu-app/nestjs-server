@@ -24,6 +24,8 @@ export enum RoleGetQueryParametersEnum {
 
 export enum RoleFieldsEnum {
   title = 'title',
+  code = 'code',
+  views = 'views',
   available = 'available',
   roleFields = 'roleFields',
 }

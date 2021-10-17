@@ -65,13 +65,13 @@ export class RoleService {
   }
 
   async update(dto: UpdateRoleDto) {
-    await this.checkExists({ _id: dto.id })
+    await this.checkExists({ code: dto.code })
 
     if (dto.views) {
       for await (const viewId of dto.views) await this.viewService.checkExists({ _id: viewId })
     }
     if (dto.available) {
-      for await (const functionalityCode of dto.available) await this.functionalityService.checkExists({ code: functionalityCode })
+      for (const functionalityCode of dto.available) this.functionalityService.checkExists({ code: functionalityCode })
     }
 
     await this.roleModel.updateOne({ _id: dto.id }, { $set: dto })
