@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { Types } from 'mongoose'
@@ -11,6 +11,7 @@ import {
   defaultGroupDeleteData,
   defaultGroupGetByFacultyIdData,
   defaultGroupGetByGroupIdData,
+  defaultGroupGetByGroupIdsData,
   defaultGroupGetByUserIdData,
   defaultGroupGetManyData,
   defaultGroupUpdateData,
@@ -52,13 +53,25 @@ export class GroupController {
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID,
     default: defaultGroupGetByGroupIdData,
-    title: 'Запросить одну группу',
+    title: 'Запросить одну группу по id',
   })
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
   async getByGroupId(@MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId, @GetGroupFields() fields?: GroupField[]) {
     return normalizeFields(await this.groupService.getById(groupId, { fields }), { fields })
   }
 
+  @Functionality({
+    code: FunctionalityCodesEnum.GROUP__GET_BY_GROUP_IDS,
+    default: defaultGroupGetByGroupIdsData,
+    title: 'Запросить список групп по списку id',
+  })
+  @Get(GroupRoutesEnum.GET_BY_GROUP_IDS)
+  async getByGroupIds(
+    @MongoId(GroupGetQueryParametersEnum.GROUP_IDS, { multiple: true }) groupIds: Types.ObjectId[],
+    @GetGroupFields() fields?: GroupField[]
+  ) {
+    return normalizeFields(await this.groupService.getByGroupIds(groupIds, { fields }), { fields })
+  }
   @Functionality({
     code: FunctionalityCodesEnum.GROUP__GET_BY_USER_ID,
     default: defaultGroupGetByUserIdData,

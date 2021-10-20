@@ -15,6 +15,7 @@ export enum GetGroupsEnum {
 export enum GroupRoutesEnum {
   CREATE = '/',
   GET_BY_GROUP_ID = '/by-group-id',
+  GET_BY_GROUP_IDS = '/by-group-ids',
   GET_BY_USER_ID = '/by-user-id',
   GET_BY_FACULTY_ID = '/by-faculty-id',
   GET_MANY = '/many',
@@ -24,6 +25,7 @@ export enum GroupRoutesEnum {
 
 export enum GroupGetQueryParametersEnum {
   GROUP_ID = 'groupId',
+  GROUP_IDS = 'groupIds',
   USER_ID = 'userId',
   FACULTY_ID = 'facultyId',
   PAGE = 'page',
@@ -66,6 +68,21 @@ export interface GroupGetByGroupIdDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
 export const defaultGroupGetByGroupIdData: FunctionalityDefault<GroupGetByGroupIdDataForFunctionality> = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableGroups: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+}
+
+export interface GroupGetByGroupIdsDataForFunctionality {
+  availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, группы которых может получить пользователь
+  availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь
+  forbiddenFaculties: MongoIdString[] // id факультетов, группы которых пользователь получить НЕ может
+  availableGroups: MongoIdString[] // id отдельных групп, которые может получить пользователь
+  forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
+}
+export const defaultGroupGetByGroupIdsData: FunctionalityDefault<GroupGetByGroupIdsDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
   availableFaculties: TypesEnum.MONGO_ID_ARRAY,
   forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,

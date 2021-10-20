@@ -27,6 +27,6 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 })
 export class GroupModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(GroupGetRoutesMiddleware).forRoutes(ModuleRoutesEnum.GROUP_MODULE, { path: '/', method: RequestMethod.GET })
+    consumer.apply(GroupGetRoutesMiddleware).forRoutes({ path: ModuleRoutesEnum.GROUP_MODULE, method: RequestMethod.GET })
   }
 }

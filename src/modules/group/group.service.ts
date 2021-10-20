@@ -5,7 +5,13 @@ import { ModelType } from '@typegoose/typegoose/lib/types'
 import { DocumentType } from '@typegoose/typegoose'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { Error, FilterQuery, Types } from 'mongoose'
-import { GroupField, GroupFieldsEnum, GroupGetByFacultyIdDataForFunctionality, GroupGetManyDataForFunctionality } from './group.constants'
+import {
+  GroupField,
+  GroupFieldsEnum,
+  GroupGetByFacultyIdDataForFunctionality,
+  GroupGetByGroupIdsDataForFunctionality,
+  GroupGetManyDataForFunctionality,
+} from './group.constants'
 import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
@@ -46,6 +52,32 @@ export class GroupService {
     }
 
     return candidate
+  }
+
+  async getByGroupIds(
+    groupIds: MongoIdString[] | Types.ObjectId[],
+    options?: ServiceGetOptions<GroupField, GroupGetByGroupIdsDataForFunctionality>
+  ) {
+    groupIds = groupIds.map(stringToObjectId)
+    await this.checkExists(groupIds.map(id => ({ _id: id })))
+    const filter: FilterQuery<DocumentType<GroupModel>> = { _id: { $in: groupIds } }
+    if (options?.functionality) {
+      filter._id = { $in: groupIds, $nin: options.functionality.data.forbiddenGroups }
+      filter.faculty = { $nin: options.functionality.data.forbiddenFaculties }
+      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = {
+          $in: groupIds.filter(id => options.functionality?.data.availableGroups.includes(id.toString())),
+          $nin: options.functionality.data.forbiddenGroups,
+        }
+        filter.faculty = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
+      }
+    }
+
+    return this.groupModel.find(
+      filter,
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+      options?.queryOptions
+    )
   }
 
   getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<GroupField, GroupGetManyDataForFunctionality>) {

@@ -18,6 +18,7 @@ export default function checkAlternativeQueryParameters<T>(
 
   parameterObjects.forEach(parameterObject => {
     const parameterObjectsNotEmptyKeys = getAllNotEmptyKeys([parameterObject])
+    console.log(parameterObjectsNotEmptyKeys, allNotEmptyKeys)
 
     let isIn = true
     allNotEmptyKeys.forEach(key => {
