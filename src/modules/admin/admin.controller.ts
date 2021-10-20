@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 
 import { OwnerJwtAuthGuard } from '../../global/guards/ownerJwtAuth.guard'
 import { AdminService } from './admin.service'
@@ -7,11 +7,6 @@ import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { Types } from 'mongoose'
 import { UpdateAdminDto } from './dto/updateAdmin.dto'
 import { LoginAdminDto } from './dto/loginAdmin.dto'
-import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
-import { AdminAdditionalFieldsEnum, AdminField, AdminFieldsEnum, AdminForbiddenFieldsEnum, GetAdminsEnum } from './admin.constants'
-import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
-import normalizeFields from '../../global/utils/normalizeFields'
 
 @Controller()
 export class AdminController {
@@ -24,41 +19,41 @@ export class AdminController {
     return this.adminService.create(dto)
   }
 
-  @UseGuards(OwnerJwtAuthGuard)
-  @Get('/')
-  async get(
-    @Query('adminId', new ParseMongoIdPipe({ required: false })) adminId?: Types.ObjectId,
-    @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
-    @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
-    @Query('name') name?: number,
-    @Query(
-      'fields',
-      new ParseFieldsPipe({
-        fieldsEnum: AdminFieldsEnum,
-        additionalFieldsEnum: AdminAdditionalFieldsEnum,
-        forbiddenFieldsEnum: AdminForbiddenFieldsEnum,
-      })
-    )
-    fields?: AdminField[]
-  ) {
-    const request = checkAlternativeQueryParameters<GetAdminsEnum>(
-      { required: { adminId }, fields, enum: GetAdminsEnum.adminId },
-      { required: { page, count }, name, fields, enum: GetAdminsEnum.all }
-    )
-
-    switch (request.enum) {
-      case GetAdminsEnum.adminId:
-        return normalizeFields(await this.adminService.getById(request.adminId, request.fields), {
-          fields: request.fields,
-          forbiddenFields: AdminForbiddenFieldsEnum,
-        })
-      case GetAdminsEnum.all:
-        return normalizeFields(await this.adminService.getAll(request.page, request.count, request.name, request.fields), {
-          fields: request.fields,
-          forbiddenFields: AdminForbiddenFieldsEnum,
-        })
-    }
-  }
+  // @UseGuards(OwnerJwtAuthGuard)
+  // @Get('/')
+  // async get(
+  //   @Query('adminId', new ParseMongoIdPipe({ required: false })) adminId?: Types.ObjectId,
+  //   @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
+  //   @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
+  //   @Query('name') name?: number,
+  //   @Query(
+  //     'fields',
+  //     new ParseFieldsPipe({
+  //       fieldsEnum: AdminFieldsEnum,
+  //       additionalFieldsEnum: AdminAdditionalFieldsEnum,
+  //       forbiddenFieldsEnum: AdminForbiddenFieldsEnum,
+  //     })
+  //   )
+  //   fields?: AdminField[]
+  // ) {
+  //   const request = checkAlternativeQueryParameters<GetAdminsEnum>(
+  //     { required: { adminId }, fields, enum: GetAdminsEnum.adminId },
+  //     { required: { page, count }, name, fields, enum: GetAdminsEnum.all }
+  //   )
+  //
+  //   switch (request.enum) {
+  //     case GetAdminsEnum.adminId:
+  //       return normalizeFields(await this.adminService.getById(request.adminId, request.fields), {
+  //         fields: request.fields,
+  //         forbiddenFields: AdminForbiddenFieldsEnum,
+  //       })
+  //     case GetAdminsEnum.all:
+  //       return normalizeFields(await this.adminService.getAll(request.page, request.count, request.name, request.fields), {
+  //         fields: request.fields,
+  //         forbiddenFields: AdminForbiddenFieldsEnum,
+  //       })
+  //   }
+  // }
 
   @UseGuards(OwnerJwtAuthGuard)
   @Patch('/reset-password')

@@ -3,7 +3,12 @@ import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FacultyField, FacultyFieldsEnum, FacultyGetManyDataForFunctionality } from './faculty.constants'
+import {
+  FacultyField,
+  FacultyFieldsEnum,
+  FacultyGetByFacultyIdsDataForFunctionality,
+  FacultyGetManyDataForFunctionality,
+} from './faculty.constants'
 import { Error, FilterQuery, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
@@ -38,6 +43,31 @@ export class FacultyService {
     }
 
     return candidate
+  }
+
+  async getByIds(
+    facultyIds: Types.ObjectId[] | MongoIdString[],
+    options?: ServiceGetOptions<FacultyField, FacultyGetByFacultyIdsDataForFunctionality>
+  ) {
+    facultyIds = facultyIds.map(stringToObjectId)
+    await this.checkExists(facultyIds.map(id => ({ _id: id })))
+
+    const filter: FilterQuery<DocumentType<FacultyModel>> = { _id: { $in: facultyIds } }
+    if (options?.functionality) {
+      filter._id = { $in: facultyIds, $nin: options.functionality.data.forbiddenFaculties }
+      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = {
+          $in: facultyIds.filter(id => options.functionality?.data.availableFaculties.includes(id.toString())),
+          $nin: options.functionality.data.forbiddenFaculties,
+        }
+      }
+    }
+
+    return this.facultyModel.find(
+      filter,
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+      options?.queryOptions
+    )
   }
 
   getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<FacultyField, FacultyGetManyDataForFunctionality>) {

@@ -12,6 +12,7 @@ export class FacultyGetRoutesMiddleware implements NestMiddleware {
 
     const request = checkAlternativeQueryParameters<FacultyRoutesEnum>(
       { required: { facultyId: query.facultyId }, fields: query.fields, enum: FacultyRoutesEnum.GET_BY_FACULTY_ID },
+      { required: { facultyIds: query.facultyIds }, fields: query.fields, enum: FacultyRoutesEnum.GET_BY_FACULTY_IDS },
       { required: { page: query.page, count: query.count }, title: query.title, fields: query.fields, enum: FacultyRoutesEnum.GET_MANY }
     )
 
@@ -19,6 +20,9 @@ export class FacultyGetRoutesMiddleware implements NestMiddleware {
     switch (request.enum) {
       case FacultyRoutesEnum.GET_BY_FACULTY_ID:
         req.url = `${start}${FacultyRoutesEnum.GET_BY_FACULTY_ID}?${queryStr}`
+        break
+      case FacultyRoutesEnum.GET_BY_FACULTY_IDS:
+        req.url = `${start}${FacultyRoutesEnum.GET_BY_FACULTY_IDS}?${queryStr}`
         break
       case FacultyRoutesEnum.GET_MANY:
         req.url = `${start}${FacultyRoutesEnum.GET_MANY}?${queryStr}`

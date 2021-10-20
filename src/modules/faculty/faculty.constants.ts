@@ -8,6 +8,7 @@ import { FunctionalityDefault } from '../functionality/functionality.constants'
 export enum FacultyRoutesEnum {
   CREATE = '/',
   GET_BY_FACULTY_ID = '/by-faculty-id',
+  GET_BY_FACULTY_IDS = '/by-faculty-ids',
   GET_MANY = '/many',
   UPDATE = '/',
   DELETE = '/',
@@ -15,6 +16,7 @@ export enum FacultyRoutesEnum {
 
 export enum FacultyGetQueryParametersEnum {
   FACULTY_ID = 'facultyId',
+  FACULTY_IDS = 'facultyIds',
   PAGE = 'page',
   COUNT = 'count',
   TITLE = 'title',
@@ -40,6 +42,17 @@ export interface FacultyGetByFacultyIdDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
 export const defaultFacultyGetByFacultyIdData: FunctionalityDefault<FacultyGetByFacultyIdDataForFunctionality> = {
+  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
+  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
+  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+}
+
+export interface FacultyGetByFacultyIdsDataForFunctionality {
+  availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетов, которые пользователь может получить
+  availableFaculties: MongoIdString[] // id факультетов, которые может получить пользователь
+  forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
+}
+export const defaultFacultyGetByFacultyIdsData: FunctionalityDefault<FacultyGetByFacultyIdsDataForFunctionality> = {
   availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
   availableFaculties: TypesEnum.MONGO_ID_ARRAY,
   forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,

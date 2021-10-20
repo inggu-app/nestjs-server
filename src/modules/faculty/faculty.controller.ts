@@ -9,6 +9,7 @@ import {
   defaultFacultyCreateData,
   defaultFacultyDeleteData,
   defaultFacultyGetByFacultyIdData,
+  defaultFacultyGetByFacultyIdsData,
   defaultFacultyGetManyData,
   defaultFacultyUpdateData,
   FacultyAdditionalFieldsEnum,
@@ -51,6 +52,19 @@ export class FacultyController {
     @GetFacultyFields() fields?: FacultyField[]
   ) {
     return normalizeFields(await this.facultyService.getById(facultyId, { fields }), { fields })
+  }
+
+  @Functionality({
+    code: FunctionalityCodesEnum.FACULTY__GET_BY_FACULTY_IDS,
+    default: defaultFacultyGetByFacultyIdsData,
+    title: 'Получить список факультетов по списку id',
+  })
+  @Get(FacultyRoutesEnum.GET_BY_FACULTY_IDS)
+  async getByFacultyIds(
+    @MongoId(FacultyGetQueryParametersEnum.FACULTY_IDS, { multiple: true }) facultyIds: Types.ObjectId[],
+    @GetFacultyFields() fields?: FacultyField[]
+  ) {
+    return normalizeFields(await this.facultyService.getByIds(facultyIds, { fields }), { fields })
   }
 
   @Functionality({

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/co
 import {
   FIELDS_QUERY_PARAMETER_IS_EMPTY,
   NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER,
-  UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER,
+  UNNECESSARY_SYMBOLS_IN_QUERY_PARAMETER,
 } from '../constants/errors.constants'
 import { objectKeys } from '../utils/objectKeys'
 
@@ -39,7 +39,7 @@ export class ParseFieldsPipe implements PipeTransform<any, string[] | undefined>
     const unnecessarySymbols = value.replace(/([a-zA-Z0-9,_])+/g, '')
 
     if (unnecessarySymbols) {
-      throw new HttpException(UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER(unnecessarySymbols), HttpStatus.BAD_REQUEST)
+      throw new HttpException(UNNECESSARY_SYMBOLS_IN_QUERY_PARAMETER('fields', unnecessarySymbols), HttpStatus.BAD_REQUEST)
     }
 
     const receivedFields = value.split(',')

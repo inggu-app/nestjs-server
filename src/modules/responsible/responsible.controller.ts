@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, NotFoundException, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { ResponsibleService } from './responsible.service'
 import { CreateResponsibleDto } from './dto/createResponsible.dto'
 import { Types } from 'mongoose'
@@ -7,17 +7,6 @@ import { LoginResponsibleDto } from './dto/loginResponsible.dto'
 import { ParseMongoIdPipe } from '../../global/pipes/mongoId.pipe'
 import { GroupService } from '../group/group.service'
 import { AdminJwtAuthGuard } from '../../global/guards/adminJwtAuth.guard'
-import checkAlternativeQueryParameters from '../../global/utils/alternativeQueryParameters'
-import { ParseFieldsPipe } from '../../global/pipes/fields.pipe'
-import {
-  GetResponsibleEnum,
-  ResponsibleAdditionalFieldsEnum,
-  ResponsibleField,
-  ResponsibleFieldsEnum,
-  ResponsibleForbiddenFieldsEnum,
-} from './responsible.constants'
-import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import normalizeFields from '../../global/utils/normalizeFields'
 import { FacultyService } from '../faculty/faculty.service'
 import { FACULTY_WITH_ID_NOT_FOUND, GROUP_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 
@@ -45,55 +34,55 @@ export class ResponsibleController {
     return this.responsibleService.create(dto)
   }
 
-  @UsePipes(AdminJwtAuthGuard)
-  @Get('/')
-  async get(
-    @Query('responsibleId', new ParseMongoIdPipe({ required: false }))
-    responsibleId?: Types.ObjectId,
-    @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
-    @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
-    @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
-    @Query('name') name?: string,
-    @Query(
-      'fields',
-      new ParseFieldsPipe({
-        fieldsEnum: ResponsibleFieldsEnum,
-        additionalFieldsEnum: ResponsibleAdditionalFieldsEnum,
-        forbiddenFieldsEnum: ResponsibleForbiddenFieldsEnum,
-      })
-    )
-    fields?: ResponsibleField[]
-  ) {
-    const request = checkAlternativeQueryParameters<GetResponsibleEnum>(
-      { required: { responsibleId }, fields, enum: GetResponsibleEnum.responsibleId },
-      { required: { groupId }, page, count, name, fields, enum: GetResponsibleEnum.groupId },
-      { required: { page, count }, name, fields, enum: GetResponsibleEnum.all }
-    )
-
-    switch (request.enum) {
-      case GetResponsibleEnum.responsibleId:
-        return normalizeFields(await this.responsibleService.getById(request.responsibleId, request.fields), {
-          fields: request.fields,
-          forbiddenFields: ResponsibleForbiddenFieldsEnum,
-        })
-      case GetResponsibleEnum.groupId:
-        return {
-          responsibles: normalizeFields(
-            await this.responsibleService.getAllByGroup(request.groupId, request.page, request.count, request.fields),
-            { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
-          ),
-          count: await this.responsibleService.countByGroup(request.groupId),
-        }
-      case GetResponsibleEnum.all:
-        return {
-          responsibles: normalizeFields(await this.responsibleService.getAll(request.page, request.count, request.name, request.fields), {
-            fields: request.fields,
-            forbiddenFields: ResponsibleForbiddenFieldsEnum,
-          }),
-          count: await this.responsibleService.countByName(request.name),
-        }
-    }
-  }
+  // @UsePipes(AdminJwtAuthGuard)
+  // @Get('/')
+  // async get(
+  //   @Query('responsibleId', new ParseMongoIdPipe({ required: false }))
+  //   responsibleId?: Types.ObjectId,
+  //   @Query('groupId', new ParseMongoIdPipe({ required: false })) groupId?: Types.ObjectId,
+  //   @Query('page', new CustomParseIntPipe({ required: false })) page?: number,
+  //   @Query('count', new CustomParseIntPipe({ required: false })) count?: number,
+  //   @Query('name') name?: string,
+  //   @Query(
+  //     'fields',
+  //     new ParseFieldsPipe({
+  //       fieldsEnum: ResponsibleFieldsEnum,
+  //       additionalFieldsEnum: ResponsibleAdditionalFieldsEnum,
+  //       forbiddenFieldsEnum: ResponsibleForbiddenFieldsEnum,
+  //     })
+  //   )
+  //   fields?: ResponsibleField[]
+  // ) {
+  //   const request = checkAlternativeQueryParameters<GetResponsibleEnum>(
+  //     { required: { responsibleId }, fields, enum: GetResponsibleEnum.responsibleId },
+  //     { required: { groupId }, page, count, name, fields, enum: GetResponsibleEnum.groupId },
+  //     { required: { page, count }, name, fields, enum: GetResponsibleEnum.all }
+  //   )
+  //
+  //   switch (request.enum) {
+  //     case GetResponsibleEnum.responsibleId:
+  //       return normalizeFields(await this.responsibleService.getById(request.responsibleId, request.fields), {
+  //         fields: request.fields,
+  //         forbiddenFields: ResponsibleForbiddenFieldsEnum,
+  //       })
+  //     case GetResponsibleEnum.groupId:
+  //       return {
+  //         responsibles: normalizeFields(
+  //           await this.responsibleService.getAllByGroup(request.groupId, request.page, request.count, request.fields),
+  //           { fields: request.fields, forbiddenFields: ResponsibleForbiddenFieldsEnum }
+  //         ),
+  //         count: await this.responsibleService.countByGroup(request.groupId),
+  //       }
+  //     case GetResponsibleEnum.all:
+  //       return {
+  //         responsibles: normalizeFields(await this.responsibleService.getAll(request.page, request.count, request.name, request.fields), {
+  //           fields: request.fields,
+  //           forbiddenFields: ResponsibleForbiddenFieldsEnum,
+  //         }),
+  //         count: await this.responsibleService.countByName(request.name),
+  //       }
+  //   }
+  // }
 
   @UseGuards(AdminJwtAuthGuard)
   @Patch('/reset-password')

@@ -12,8 +12,8 @@ export const INCORRECT_CREDENTIALS = 'Неправильные логин или
 export const INCORRECT_INT = 'Некорректное значение целого числа'
 export const INCORRECT_STRING = 'Некорректное значение строки'
 export const FIELDS_QUERY_PARAMETER_IS_EMPTY = 'Поле fields не должно быть пустым'
-export const UNNECESSARY_SYMBOLS_IN_FIELDS_QUERY_PARAMETER = (symbols: string) =>
-  `В значении query-параметра fields обнаружены лишние символы - ${symbols}`
+export const UNNECESSARY_SYMBOLS_IN_QUERY_PARAMETER = (parameter: string, symbols: string) =>
+  `В значении query-параметра ${parameter} обнаружены лишние символы - ${symbols}`
 export const NOT_EXISTS_FIELD_IN_FIELDS_QUERY_PARAMETER = (field: string, availableFields: string[]) =>
   `Поле "${field}" не существует. Доступные поля: ${availableFields.join(', ')}`
 export const INCORRECT_FIELDS_SET_IN_FIELDS_QUERY_PARAMETER = 'Набор таких параметров не найден. Проверьте документацию'
