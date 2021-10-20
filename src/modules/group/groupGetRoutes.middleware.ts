@@ -14,7 +14,7 @@ export class GroupGetRoutesMiddleware implements NestMiddleware {
       { required: { groupId: query.groupId }, fields: query.fields, enum: GroupRoutesEnum.GET_BY_GROUP_ID },
       { required: { groupIds: query.groupIds }, fields: query.fields, enum: GroupRoutesEnum.GET_BY_GROUP_IDS },
       { required: { userId: query.userId }, fields: query.fields, enum: GroupRoutesEnum.GET_BY_USER_ID },
-      { required: { facultyId: query.facultyId }, fields: query.count, enum: GroupRoutesEnum.GET_BY_FACULTY_ID },
+      { required: { facultyId: query.facultyId }, fields: query.fields, enum: GroupRoutesEnum.GET_BY_FACULTY_ID },
       { required: { page: query.page, count: query.count }, title: query.title, fields: query.fields, enum: GroupRoutesEnum.GET_MANY }
     )
 
