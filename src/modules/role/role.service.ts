@@ -4,7 +4,7 @@ import { RoleModel } from './role.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { Error, FilterQuery, Types } from 'mongoose'
-import { ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
+import { ROLE_INCORRECT_FIELD_TYPE, ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { RoleField, RoleFieldsEnum, RoleGetManyDataForFunctionality } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
@@ -13,6 +13,9 @@ import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { ViewService } from '../view/view.service'
 import { FunctionalityService } from '../functionality/functionality.service'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
+import { objectKeys } from '../../global/utils/objectKeys'
+import { isEnum } from 'class-validator'
+import { TypesEnum } from '../../global/enums/types.enum'
 
 @Injectable()
 export class RoleService {
@@ -65,7 +68,7 @@ export class RoleService {
   }
 
   async update(dto: UpdateRoleDto) {
-    await this.checkExists({ code: dto.code })
+    await this.checkExists({ _id: dto.id })
 
     if (dto.views) {
       for await (const viewId of dto.views) await this.viewService.checkExists({ _id: viewId })
@@ -73,6 +76,11 @@ export class RoleService {
     if (dto.available) {
       for (const functionalityCode of dto.available) this.functionalityService.checkExists({ code: functionalityCode })
     }
+
+    if (dto.roleFields)
+      for (const field of objectKeys(dto.roleFields)) {
+        if (!isEnum(dto.roleFields[field], TypesEnum)) throw new BadRequestException(ROLE_INCORRECT_FIELD_TYPE(field))
+      }
 
     await this.roleModel.updateOne({ _id: dto.id }, { $set: dto })
   }

@@ -140,14 +140,17 @@ export class UserService {
         const missingFields = difference(objectKeys(functionality.default), objectKeys(f.data))
         if (missingFields.length) throw new BadRequestException(FUNCTIONALITY_MISSING_FIELDS(f.code, missingFields))
         objectKeys(f.data).forEach(field => {
+          console.log(field, f.data[field], functionality.default[field])
           if (
             functionality.default[field] === FunctionalityAvailableTypeEnum.ALL ||
             functionality.default[field] === FunctionalityAvailableTypeEnum.CUSTOM
           ) {
+            console.log(f.data[field], functionality.default[field])
             if (f.data[field] !== FunctionalityAvailableTypeEnum.ALL && f.data[field] !== FunctionalityAvailableTypeEnum.CUSTOM)
               throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
-          } else if (!checkTypes(f.data[field], functionality.default[field] as TypesEnum))
+          } else if (!checkTypes(f.data[field], functionality.default[field] as TypesEnum)) {
             throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+          }
         })
       }
     }

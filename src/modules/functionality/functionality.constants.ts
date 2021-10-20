@@ -8,7 +8,7 @@ export enum FunctionalityRoutesEnum {
 
 export interface RegisterFunctionality {
   code: FunctionalityCodesEnum
-  default: FunctionalityDefault<{ [key: string]: any }>
+  default: FunctionalityDefault<{ [key: string]: TypesEnum }>
   title: string
 }
 

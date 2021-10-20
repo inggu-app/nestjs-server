@@ -28,7 +28,7 @@ export class RoleModel extends TimeStamps implements Role {
   @prop()
   available: FunctionalityCodesEnum[]
 
-  @prop()
+  @prop({ default: {} })
   roleFields: {
     [key: string]: TypesEnum
   }
