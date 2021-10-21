@@ -53,7 +53,7 @@ export class ScheduleService {
 
   async delete(groupId: Types.ObjectId | MongoIdString, ids?: Types.ObjectId[]) {
     groupId = stringToObjectId(groupId)
-    await this.lessonModel.deleteMany(ids ? { groupId, _id: { $in: ids } } : { groupId }).exec()
+    await this.lessonModel.deleteMany(ids ? { group: groupId, _id: { $in: ids } } : { groupId }).exec()
   }
 
   async checkExists(
