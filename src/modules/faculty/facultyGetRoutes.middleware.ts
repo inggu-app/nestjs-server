@@ -28,7 +28,7 @@ export class FacultyGetRoutesMiddleware implements NestMiddleware {
         req.url = `${start}${FacultyRoutesEnum.GET_MANY}?${queryStr}`
         break
     }
-    console.log(req.url)
+
     next()
   }
 }

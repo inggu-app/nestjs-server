@@ -26,6 +26,7 @@ import { Request } from 'express'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { ConfigService } from '@nestjs/config'
+import { isMongoId } from 'class-validator'
 
 @Injectable()
 export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
@@ -59,7 +60,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         castedFunctionality = functionality as AvailableFunctionality<GroupGetByGroupIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(GroupGetQueryParametersEnum), request.url)
-        if (!queryParams.groupId) return true
+        if (!queryParams.groupId || !isMongoId(queryParams.groupId)) return true
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.groupId)) break
         if (castedFunctionality.data.availableGroups.includes(queryParams.groupId)) return true
         currentGroup = await this.groupService.getById(queryParams.groupId, { fields: ['faculty'] })
@@ -71,7 +72,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         castedFunctionality = functionality as AvailableFunctionality<GroupGetByUserIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(GroupGetQueryParametersEnum), request.url)
-        if (!queryParams.userId) return true
+        if (!queryParams.userId || !isMongoId(queryParams.userId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
         if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true
@@ -80,7 +81,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         castedFunctionality = functionality as AvailableFunctionality<GroupGetByFacultyIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(GroupGetQueryParametersEnum), request.url)
-        if (!queryParams.facultyId) return true
+        if (!queryParams.facultyId || !isMongoId(queryParams.facultyId)) return true
         if (castedFunctionality.data.forbiddenFaculties.includes(queryParams.facultyId)) break
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableFaculties.includes(queryParams.facultyId)) return true
@@ -110,7 +111,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         castedFunctionality = functionality as AvailableFunctionality<GroupDeleteDataForFunctionality>
 
         queryParams = parseRequestQueries(['groupId'], request.url)
-        if (!queryParams.groupId) return true
+        if (!queryParams.groupId || !isMongoId(queryParams.groupId)) return true
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.groupId)) break
         if (castedFunctionality.data.availableGroups.includes(queryParams.groupId)) return true
         currentGroup = await this.groupService.getById(queryParams.groupId, { fields: ['faculty'] })

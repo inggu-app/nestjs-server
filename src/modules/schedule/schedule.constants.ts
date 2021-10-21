@@ -16,10 +16,6 @@ export enum ScheduleGetQueryParametersEnum {
   FIELDS = 'fields',
 }
 
-export enum GetScheduleEnum {
-  groupId,
-}
-
 export enum LessonFieldsEnum {
   title = 'title',
   teacher = 'teacher',
@@ -52,6 +48,7 @@ export enum WeeksTypeEnum {
   WEEKS,
   FIRST,
   SECOND,
+  ALL,
 }
 
 export interface ScheduleCreateDataForFunctionality {

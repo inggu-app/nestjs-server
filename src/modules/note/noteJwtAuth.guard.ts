@@ -23,6 +23,7 @@ import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ConfigService } from '@nestjs/config'
 import { GroupModel } from '../group/group.model'
+import { isMongoId } from 'class-validator'
 
 export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   constructor(
@@ -57,7 +58,7 @@ export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
       case FunctionalityCodesEnum.NOTE__GET_BY_NOTE_ID:
         castedFunctionality = functionality as AvailableFunctionality<NoteGetByNoteIdDataForFunctionality>
         queryParams = parseRequestQueries(getEnumValues(NoteGetQueryParametersEnum), request.url)
-        if (!queryParams.noteId) return true
+        if (!queryParams.noteId || !isMongoId(queryParams.noteId)) return true
         note = await this.noteService.getById(queryParams.noteId, { fields: ['lesson'] })
         lesson = await this.scheduleService.getById(note.lesson, { fields: ['group'] })
         if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.toString())) break
@@ -68,7 +69,7 @@ export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         castedFunctionality = functionality as AvailableFunctionality<NoteGetByLessonIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(NoteGetQueryParametersEnum), request.url)
-        if (!queryParams.lessonId) return true
+        if (!queryParams.lessonId || !isMongoId(queryParams.lessonId)) return true
         lesson = await this.scheduleService.getById(queryParams.lessonId, { fields: ['group'] })
         if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.toString())) break
         if (castedFunctionality.data.availableGroupsType === FunctionalityAvailableTypeEnum.ALL) return true
@@ -78,7 +79,7 @@ export class NoteJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         castedFunctionality = functionality as AvailableFunctionality<NoteDeleteDataForFunctionality>
 
         queryParams = parseRequestQueries(['noteId'], request.url)
-        if (!queryParams.noteId) return true
+        if (!queryParams.noteId || !isMongoId(queryParams.noteId)) return true
         note = await this.noteService.getById(queryParams.noteId, { fields: ['lesson'] })
         lesson = await this.scheduleService.getById(note.lesson, { fields: ['group'] })
         if (castedFunctionality.data.forbiddenGroups.includes(lesson.group.toString())) break

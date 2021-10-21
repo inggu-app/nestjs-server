@@ -9,6 +9,7 @@ import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ViewGetByUserIdDataForFunctionality, ViewGetQueryParametersEnum } from './view.constants'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
+import { isMongoId } from 'class-validator'
 
 export class ViewJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
@@ -22,7 +23,7 @@ export class ViewJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
       case FunctionalityCodesEnum.VIEW__GET_BY_USER_ID:
         castedFunctionality = functionality as AvailableFunctionality<ViewGetByUserIdDataForFunctionality>
         queryParams = parseRequestQueries(getEnumValues(ViewGetQueryParametersEnum), request.url)
-        if (!queryParams.userId) return true
+        if (!queryParams.userId || !isMongoId(queryParams.userId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
         if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true

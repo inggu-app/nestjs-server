@@ -19,6 +19,7 @@ import { GroupService } from '../group/group.service'
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ConfigService } from '@nestjs/config'
+import { isMongoId } from 'class-validator'
 
 export class ScheduleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   constructor(
@@ -52,7 +53,7 @@ export class ScheduleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGua
         castedFunctionality = functionality as AvailableFunctionality<ScheduleGetByGroupIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(ScheduleGetQueryParametersEnum), request.url)
-        if (!queryParams.groupId) return true
+        if (!queryParams.groupId || !isMongoId(queryParams.groupId)) return true
         if (castedFunctionality.data.forbiddenGroups.includes(queryParams.groupId)) break
         group = await this.groupService.getById(queryParams.groupId, { fields: ['faculty'] })
         if (castedFunctionality.data.forbiddenFaculties.includes(group.faculty.toString())) break

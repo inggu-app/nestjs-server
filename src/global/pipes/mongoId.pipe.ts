@@ -25,8 +25,6 @@ export class ParseMongoIdPipe implements PipeTransform<any, Types.ObjectId | Typ
 
   transform(value: string | undefined): Types.ObjectId | Types.ObjectId[] | undefined {
     if (!this.options.required && value === undefined) return value
-
-    console.log(this.options.multiple, value)
     if (this.options.multiple && value) {
       const unnecessarySymbols = value.replace(/([a-zA-Z0-9,_])+/g, '')
 

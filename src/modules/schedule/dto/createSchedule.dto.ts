@@ -1,4 +1,4 @@
-import { IsArray, IsIn, IsMongoId, IsNumber, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator'
+import { IsArray, IsEnum, IsMongoId, IsNumber, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { WeekDaysEnum } from '../../../global/enums/WeekDays.enum'
 import { LessonFieldsEnum, WeeksTypeEnum } from '../schedule.constants'
@@ -41,18 +41,10 @@ export class Lesson implements LessonType {
   @IsString()
   classroom: string
 
-  @IsIn([
-    WeekDaysEnum.MONDAY,
-    WeekDaysEnum.TUESDAY,
-    WeekDaysEnum.WEDNESDAY,
-    WeekDaysEnum.THURSDAY,
-    WeekDaysEnum.FRIDAY,
-    WeekDaysEnum.SATURDAY,
-    WeekDaysEnum.SUNDAY,
-  ])
+  @IsEnum(WeekDaysEnum)
   weekDay: WeekDaysEnum
 
-  @IsIn([WeeksTypeEnum.WEEKS, WeeksTypeEnum.FIRST, WeeksTypeEnum.SECOND])
+  @IsEnum(WeeksTypeEnum)
   weeksType: WeeksTypeEnum
 
   @IsNumber({}, { each: true })

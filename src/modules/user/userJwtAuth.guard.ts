@@ -18,6 +18,7 @@ import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { UpdateUserDto } from './dto/updateUser.dto'
 import { objectKeys } from '../../global/utils/objectKeys'
 import { Types } from 'mongoose'
+import { isMongoId } from 'class-validator'
 
 export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
@@ -35,7 +36,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         castedFunctionality = functionality as AvailableFunctionality<UserGetByUserIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(UserGetQueryParametersEnum), request.url)
-        if (!queryParams.userId) return true
+        if (!queryParams.userId || !isMongoId(queryParams.userId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
         currentUser = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
         if (
@@ -68,7 +69,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         castedFunctionality = functionality as AvailableFunctionality<UserGetByRoleIdDataForFunctionality>
 
         queryParams = parseRequestQueries(getEnumValues(UserGetQueryParametersEnum), request.url)
-        if (!queryParams.userId || !queryParams.roleId) return true
+        if (!queryParams.userId || !queryParams.roleId || !isMongoId(queryParams.userId) || !isMongoId(queryParams.roleId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
         currentUser = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
         if (
@@ -196,7 +197,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         castedFunctionality = functionality as AvailableFunctionality<UserDeleteDataForFunctionality>
 
         queryParams = parseRequestQueries(['userId'], request.url)
-        if (!queryParams.userId) return true
+        if (!queryParams.userId || !isMongoId(queryParams.userId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
         const user = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
         if (castedFunctionality.data.forbiddenRoles.reduce((acc, role) => !!user.roles.find(r => r.toString() === role), false)) break

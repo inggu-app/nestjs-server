@@ -16,10 +16,10 @@ import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { objectKeys } from '../../global/utils/objectKeys'
+import { isMongoId } from 'class-validator'
 
 export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality, user: DocumentType<UserModel>, request: Request) {
-    console.log(functionality)
     let castedFunctionality
     let queryParams
     let requestBody
@@ -31,7 +31,7 @@ export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
 
         if (castedFunctionality.data.availableRolesType === FunctionalityAvailableTypeEnum.ALL) return true
         queryParams = parseRequestQueries(getEnumValues(RoleGetQueryParametersEnum), request.url)
-        if (!queryParams.roleId) return true
+        if (!queryParams.roleId || !isMongoId(queryParams.roleId)) return true
         if (castedFunctionality.data.availableRoles.includes(queryParams.roleId)) return true
         break
       case FunctionalityCodesEnum.ROLE__GET_MANY:
@@ -73,7 +73,7 @@ export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
 
         if (castedFunctionality.data.availableRolesType === FunctionalityAvailableTypeEnum.ALL) return true
         queryParams = parseRequestQueries(['roleId'], request.url)
-        if (!queryParams.roleId) return true
+        if (!queryParams.roleId || !isMongoId(queryParams.roleId)) return true
         if (castedFunctionality.data.availableRoles.includes(queryParams.roleId)) return true
         break
     }
