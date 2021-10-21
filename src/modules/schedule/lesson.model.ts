@@ -40,7 +40,7 @@ export class LessonModel extends TimeStamps implements Lesson {
   })
   weekDay: number
 
-  @prop({ enum: [WeeksTypeEnum.FIRST, WeeksTypeEnum.SECOND, WeeksTypeEnum.WEEKS] })
+  @prop({ enum: WeeksTypeEnum })
   weeksType: number
 
   @prop({ type: [Number] })
