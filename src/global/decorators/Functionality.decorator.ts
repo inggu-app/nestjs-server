@@ -16,6 +16,7 @@ import { AppVersionJwtAuthGuard } from '../../modules/settings/appVersion/appVer
 import { CallScheduleJwtAuthGuard } from '../../modules/settings/callSchedule/callScheduleJwtAuth.guard'
 import { SecretLabelJwtAuthGuard } from '../../modules/settings/secretLabel/secretLabelJwtAuth.guard'
 import { SemesterStartDateJwtAuthGuard } from '../../modules/settings/semesterStartDate/semesterStartDateJwtAuth.guard'
+import { WeeksCountJwtAuthGuard } from '../../modules/settings/weeksCount/weeksCountJwtAuth.guard'
 
 interface FunctionalityDecoratorOptions extends RegisterFunctionality {}
 
@@ -86,6 +87,9 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
     case FunctionalityCodesEnum.SEMESTER_START_DATE__CREATE:
     case FunctionalityCodesEnum.SEMESTER_START_DATE__GET:
       return SemesterStartDateJwtAuthGuard
+    case FunctionalityCodesEnum.WEEKS_COUNT__CREATE:
+    case FunctionalityCodesEnum.WEEKS_COUNT__GET:
+      return WeeksCountJwtAuthGuard
     default:
       return BaseJwtAuthGuard
   }

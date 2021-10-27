@@ -1,33 +1,43 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { WeeksCountService } from './weeksCount.service'
 import { CreateWeeksCountDto } from './dto/createWeeksCount.dto'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
-import { AdminJwtAuthGuard } from '../../../global/guards/adminJwtAuth.guard'
 import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
-import { GetWeeksCountEnum } from './weeksCount.constants'
+import { defaultWeeksCountCreateData, defaultWeeksCountGetData, WeeksCountRoutesEnum } from './weeksCount.constants'
+import { Functionality } from '../../../global/decorators/Functionality.decorator'
+import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 
 @Controller()
 export class WeeksCountController {
   constructor(private readonly weeksCountService: WeeksCountService) {}
 
-  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.WEEKS_COUNT__CREATE,
+    default: defaultWeeksCountCreateData,
+    title: 'Установить количество недель в семестре',
+  })
+  @Post(WeeksCountRoutesEnum.CREATE)
   async createWeeksCount(@Body() dto: CreateWeeksCountDto) {
     await this.weeksCountService.deleteActiveWeeksCount()
 
     return this.weeksCountService.createWeeksCount(dto)
   }
 
-  @Get('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.WEEKS_COUNT__GET,
+    default: defaultWeeksCountGetData,
+    title: 'Получить количество недель в семестре',
+  })
+  @Get(WeeksCountRoutesEnum.GET)
   async getWeeksCount(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
-    const request = checkAlternativeQueryParameters<GetWeeksCountEnum>({
+    const request = checkAlternativeQueryParameters<WeeksCountRoutesEnum>({
       updatedAt,
-      enum: GetWeeksCountEnum.get,
+      enum: WeeksCountRoutesEnum.GET,
     })
 
     switch (request.enum) {
-      case GetWeeksCountEnum.get:
+      case WeeksCountRoutesEnum.GET:
         const weeksCount = await this.weeksCountService.getActiveWeeksCount()
 
         if ((weeksCount && weeksCount?.updatedAt && request.updatedAt < weeksCount?.updatedAt) || !request.updatedAt) {
