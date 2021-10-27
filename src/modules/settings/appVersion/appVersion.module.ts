@@ -29,6 +29,6 @@ import { ModuleRoutesEnum } from '../../../global/enums/moduleRoutes.enum'
 })
 export class AppVersionModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AppVersionGetRoutesMiddleware).forRoutes({ method: RequestMethod.GET, path: ModuleRoutesEnum.APP_VERSION })
+    consumer.apply(AppVersionGetRoutesMiddleware).forRoutes({ method: RequestMethod.GET, path: ModuleRoutesEnum.APP_VERSION_MODULE })
   }
 }

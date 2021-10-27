@@ -58,6 +58,9 @@ export enum FunctionalityCodesEnum {
 
   CALL_SCHEDULE__CREATE = 'CALL_SCHEDULE__CREATE',
   CALL_SCHEDULE__GET = 'CALL_SCHEDULE__GET',
+
+  SECRET_LABEL__CREATE = 'SECRET_LABEL__CREATE',
+  SECRET_LABEL__GET = 'SECRET_LABEL__GET',
 }
 
 enumKeyValuesMatch(FunctionalityCodesEnum)

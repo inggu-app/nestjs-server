@@ -8,5 +8,10 @@ export enum ModuleRoutesEnum {
   FUNCTIONALITY_MODULE = '/functionalities',
   INTERFACE_MODULE = '/interfaces',
   VIEW_MODULE = '/views',
-  APP_VERSION = '/app-version',
+  SETTINGS_MODULE = '/settings',
+  APP_VERSION_MODULE = '/app-version',
+  CALL_SCHEDULE_MODULE = '/call-schedule',
+  SECRET_LABEL_MODULE = '/secret-label',
+  SEMESTER_START_DATE_MODULE = '/semester-start-date',
+  WEEKS_COUNT_MODULE = '/weeks-count',
 }

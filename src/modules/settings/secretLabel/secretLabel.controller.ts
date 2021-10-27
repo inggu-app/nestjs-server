@@ -1,33 +1,44 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CreateSecretLabelDto } from './dto/createSecretLabel.dto'
 import { SecretLabelService } from './secretLabel.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
-import { AdminJwtAuthGuard } from '../../../global/guards/adminJwtAuth.guard'
 import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
-import { GetSecretLabelEnum } from './secretLabel.constants'
+import { SecretLabelRoutesEnum } from './secretLabel.constants'
+import { Functionality } from '../../../global/decorators/Functionality.decorator'
+import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
+import { defaultCallScheduleCreateData, defaultCallScheduleGetData } from '../callSchedule/callSchedule.constants'
 
 @Controller()
 export class SecretLabelController {
   constructor(private readonly secretLabelService: SecretLabelService) {}
 
-  @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.SECRET_LABEL__CREATE,
+    default: defaultCallScheduleCreateData,
+    title: 'Установить секретную надпись',
+  })
+  @Post(SecretLabelRoutesEnum.CREATE)
   async createSecretLabel(@Body() dto: CreateSecretLabelDto) {
     await this.secretLabelService.deleteActiveSecretLabel()
 
     return this.secretLabelService.createSecretLabel(dto)
   }
 
-  @Get('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.SECRET_LABEL__GET,
+    default: defaultCallScheduleGetData,
+    title: 'Получить секретную надпись',
+  })
+  @Get(SecretLabelRoutesEnum.GET)
   async getSecretLabel(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
-    const request = checkAlternativeQueryParameters<GetSecretLabelEnum>({
+    const request = checkAlternativeQueryParameters<SecretLabelRoutesEnum>({
       updatedAt,
-      enum: GetSecretLabelEnum.get,
+      enum: SecretLabelRoutesEnum.GET,
     })
 
     switch (request.enum) {
-      case GetSecretLabelEnum.get:
+      case SecretLabelRoutesEnum.GET:
         const secretLabel = await this.secretLabelService.getActiveSecretLabel()
 
         if ((secretLabel && secretLabel?.updatedAt && request.updatedAt < secretLabel?.updatedAt) || !request.updatedAt) {

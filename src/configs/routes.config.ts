@@ -64,27 +64,27 @@ export const routesConfig: Routes = [
     module: ViewModule,
   },
   {
-    path: '/settings',
+    path: ModuleRoutesEnum.SETTINGS_MODULE,
     module: SettingsModule,
     children: [
       {
-        path: '/call-schedule',
+        path: ModuleRoutesEnum.CALL_SCHEDULE_MODULE,
         module: CallScheduleModule,
       },
       {
-        path: '/secret-label',
+        path: ModuleRoutesEnum.SECRET_LABEL_MODULE,
         module: SecretLabelModule,
       },
       {
-        path: '/semester-start-date',
+        path: ModuleRoutesEnum.SEMESTER_START_DATE_MODULE,
         module: SemesterStartDateModule,
       },
       {
-        path: '/weeks-count',
+        path: ModuleRoutesEnum.WEEKS_COUNT_MODULE,
         module: WeeksCountModule,
       },
       {
-        path: ModuleRoutesEnum.APP_VERSION,
+        path: ModuleRoutesEnum.APP_VERSION_MODULE,
         module: AppVersionModule,
       },
     ],

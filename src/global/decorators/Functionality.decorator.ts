@@ -14,6 +14,7 @@ import { FunctionalityJwtAuthGuard } from '../../modules/functionality/functiona
 import { ViewJwtAuthGuard } from '../../modules/view/viewJwtAuth.guard'
 import { AppVersionJwtAuthGuard } from '../../modules/settings/appVersion/appVersionJwtAuth.guard'
 import { CallScheduleJwtAuthGuard } from '../../modules/settings/callSchedule/callScheduleJwtAuth.guard'
+import { SecretLabelJwtAuthGuard } from '../../modules/settings/secretLabel/secretLabelJwtAuth.guard'
 
 interface FunctionalityDecoratorOptions extends RegisterFunctionality {}
 
@@ -78,6 +79,9 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
     case FunctionalityCodesEnum.CALL_SCHEDULE__CREATE:
     case FunctionalityCodesEnum.CALL_SCHEDULE__GET:
       return CallScheduleJwtAuthGuard
+    case FunctionalityCodesEnum.SECRET_LABEL__CREATE:
+    case FunctionalityCodesEnum.SECRET_LABEL__GET:
+      return SecretLabelJwtAuthGuard
     default:
       return BaseJwtAuthGuard
   }
