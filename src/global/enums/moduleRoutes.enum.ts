@@ -8,4 +8,5 @@ export enum ModuleRoutesEnum {
   FUNCTIONALITY_MODULE = '/functionalities',
   INTERFACE_MODULE = '/interfaces',
   VIEW_MODULE = '/views',
+  APP_VERSION = '/app-version',
 }

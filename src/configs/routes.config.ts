@@ -84,7 +84,7 @@ export const routesConfig: Routes = [
         module: WeeksCountModule,
       },
       {
-        path: '/app-version',
+        path: ModuleRoutesEnum.APP_VERSION,
         module: AppVersionModule,
       },
     ],

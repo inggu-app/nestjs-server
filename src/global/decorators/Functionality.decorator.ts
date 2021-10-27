@@ -12,6 +12,7 @@ import { UserJwtAuthGuard } from '../../modules/user/userJwtAuth.guard'
 import { InterfaceJwtAuthGuard } from '../../modules/interface/interfaceJwtAuth.guard'
 import { FunctionalityJwtAuthGuard } from '../../modules/functionality/functionalityJwtAuth.guard'
 import { ViewJwtAuthGuard } from '../../modules/view/viewJwtAuth.guard'
+import { AppVersionJwtAuthGuard } from '../../modules/settings/appVersion/appVersionJwtAuth.guard'
 
 interface FunctionalityDecoratorOptions extends RegisterFunctionality {}
 
@@ -68,6 +69,11 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
     case FunctionalityCodesEnum.VIEW__UPDATE:
     case FunctionalityCodesEnum.VIEW__DELETE:
       return ViewJwtAuthGuard
+    case FunctionalityCodesEnum.APP_VERSION__CREATE:
+    case FunctionalityCodesEnum.APP_VERSION__POST_FEATURES:
+    case FunctionalityCodesEnum.APP_VERSION__GET:
+    case FunctionalityCodesEnum.APP_VERSION__DELETE:
+      return AppVersionJwtAuthGuard
     default:
       return BaseJwtAuthGuard
   }

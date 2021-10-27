@@ -1,53 +1,74 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { AppVersionService } from './appVersion.service'
 import { SetFeaturesDto } from './dto/setFeaturesDto'
-import { OSs } from '../../../global/constants/other.constants'
 import { OsPipe } from '../../../global/pipes/os.pipe'
 import { AppVersionPipe } from '../../../global/pipes/appVersion.pipe'
-import { OwnerJwtAuthGuard } from '../../../global/guards/ownerJwtAuth.guard'
-import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
-import { GetAppVersionEnum } from './appVersion.constants'
+import {
+  AppVersionRoutesEnum,
+  defaultAppVersionCheckData,
+  defaultAppVersionCreateData,
+  defaultAppVersionDeleteData,
+  defaultAppVersionGetData,
+  defaultAppVersionPostFeaturesData,
+} from './appVersion.constants'
 import { SetCurrentVersionDto } from './dto/setCurrentVersionDto'
 import { DeleteVersionDto } from './dto/deleteVersionDto'
+import { Functionality } from '../../../global/decorators/Functionality.decorator'
+import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
+import { OperationSystems } from '../../../global/enums/OS.enum'
 
 @Controller()
 export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}
 
-  @UseGuards(OwnerJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Post('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.APP_VERSION__CREATE,
+    default: defaultAppVersionCreateData,
+    title: 'Установить версию приложения',
+  })
+  @Post(AppVersionRoutesEnum.CREATE)
   setCurrentVersion(@Body() dto: SetCurrentVersionDto) {
     return this.appVersionService.setCurrentVersion(dto.os, dto.version)
   }
 
-  @UseGuards(OwnerJwtAuthGuard)
   @UsePipes(new ValidationPipe())
-  @Patch('/')
+  @Functionality({
+    code: FunctionalityCodesEnum.APP_VERSION__POST_FEATURES,
+    default: defaultAppVersionPostFeaturesData,
+    title: 'Установить фичи для версии',
+  })
+  @Patch(AppVersionRoutesEnum.PATCH_FEATURES)
   setFeatures(@Body() dto: SetFeaturesDto) {
     return this.appVersionService.setFeatures(dto.os, dto)
   }
 
-  @Get('/')
-  async get(
-    @Query('os', new OsPipe({ required: false })) os?: typeof OSs[number],
-    @Query('version', new AppVersionPipe({ required: false })) version?: string
-  ) {
-    const request = checkAlternativeQueryParameters<GetAppVersionEnum>(
-      { required: { os, version }, enum: GetAppVersionEnum.check },
-      { required: { os }, enum: GetAppVersionEnum.get }
-    )
-
-    switch (request.enum) {
-      case GetAppVersionEnum.get:
-        return this.appVersionService.getCurrentVersion(request.os)
-      case GetAppVersionEnum.check:
-        return this.appVersionService.get(request.os, request.version)
-    }
+  @Functionality({
+    code: FunctionalityCodesEnum.APP_VERSION__CHECK,
+    default: defaultAppVersionCheckData,
+    title: 'Проверить версию приложения',
+  })
+  @Get(AppVersionRoutesEnum.CHECK)
+  async check(@Query('os', new OsPipe()) os: OperationSystems, @Query('version', new AppVersionPipe()) version: string) {
+    return this.appVersionService.get(os, version)
   }
 
-  @UseGuards(OwnerJwtAuthGuard)
+  @Functionality({
+    code: FunctionalityCodesEnum.APP_VERSION__GET,
+    default: defaultAppVersionGetData,
+    title: 'Получить версию приложения',
+  })
+  @Get('/')
+  async get(@Query('os', new OsPipe()) os: OperationSystems) {
+    return this.appVersionService.getCurrentVersion(os)
+  }
+
   @UsePipes(new ValidationPipe())
+  @Functionality({
+    code: FunctionalityCodesEnum.APP_VERSION__DELETE,
+    default: defaultAppVersionDeleteData,
+    title: 'Удалить версию приложения',
+  })
   @Delete('/')
   deleteVersion(@Body() dto: DeleteVersionDto) {
     return this.appVersionService.deleteVersion(dto)
