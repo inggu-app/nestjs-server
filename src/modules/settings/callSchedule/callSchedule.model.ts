@@ -3,6 +3,9 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../../configs/modelDefaultOptions.config'
 import { ALL_SETTINGS_TYPES } from '../settings.constants'
 
+export interface CallScheduleModel {
+  updatedAt: Date
+}
 export interface CallScheduleModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<CallScheduleModel>(),

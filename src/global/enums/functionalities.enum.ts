@@ -55,6 +55,9 @@ export enum FunctionalityCodesEnum {
   APP_VERSION__GET = 'APP_VERSION__GET',
   APP_VERSION__CHECK = 'APP_VERSION__CHECK',
   APP_VERSION__DELETE = 'APP_VERSION__DELETE',
+
+  CALL_SCHEDULE__CREATE = 'CALL_SCHEDULE__CREATE',
+  CALL_SCHEDULE__GET = 'CALL_SCHEDULE__GET',
 }
 
 enumKeyValuesMatch(FunctionalityCodesEnum)
