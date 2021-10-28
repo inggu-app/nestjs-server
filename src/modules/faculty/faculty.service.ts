@@ -23,7 +23,7 @@ export class FacultyService {
   constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
 
   async create(dto: CreateFacultyDto) {
-    await this.checkExists({ title: dto.title }, new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST))
+    await this.checkExists({ title: dto.title }, new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST), false)
 
     return this.facultyModel.create(dto)
   }
@@ -121,21 +121,30 @@ export class FacultyService {
   async checkExists(
     filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase> | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>[],
     error: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id))
+      new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id)),
+    checkExisting = true
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.facultyModel.exists(f)
 
-        if (!candidate) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+        if (!candidate && checkExisting) {
+          if (typeof error === 'function') throw error(f)
+          throw error
+        } else if (candidate && !checkExisting) {
+          if (typeof error === 'function') throw error(f)
+          throw error
         }
       }
     } else {
-      if (!(await this.facultyModel.exists(filter))) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+      const candidate = await this.facultyModel.exists(filter)
+
+      if (!candidate && checkExisting) {
+        if (typeof error === 'function') throw error(filter)
+        throw error
+      } else if (candidate && !checkExisting) {
+        if (typeof error === 'function') throw error(filter)
+        throw error
       }
     }
 

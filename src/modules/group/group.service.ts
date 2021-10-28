@@ -174,17 +174,17 @@ export class GroupService {
 
         if (!candidate && checkExisting) {
           if (typeof error === 'function') throw error(f)
-          throw Error
+          throw error
         } else if (candidate && !checkExisting) {
           if (typeof error === 'function') throw error(f)
-          throw Error
+          throw error
         }
       }
     } else {
       const candidate = await this.groupModel.exists(filter)
       if (!candidate && checkExisting) {
         if (typeof error === 'function') throw error(filter)
-        throw Error
+        throw error
       } else if (candidate && !checkExisting) {
         if (typeof error === 'function') throw error(filter)
         throw error
