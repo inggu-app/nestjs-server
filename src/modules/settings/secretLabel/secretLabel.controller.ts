@@ -7,7 +7,9 @@ import { SecretLabelRoutesEnum } from './secretLabel.constants'
 import { Functionality } from '../../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 import { defaultCallScheduleCreateData, defaultCallScheduleGetData } from '../callSchedule/callSchedule.constants'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Секретная надпись')
 @Controller()
 export class SecretLabelController {
   constructor(private readonly secretLabelService: SecretLabelService) {}

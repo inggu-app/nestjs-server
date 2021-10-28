@@ -23,7 +23,9 @@ import { Fields } from '../../global/decorators/Fields.decorator'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Заметки')
 @Controller()
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}

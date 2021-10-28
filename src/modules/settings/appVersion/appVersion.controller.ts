@@ -16,7 +16,9 @@ import { DeleteVersionDto } from './dto/deleteVersionDto'
 import { Functionality } from '../../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 import { OperationSystems } from '../../../global/enums/OS.enum'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Версия приложения')
 @Controller()
 export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}

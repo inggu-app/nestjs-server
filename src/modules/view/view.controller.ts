@@ -21,7 +21,9 @@ import { Types } from 'mongoose'
 import normalizeFields from '../../global/utils/normalizeFields'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Отображения')
 @Controller()
 export class ViewController {
   constructor(private readonly viewService: ViewService) {}

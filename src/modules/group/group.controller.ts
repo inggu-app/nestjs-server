@@ -28,7 +28,9 @@ import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { Fields } from '../../global/decorators/Fields.decorator'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Группы')
 @Controller()
 export class GroupController {
   constructor(

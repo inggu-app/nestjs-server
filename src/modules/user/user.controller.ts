@@ -25,7 +25,9 @@ import normalizeFields from '../../global/utils/normalizeFields'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { objectWithKeys } from '../../global/utils/objectWithKeys'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Пользователи')
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}

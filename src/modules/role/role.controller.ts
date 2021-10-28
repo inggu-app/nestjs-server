@@ -21,7 +21,9 @@ import { Fields } from '../../global/decorators/Fields.decorator'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Роли')
 @Controller()
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}

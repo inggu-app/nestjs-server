@@ -5,7 +5,9 @@ import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 import { CallScheduleRoutesEnum, defaultCallScheduleCreateData, defaultCallScheduleGetData } from './callSchedule.constants'
 import { Functionality } from '../../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Расписание звонков')
 @Controller()
 export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}

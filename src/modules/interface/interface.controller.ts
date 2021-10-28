@@ -18,7 +18,9 @@ import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { Types } from 'mongoose'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Интерфейсы')
 @Controller()
 export class InterfaceController {
   constructor(private readonly interfaceService: InterfaceService) {}

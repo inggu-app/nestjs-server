@@ -19,7 +19,9 @@ import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Расписание')
 @Controller()
 export class ScheduleController {
   constructor(

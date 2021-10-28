@@ -10,7 +10,9 @@ import {
 } from './semesterStartDate.constants'
 import { Functionality } from '../../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Дата старта семестра')
 @Controller()
 export class SemesterStartDateController {
   constructor(private readonly semesterStartDateService: SemesterStartDateService) {}

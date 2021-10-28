@@ -6,7 +6,9 @@ import checkAlternativeQueryParameters from '../../../global/utils/alternativeQu
 import { defaultWeeksCountCreateData, defaultWeeksCountGetData, WeeksCountRoutesEnum } from './weeksCount.constants'
 import { Functionality } from '../../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Количество недель')
 @Controller()
 export class WeeksCountController {
   constructor(private readonly weeksCountService: WeeksCountService) {}
