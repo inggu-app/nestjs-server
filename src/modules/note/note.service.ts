@@ -56,22 +56,32 @@ export class NoteService {
 
   async checkExists(
     filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase> | ObjectByInterface<typeof NoteFieldsEnum, ModelBase>[],
-    error: ((filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(NOTE_WITH_ID_NOT_FOUND(f._id))
+    options: { error?: ((filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(NOTE_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.noteModel.exists(f)
 
-        if (!candidate) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
-      if (!(await this.noteModel.exists(filter))) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+      const candidate = await this.noteModel.exists(filter)
+
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 
