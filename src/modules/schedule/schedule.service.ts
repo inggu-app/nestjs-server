@@ -58,22 +58,32 @@ export class ScheduleService {
 
   async checkExists(
     filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase> | ObjectByInterface<typeof LessonFieldsEnum, ModelBase>[],
-    error: ((filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(LESSON_WITH_ID_NOT_FOUND(f._id))
+    options: { error?: ((filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(LESSON_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.lessonModel.exists(f)
 
-        if (!candidate) {
-          if (error instanceof Error) throw Error
-          throw error(f)
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
-      if (!(await this.lessonModel.exists(filter))) {
-        if (error instanceof Error) throw error
-        throw error(filter)
+      const candidate = await this.lessonModel.exists(filter)
+
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 

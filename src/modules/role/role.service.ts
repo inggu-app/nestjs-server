@@ -26,7 +26,10 @@ export class RoleService {
   ) {}
 
   async create(dto: CreateRoleDto) {
-    await this.checkExists({ title: dto.title, code: dto.code }, new BadRequestException(ROLE_WITH_TITLE_EXISTS(dto.title)), false)
+    await this.checkExists(
+      { title: dto.title, code: dto.code },
+      { error: new BadRequestException(ROLE_WITH_TITLE_EXISTS(dto.title)), checkExisting: false }
+    )
     await this.roleModel.create(dto)
 
     return
@@ -99,30 +102,31 @@ export class RoleService {
 
   async checkExists(
     filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase> | ObjectByInterface<typeof RoleFieldsEnum, ModelBase>[],
-    error: ((filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(ROLE_WITH_ID_NOT_FOUND(f._id)),
-    checkExisting = true
+    options: { error?: ((filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(ROLE_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.roleModel.exists(f)
 
-        if (!candidate && checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
-        } else if (candidate && !checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
       const candidate = await this.roleModel.exists(filter)
-      if (!candidate && checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
-      } else if (candidate && !checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 

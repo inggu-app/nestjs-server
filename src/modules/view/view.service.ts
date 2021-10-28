@@ -98,7 +98,10 @@ export class ViewService {
 
   async update(dto: UpdateViewDto) {
     await this.checkExists({ code: dto.code })
-    await this.interfaceService.checkExists({ code: dto.interface }, new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(dto.interface)))
+    await this.interfaceService.checkExists(
+      { code: dto.interface },
+      { error: new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(dto.interface)) }
+    )
     await this.viewModel.updateOne({ code: dto.code }, { $set: dto })
   }
 

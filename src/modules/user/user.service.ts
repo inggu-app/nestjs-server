@@ -62,7 +62,10 @@ export class UserService {
   ) {}
 
   async create(dto: CreateUserDto) {
-    await this.checkExists({ login: dto.login }, new BadRequestException(USER_WITH_LOGIN_EXISTS(dto.login)), false)
+    await this.checkExists(
+      { login: dto.login },
+      { error: new BadRequestException(USER_WITH_LOGIN_EXISTS(dto.login)), checkExisting: false }
+    )
 
     const generatedUniqueKey = generateUniqueKey()
     const hashedUniqueKey = await bcrypt.hash(generatedUniqueKey, hashSalt)
@@ -88,7 +91,7 @@ export class UserService {
   }
 
   async getByLogin(login: string, options?: ServiceGetOptions<UserField>) {
-    await this.checkExists({ login }, new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND))
+    await this.checkExists({ login }, { error: new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND) })
     return this.userModel.findOne(
       { login },
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
@@ -184,30 +187,32 @@ export class UserService {
 
   async checkExists(
     filter: ObjectByInterface<typeof UserFieldsEnum, ModelBase> | ObjectByInterface<typeof UserFieldsEnum, ModelBase>[],
-    error: ((filter: ObjectByInterface<typeof UserFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(USER_WITH_ID_NOT_FOUND(f._id)),
-    checkExisting = true
+    options: { error?: ((filter: ObjectByInterface<typeof UserFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(USER_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.userModel.exists(f)
 
-        if (!candidate && checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
-        } else if (candidate && !checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
       const candidate = await this.userModel.exists(filter)
-      if (!candidate && checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
-      } else if (candidate && !checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
+
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 

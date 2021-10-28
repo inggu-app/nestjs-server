@@ -23,7 +23,10 @@ export class FacultyService {
   constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
 
   async create(dto: CreateFacultyDto) {
-    await this.checkExists({ title: dto.title }, new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST), false)
+    await this.checkExists(
+      { title: dto.title },
+      { error: new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST), checkExisting: false }
+    )
 
     return this.facultyModel.create(dto)
   }
@@ -120,31 +123,32 @@ export class FacultyService {
 
   async checkExists(
     filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase> | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>[],
-    error: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id)),
-    checkExisting = true
+    options: { error?: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.facultyModel.exists(f)
 
-        if (!candidate && checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
-        } else if (candidate && !checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
       const candidate = await this.facultyModel.exists(filter)
 
-      if (!candidate && checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
-      } else if (candidate && !checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 

@@ -21,7 +21,10 @@ export class InterfaceService {
   constructor(@InjectModel(InterfaceModel) private readonly interfaceModel: ModelType<InterfaceModel>) {}
 
   async create(dto: CreateInterfaceDto) {
-    await this.checkExists({ code: dto.code }, new BadRequestException(INTERFACE_WITH_CODE_EXISTS(dto.code)), false)
+    await this.checkExists(
+      { code: dto.code },
+      { error: new BadRequestException(INTERFACE_WITH_CODE_EXISTS(dto.code)), checkExisting: false }
+    )
     return this.interfaceModel.create(dto)
   }
 
@@ -36,7 +39,7 @@ export class InterfaceService {
   }
 
   async getByCode(code: string, options?: ServiceGetOptions<InterfaceField>) {
-    await this.checkExists({ code }, new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(code)))
+    await this.checkExists({ code }, { error: new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(code)) })
     return this.interfaceModel.findOne(
       { code },
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
@@ -45,7 +48,7 @@ export class InterfaceService {
   }
 
   async update(dto: UpdateInterfaceDto) {
-    await this.checkExists({ code: dto.code }, new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(dto.code)))
+    await this.checkExists({ code: dto.code }, { error: new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(dto.code)) })
     await this.interfaceModel.updateOne({ code: dto.code }, { $set: dto })
     return
   }
@@ -59,30 +62,31 @@ export class InterfaceService {
 
   async checkExists(
     filter: FilterQuery<DocumentType<InterfaceModel>>,
-    error: ((filter: ObjectByInterface<typeof InterfaceFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(INTERFACE_WITH_ID_NOT_FOUND(f._id)),
-    checkExisting = true
+    options: { error?: ((filter: ObjectByInterface<typeof InterfaceFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(INTERFACE_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.interfaceModel.exists(f)
 
-        if (!candidate && checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
-        } else if (candidate && !checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
       const candidate = await this.interfaceModel.exists(filter)
-      if (!candidate && checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
-      } else if (candidate && !checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 

@@ -1,4 +1,4 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
@@ -12,7 +12,6 @@ import {
   GroupGetByGroupIdsDataForFunctionality,
   GroupGetManyDataForFunctionality,
 } from './group.constants'
-import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
@@ -25,16 +24,13 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 export class GroupService {
   constructor(
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
-    @Inject(forwardRef(() => ResponsibleService))
-    private readonly responsibleService: ResponsibleService,
     private readonly facultyService: FacultyService
   ) {}
 
   async create(dto: CreateGroupDto) {
     await this.checkExists(
       { title: dto.title, faculty: dto.faculty },
-      new HttpException(GROUP_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST),
-      false
+      { error: new HttpException(GROUP_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST), checkExisting: false }
     )
 
     return this.groupModel.create(dto)
@@ -135,15 +131,11 @@ export class GroupService {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.groupModel.deleteOne({ _id: id }).exec()
-    await this.responsibleService.deleteGroupsFromAllResponsibles([id])
   }
 
   async deleteAllByFacultyId(facultyId: Types.ObjectId | MongoIdString) {
     facultyId = stringToObjectId(facultyId)
-    const groups = await this.groupModel.find({ faculty: facultyId }).exec()
-    const groupsIds: Types.ObjectId[] = groups.map(group => group.id)
 
-    await this.responsibleService.deleteGroupsFromAllResponsibles(groupsIds)
     return this.groupModel.deleteMany({ faculty: facultyId }).exec()
   }
 
@@ -164,30 +156,31 @@ export class GroupService {
 
   async checkExists(
     filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase> | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>[],
-    error: ((filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase>) => Error) | Error = f =>
-      new NotFoundException(GROUP_WITH_ID_NOT_FOUND(f._id)),
-    checkExisting = true
+    options: { error?: ((filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+      error: f => new NotFoundException(GROUP_WITH_ID_NOT_FOUND(f._id)),
+      checkExisting: true,
+    }
   ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.groupModel.exists(f)
 
-        if (!candidate && checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
-        } else if (candidate && !checkExisting) {
-          if (typeof error === 'function') throw error(f)
-          throw error
+        if (!candidate && options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
+        } else if (candidate && !options.checkExisting) {
+          if (typeof options.error === 'function') throw options.error(f)
+          throw options.error
         }
       }
     } else {
       const candidate = await this.groupModel.exists(filter)
-      if (!candidate && checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
-      } else if (candidate && !checkExisting) {
-        if (typeof error === 'function') throw error(filter)
-        throw error
+      if (!candidate && options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
+      } else if (candidate && !options.checkExisting) {
+        if (typeof options.error === 'function') throw options.error(filter)
+        throw options.error
       }
     }
 
