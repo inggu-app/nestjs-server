@@ -4,7 +4,6 @@ import { GroupService } from './group.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { FacultyModule } from '../faculty/faculty.module'
-import { ResponsibleModule } from '../responsible/responsible.module'
 import { GroupGetRoutesMiddleware } from './groupGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 
@@ -21,7 +20,6 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
       },
     ]),
     forwardRef(() => FacultyModule),
-    forwardRef(() => ResponsibleModule),
   ],
   exports: [GroupService],
 })

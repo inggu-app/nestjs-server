@@ -8,8 +8,6 @@ import { RouterModule } from 'nest-router'
 import { routesConfig } from '../../configs/routes.config'
 import { ScheduleModule } from '../schedule/schedule.module'
 import { SettingsModule } from '../settings/settings.module'
-import { ResponsibleModule } from '../responsible/responsible.module'
-import { AdminModule } from '../admin/admin.module'
 import { NoteModule } from '../note/note.module'
 import { UserModule } from '../user/user.module'
 import { RoleModule } from '../role/role.module'
@@ -23,8 +21,6 @@ import { ViewModule } from '../view/view.module'
   imports: [
     ScheduleModule,
     SettingsModule,
-    ResponsibleModule,
-    AdminModule,
     NoteModule,
     UserModule,
     RoleModule,

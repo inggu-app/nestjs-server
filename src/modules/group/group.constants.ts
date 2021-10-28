@@ -90,18 +90,6 @@ export const defaultGroupGetByGroupIdsData: FunctionalityDefault<GroupGetByGroup
   forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
 }
 
-export interface GroupGetByUserIdDataForFunctionality {
-  // TODO: Нужно ли вообще запрашивать список групп для ответственного в этом модуле?
-  availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, список групп которых может получить пользователь
-  availableUsers: MongoIdString[] // id пользователей, список групп которых может получить пользователь
-  forbiddenUsers: MongoIdString[] // id пользователей, список групп которых пользователь получить НЕ может
-}
-export const defaultGroupGetByUserIdData: FunctionalityDefault<GroupGetByUserIdDataForFunctionality> = {
-  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
-}
-
 export interface GroupGetByFacultyIdDataForFunctionality {
   availableFacultiesType: FunctionalityAvailableTypeEnum // доступность факультетоВ, группы которых может получить пользователь
   availableFaculties: MongoIdString[] // id факультетов, группы которых может получить пользователь

@@ -11,7 +11,6 @@ import {
   GroupDeleteDataForFunctionality,
   GroupGetByFacultyIdDataForFunctionality,
   GroupGetByGroupIdDataForFunctionality,
-  GroupGetByUserIdDataForFunctionality,
   GroupGetQueryParametersEnum,
   GroupUpdateDataForFunctionality,
 } from './group.constants'
@@ -65,15 +64,6 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
         if (castedFunctionality.data.forbiddenFaculties.includes(String(currentGroup.faculty))) break
         if (castedFunctionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableFaculties.includes(String(currentGroup.faculty))) return true
-        break
-      case FunctionalityCodesEnum.GROUP__GET_BY_USER_ID:
-        castedFunctionality = functionality as AvailableFunctionality<GroupGetByUserIdDataForFunctionality>
-
-        queryParams = parseRequestQueries(getEnumValues(GroupGetQueryParametersEnum), request.url)
-        if (!queryParams.userId || !isMongoId(queryParams.userId)) return true
-        if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
-        if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
-        if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true
         break
       case FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID:
         castedFunctionality = functionality as AvailableFunctionality<GroupGetByFacultyIdDataForFunctionality>

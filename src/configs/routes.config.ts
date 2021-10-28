@@ -8,8 +8,6 @@ import { SecretLabelModule } from '../modules/settings/secretLabel/secretLabel.m
 import { SemesterStartDateModule } from '../modules/settings/semesterStartDate/semesterStartDate.module'
 import { WeeksCountModule } from '../modules/settings/weeksCount/weeksCount.module'
 import { AppVersionModule } from '../modules/settings/appVersion/appVersion.module'
-import { ResponsibleModule } from '../modules/responsible/responsible.module'
-import { AdminModule } from '../modules/admin/admin.module'
 import { NoteModule } from '../modules/note/note.module'
 import { UserModule } from '../modules/user/user.module'
 import { FunctionalityModule } from '../modules/functionality/functionality.module'
@@ -30,14 +28,6 @@ export const routesConfig: Routes = [
   {
     path: ModuleRoutesEnum.FACULTY_MODULE,
     module: FacultyModule,
-  },
-  {
-    path: '/responsibles',
-    module: ResponsibleModule,
-  },
-  {
-    path: '/admins',
-    module: AdminModule,
   },
   {
     path: ModuleRoutesEnum.NOTE_MODULE,

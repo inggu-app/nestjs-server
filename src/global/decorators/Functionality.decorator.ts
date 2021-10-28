@@ -29,7 +29,6 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
   switch (functionalityCode) {
     case FunctionalityCodesEnum.GROUP__CREATE:
     case FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID:
-    case FunctionalityCodesEnum.GROUP__GET_BY_USER_ID:
     case FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID:
     case FunctionalityCodesEnum.GROUP__GET_MANY:
     case FunctionalityCodesEnum.GROUP__UPDATE:

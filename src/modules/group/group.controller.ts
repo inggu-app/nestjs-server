@@ -3,7 +3,6 @@ import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
-import { ResponsibleService } from '../responsible/responsible.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import {
@@ -12,7 +11,6 @@ import {
   defaultGroupGetByFacultyIdData,
   defaultGroupGetByGroupIdData,
   defaultGroupGetByGroupIdsData,
-  defaultGroupGetByUserIdData,
   defaultGroupGetManyData,
   defaultGroupUpdateData,
   GroupAdditionalFieldsEnum,
@@ -33,11 +31,7 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('Группы')
 @Controller()
 export class GroupController {
-  constructor(
-    private readonly groupService: GroupService,
-    private readonly facultyService: FacultyService,
-    private readonly responsibleService: ResponsibleService
-  ) {}
+  constructor(private readonly groupService: GroupService, private readonly facultyService: FacultyService) {}
 
   @UsePipes(new ValidationPipe())
   @Functionality({
@@ -73,15 +67,6 @@ export class GroupController {
     @GetGroupFields() fields?: GroupField[]
   ) {
     return normalizeFields(await this.groupService.getByGroupIds(groupIds, { fields }), { fields })
-  }
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__GET_BY_USER_ID,
-    default: defaultGroupGetByUserIdData,
-    title: 'Запросить по id ответственного',
-  })
-  @Get(GroupRoutesEnum.GET_BY_USER_ID)
-  private async getByUserId(@MongoId(GroupGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @GetGroupFields() fields?: GroupField[]) {
-    return normalizeFields(await this.responsibleService.getAllGroupsByResponsible(userId, fields), { fields })
   }
 
   @Functionality({
