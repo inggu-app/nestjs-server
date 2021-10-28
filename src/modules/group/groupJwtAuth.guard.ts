@@ -21,7 +21,6 @@ import { GroupService } from './group.service'
 import { BaseJwtAuthGuard, JwtAuthGuardValidate } from '../../global/guards/baseJwtAuth.guard'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
-import { ResponsibleService } from '../responsible/responsible.service'
 import { Request } from 'express'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { parseRequestQueries } from '../../global/utils/parseRequestQueries'
@@ -36,8 +35,7 @@ export class GroupJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardV
     @Inject(JwtService) protected readonly jwtService: JwtService,
     @Inject(ConfigService) protected readonly configService: ConfigService,
     @Inject(FunctionalityService) private readonly functionalitiesService: FunctionalityService,
-    @Inject(GroupService) private readonly groupService: GroupService,
-    @Inject(ResponsibleService) private readonly responsibleService: ResponsibleService
+    @Inject(GroupService) private readonly groupService: GroupService
   ) {
     super(reflector, userService, jwtService, configService)
   }
