@@ -66,7 +66,9 @@ export class FacultyController {
     @MongoId(FacultyGetQueryParametersEnum.FACULTY_IDS, { multiple: true }) facultyIds: Types.ObjectId[],
     @GetFacultyFields() fields?: FacultyField[]
   ) {
-    return normalizeFields(await this.facultyService.getByIds(facultyIds, { fields }), { fields })
+    return {
+      faculties: normalizeFields(await this.facultyService.getByIds(facultyIds, { fields }), { fields }),
+    }
   }
 
   @Functionality({
@@ -76,8 +78,8 @@ export class FacultyController {
   })
   @Get(FacultyRoutesEnum.GET_MANY)
   async getMany(
-    @Query(FacultyGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
-    @Query(FacultyGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
+    @Query(FacultyGetQueryParametersEnum.PAGE, new CustomParseIntPipe({ intType: 'positive' })) page: number,
+    @Query(FacultyGetQueryParametersEnum.COUNT, new CustomParseIntPipe({ intType: 'positive' })) count: number,
     @Req() { functionality }: CustomRequest<any, FacultyGetManyDataForFunctionality>,
     @Query(FacultyGetQueryParametersEnum.TITLE) title?: string,
     @GetFacultyFields() fields?: FacultyField[]

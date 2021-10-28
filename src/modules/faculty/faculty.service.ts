@@ -95,7 +95,7 @@ export class FacultyService {
         filter._id = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
       }
     }
-    if (options?.user) return this.facultyModel.countDocuments(filter).exec()
+    return this.facultyModel.countDocuments(filter).exec()
   }
 
   async update(dto: UpdateFacultyDto) {

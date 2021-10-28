@@ -7,8 +7,8 @@ import { FunctionalityDefault } from '../functionality/functionality.constants'
 
 export enum FacultyRoutesEnum {
   CREATE = '/',
-  GET_BY_FACULTY_ID = '/by-faculty-id',
-  GET_BY_FACULTY_IDS = '/by-faculty-ids',
+  GET_BY_FACULTY_ID = '/',
+  GET_BY_FACULTY_IDS = '/by-ids',
   GET_MANY = '/many',
   UPDATE = '/',
   DELETE = '/',
