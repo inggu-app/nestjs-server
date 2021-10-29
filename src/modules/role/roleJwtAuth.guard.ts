@@ -63,7 +63,7 @@ export class RoleJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         let isCorrect = true
         requestBody.available?.forEach(f => {
           castedFunctionality = functionality as AvailableFunctionality<RoleUpdateDataForFunctionality>
-          if (!castedFunctionality.data.availableFunctionalities.includes(f)) isCorrect = false
+          if (!castedFunctionality.data.availableFunctionalities.includes(f.code)) isCorrect = false
         })
         if (!isCorrect) break
 

@@ -6,6 +6,7 @@ import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { ViewModel } from '../view/view.model'
 import { Types } from 'mongoose'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { AvailableFunctionality } from '../functionality/functionality.constants'
 
 type Role = {
   [key in RoleFieldsEnum]: any
@@ -22,14 +23,27 @@ export class RoleModel extends TimeStamps implements Role {
   @prop()
   code: string
 
+  @prop()
+  isVisible: boolean
+
   @prop({ default: [], ref: () => ViewModel })
   views: Ref<ViewModel, Types.ObjectId>[]
 
-  @prop()
-  available: FunctionalityCodesEnum[]
+  @prop({ default: [] })
+  available: Available[]
 
   @prop({ default: {} })
   roleFields: {
     [key: string]: TypesEnum
+  }
+}
+
+class Available implements AvailableFunctionality {
+  @prop()
+  code: FunctionalityCodesEnum
+
+  @prop()
+  data: {
+    [key: string]: any
   }
 }

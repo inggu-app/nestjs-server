@@ -4,7 +4,14 @@ import { RoleModel } from './role.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { Error, FilterQuery, Types } from 'mongoose'
-import { ROLE_INCORRECT_FIELD_TYPE, ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
+import {
+  FUNCTIONALITY_EXTRA_FIELDS,
+  FUNCTIONALITY_INCORRECT_FIELD_TYPE,
+  FUNCTIONALITY_MISSING_FIELDS,
+  ROLE_INCORRECT_FIELD_TYPE,
+  ROLE_WITH_ID_NOT_FOUND,
+  ROLE_WITH_TITLE_EXISTS,
+} from '../../global/constants/errors.constants'
 import { RoleField, RoleFieldsEnum, RoleGetManyDataForFunctionality } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
@@ -16,6 +23,8 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { objectKeys } from '../../global/utils/objectKeys'
 import { isEnum } from 'class-validator'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { difference } from 'underscore'
+import { checkTypes } from '../../global/utils/checkTypes'
 
 @Injectable()
 export class RoleService {
@@ -77,7 +86,25 @@ export class RoleService {
       for await (const viewId of dto.views) await this.viewService.checkExists({ _id: viewId })
     }
     if (dto.available) {
-      for (const functionalityCode of dto.available) this.functionalityService.checkExists({ code: functionalityCode })
+      for (const f of dto.available) {
+        this.functionalityService.checkExists({ code: f.code })
+        const functionality = this.functionalityService.getByCode(f.code)
+        const extraFields = difference(objectKeys(f.data), objectKeys(functionality.default))
+        if (extraFields.length) throw new BadRequestException(FUNCTIONALITY_EXTRA_FIELDS(f.code, extraFields))
+        const missingFields = difference(objectKeys(functionality.default), objectKeys(f.data))
+        if (missingFields.length) throw new BadRequestException(FUNCTIONALITY_MISSING_FIELDS(f.code, missingFields))
+        objectKeys(f.data).forEach(field => {
+          if (
+            functionality.default[field] === FunctionalityAvailableTypeEnum.ALL ||
+            functionality.default[field] === FunctionalityAvailableTypeEnum.CUSTOM
+          ) {
+            if (f.data[field] !== FunctionalityAvailableTypeEnum.ALL && f.data[field] !== FunctionalityAvailableTypeEnum.CUSTOM)
+              throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+          } else if (!checkTypes(f.data[field], functionality.default[field] as TypesEnum)) {
+            throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+          }
+        })
+      }
     }
 
     if (dto.roleFields)

@@ -137,6 +137,7 @@ export class UserService {
 
     if (dto.available) {
       for (const f of dto.available) {
+        this.functionalityService.checkExists({ code: f.code })
         const functionality = this.functionalityService.getByCode(f.code)
         const extraFields = difference(objectKeys(f.data), objectKeys(functionality.default))
         if (extraFields.length) throw new BadRequestException(FUNCTIONALITY_EXTRA_FIELDS(f.code, extraFields))
