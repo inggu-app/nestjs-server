@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsEnum, IsMongoId, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
+import { IsArray, IsBoolean, IsEnum, IsMongoId, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 import { MongoIdString } from '../../../global/types'
 import { AvailableFunctionality } from '../../functionality/functionality.constants'
@@ -19,6 +19,10 @@ export class UpdateRoleDto implements UpdateRoleDtoType {
   @IsOptional()
   @IsBoolean()
   isVisible?: boolean
+
+  @IsOptional()
+  @IsNumber()
+  priority: number
 
   @IsOptional()
   @IsArray()
@@ -57,6 +61,7 @@ export enum UpdateRoleDtoKeysEnum {
   title = 'title',
   code = 'code',
   isVisible = 'isVisible',
+  priority = 'priority',
   available = 'available',
   roleFields = 'roleFields',
   views = 'views',
