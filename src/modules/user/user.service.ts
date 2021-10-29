@@ -157,7 +157,7 @@ export class UserService {
       }
     }
 
-    await this.userModel.updateOne({ _id: dto.id }, dto)
+    await this.userModel.updateOne({ _id: dto.id }, { $set: dto })
   }
 
   async delete(userId: Types.ObjectId) {

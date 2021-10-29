@@ -9,6 +9,7 @@ import { FunctionalityCodesEnum } from '../enums/functionalities.enum'
 import { Request } from 'express'
 import { AvailableFunctionality } from '../../modules/functionality/functionality.constants'
 import { ConfigService } from '@nestjs/config'
+import { RoleModel } from '../../modules/role/role.model'
 
 export interface CustomRequest<Body = any, FunctionalityType = { [key: string]: any }> extends Omit<Request<any, any, Body>, 'user'> {
   user: DocumentType<UserModel> | undefined
@@ -40,11 +41,29 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
       try {
         if (await this.jwtService.verifyAsync(token, { secret: this.configService.get('JWT_SECRET_KEY') })) {
           const tokenData = this.jwtService.decode(token) as UserAccessTokenData
-          const user = await this.userService.getById(tokenData.id, { queryOptions: { populate: { path: 'roles' } } })
+          const user = await this.userService.getById(tokenData.id, {
+            queryOptions: { populate: { path: 'roles', populate: { path: 'role', select: ['priority', 'available', 'title'] } } },
+          })
 
           if (user) {
             const code = this.reflector.get<FunctionalityCodesEnum>('code', context.getHandler())
-            const functionality = user.available.find(functionality => functionality.code === code)
+            const functionalities = user.available
+            user.roles
+              .sort((a, b) => {
+                a.role = a.role as RoleModel
+                b.role = b.role as RoleModel
+                return b.role.priority - a.role.priority
+              })
+              .forEach(role => {
+                role.role = role.role as RoleModel
+                role.role.available.forEach(functionality => {
+                  if (!functionalities.find(f => f.code === functionality.code)) {
+                    functionalities.push(functionality)
+                  }
+                })
+              })
+
+            const functionality = functionalities.find(functionality => functionality.code === code)
 
             if (functionality) {
               context.switchToHttp().getRequest<CustomRequest>().user = user

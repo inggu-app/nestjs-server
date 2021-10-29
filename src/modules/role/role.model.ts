@@ -26,6 +26,9 @@ export class RoleModel extends TimeStamps implements Role {
   @prop()
   isVisible: boolean
 
+  @prop({ default: 0 })
+  priority: number
+
   @prop({ default: [], ref: () => ViewModel })
   views: Ref<ViewModel, Types.ObjectId>[]
 
@@ -36,9 +39,6 @@ export class RoleModel extends TimeStamps implements Role {
   roleFields: {
     [key: string]: TypesEnum
   }
-
-  @prop({ default: 0 })
-  priority: number
 }
 
 class Available implements AvailableFunctionality {
