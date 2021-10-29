@@ -1,5 +1,5 @@
 import { TypesEnum } from '../enums/types.enum'
-import { isBoolean, isMongoId, isNumber, isString } from 'class-validator'
+import { isBoolean, isMongoId, isNumber, isObject, isString } from 'class-validator'
 import { BadRequestException } from '@nestjs/common'
 
 export const checkTypes = (checkedValue: any, referenceValue: TypesEnum) => {
@@ -12,6 +12,8 @@ export const checkTypes = (checkedValue: any, referenceValue: TypesEnum) => {
       return typeof checkedValue === 'boolean'
     case TypesEnum.MONGO_ID:
       return isMongoId(checkedValue)
+    case TypesEnum.OBJECT:
+      return typeof checkedValue === 'object'
     case TypesEnum.STRING_ARRAY:
       return checkArray(checkedValue, isString)
     case TypesEnum.NUMBER_ARRAY:
@@ -20,6 +22,8 @@ export const checkTypes = (checkedValue: any, referenceValue: TypesEnum) => {
       return checkArray(checkedValue, isBoolean)
     case TypesEnum.MONGO_ID_ARRAY:
       return checkArray(checkedValue, isMongoId)
+    case TypesEnum.OBJECT_ARRAY:
+      return checkArray(checkedValue, isObject)
   }
 }
 

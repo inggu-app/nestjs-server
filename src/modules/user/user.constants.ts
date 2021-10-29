@@ -6,6 +6,7 @@ import { MongoIdString } from '../../global/types'
 import { UpdateUserDtoKeysEnum } from './dto/updateUser.dto'
 import { FunctionalityDefault } from '../functionality/functionality.constants'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 
 export enum UserRoutesEnum {
   CREATE = '/',
@@ -56,11 +57,26 @@ export interface UserGetByUserIdDataForFunctionality {
   forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми нельзя получить
 }
 export const defaultUserGetByUserIdData: FunctionalityDefault<UserGetByUserIdDataForFunctionality> = {
-  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
-  availableRoles: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
+  availableUsersType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  forbiddenUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  availableRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  forbiddenRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
 }
 
 export interface UserGetByRoleIdDataForFunctionality {
@@ -72,12 +88,30 @@ export interface UserGetByRoleIdDataForFunctionality {
   forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми нельзя получить
 }
 export const defaultUserGetByRoleIdData: FunctionalityDefault<UserGetByRoleIdDataForFunctionality> = {
-  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
-  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
-  availableRoles: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
+  availableUsersType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  forbiddenUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  availableRolesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  forbiddenRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
 }
 
 export interface UserUpdateDataForFunctionality {
@@ -98,21 +132,66 @@ export interface UserUpdateDataForFunctionality {
   availableToSetInterfaces: MongoIdString[] // id интерфейсов, которые пользователь может назначить
 }
 export const defaultUserUpdateData: FunctionalityDefault<UserUpdateDataForFunctionality> = {
-  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
-  availableRolesType: FunctionalityAvailableTypeEnum.ALL,
-  availableRoles: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
-  availableFields: TypesEnum.STRING_ARRAY,
-  availableToSetFunctionalitiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableToSetFunctionalities: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenToSetFunctionalities: TypesEnum.MONGO_ID_ARRAY,
-  availableToSetRolesType: FunctionalityAvailableTypeEnum.ALL,
-  availableToSetRoles: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenToSetRoles: TypesEnum.MONGO_ID_ARRAY,
-  availableToSetInterfacesType: FunctionalityAvailableTypeEnum.ALL,
-  availableToSetInterfaces: TypesEnum.MONGO_ID_ARRAY,
+  availableUsersType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  forbiddenUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  availableRolesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  forbiddenRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  availableFields: {
+    type: TypesEnum.STRING_ARRAY,
+    model: null,
+  },
+  availableToSetFunctionalitiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableToSetFunctionalities: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: null,
+  },
+  forbiddenToSetFunctionalities: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: null,
+  },
+  availableToSetRolesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableToSetRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  forbiddenToSetRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  availableToSetInterfacesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableToSetInterfaces: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.INTERFACE_MODEL,
+  },
 }
 
 export interface UserDeleteDataForFunctionality {
@@ -123,9 +202,24 @@ export interface UserDeleteDataForFunctionality {
   forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми пользователь удалить не может
 }
 export const defaultUserDeleteData: FunctionalityDefault<UserDeleteDataForFunctionality> = {
-  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
-  availableRoles: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenRoles: TypesEnum.MONGO_ID_ARRAY,
+  availableUsersType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  forbiddenUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  availableRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  forbiddenRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
 }

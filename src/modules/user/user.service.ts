@@ -17,6 +17,7 @@ import { Error, Types } from 'mongoose'
 import {
   FUNCTIONALITY_EXTRA_FIELDS,
   FUNCTIONALITY_INCORRECT_FIELD_TYPE,
+  FUNCTIONALITY_INCORRECT_FIELD_VALUE,
   FUNCTIONALITY_MISSING_FIELDS,
   INCORRECT_CREDENTIALS,
   ROLE_EXTRA_FIELDS,
@@ -130,7 +131,7 @@ export class UserService {
         for (const field of objectKeys(roleData.data)) {
           if (!checkTypes(roleData.data[field], role.roleFields[field].type))
             throw new BadRequestException(ROLE_INCORRECT_FIELD_TYPE(field))
-          else if (role.roleFields[field].model) {
+          if (role.roleFields[field].model) {
             const model = getModelWithString(role.roleFields[field].model as string)
             if (role.roleFields[field].type === TypesEnum.MONGO_ID) {
               if (!(await model?.exists({ _id: roleData.data[field] })))
@@ -139,7 +140,7 @@ export class UserService {
               const ids = roleData.data[field] as Array<any>
               for (const id of ids) {
                 if (!(await model?.exists({ _id: id })))
-                  throw new BadRequestException(ROLE_INCORRECT_FIELD_VALUE(role.roleFields[field].model as string, roleData.data[field]))
+                  throw new BadRequestException(ROLE_INCORRECT_FIELD_VALUE(role.roleFields[field].model as string, id))
               }
             }
           }
@@ -159,17 +160,36 @@ export class UserService {
         if (extraFields.length) throw new BadRequestException(FUNCTIONALITY_EXTRA_FIELDS(f.code, extraFields))
         const missingFields = difference(objectKeys(functionality.default), objectKeys(f.data))
         if (missingFields.length) throw new BadRequestException(FUNCTIONALITY_MISSING_FIELDS(f.code, missingFields))
-        objectKeys(f.data).forEach(field => {
+        for (const field of objectKeys(f.data)) {
           if (
-            functionality.default[field] === FunctionalityAvailableTypeEnum.ALL ||
-            functionality.default[field] === FunctionalityAvailableTypeEnum.CUSTOM
+            functionality.default[field].type === FunctionalityAvailableTypeEnum.ALL ||
+            functionality.default[field].type === FunctionalityAvailableTypeEnum.CUSTOM
           ) {
             if (f.data[field] !== FunctionalityAvailableTypeEnum.ALL && f.data[field] !== FunctionalityAvailableTypeEnum.CUSTOM)
               throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
-          } else if (!checkTypes(f.data[field], functionality.default[field] as TypesEnum)) {
-            throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+          } else {
+            if (!checkTypes(f.data[field], functionality.default[field].type as TypesEnum)) {
+              throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+            }
+            if (functionality.default[field].model) {
+              const model = getModelWithString(functionality.default[field].model as string)
+              if (functionality.default[field].type === TypesEnum.MONGO_ID) {
+                if (!(await model?.exists({ _id: f.data[field] }))) {
+                  throw new BadRequestException(
+                    FUNCTIONALITY_INCORRECT_FIELD_VALUE(functionality.default[field].model as string, f.data[field])
+                  )
+                }
+              } else if (functionality.default[field].type === TypesEnum.MONGO_ID_ARRAY) {
+                const ids = f.data[field] as Array<any>
+                for (const id of ids) {
+                  if (!(await model?.exists({ _id: id }))) {
+                    throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_VALUE(functionality.default[field].model as string, id))
+                  }
+                }
+              }
+            }
           }
-        })
+        }
       }
     }
 

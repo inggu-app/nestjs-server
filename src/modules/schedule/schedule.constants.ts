@@ -4,6 +4,7 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { MongoIdString } from '../../global/types'
 import { FunctionalityDefault } from '../functionality/functionality.constants'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 
 export enum ScheduleRoutesEnum {
   CREATE = '/',
@@ -59,11 +60,26 @@ export interface ScheduleCreateDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id групп, для которых пользователь создавать или обновлять расписание НЕ может
 }
 export const defaultScheduleCreateData: FunctionalityDefault<ScheduleCreateDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }
 
 export interface ScheduleGetByGroupIdDataForFunctionality {
@@ -74,9 +90,24 @@ export interface ScheduleGetByGroupIdDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id групп, расписание которых пользователь получить НЕ может
 }
 export const defaultScheduleGetByGroupIdData: FunctionalityDefault<ScheduleGetByGroupIdDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }

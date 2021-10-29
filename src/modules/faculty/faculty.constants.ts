@@ -4,6 +4,7 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { MongoIdString } from '../../global/types'
 import { TypesEnum } from '../../global/enums/types.enum'
 import { FunctionalityDefault } from '../functionality/functionality.constants'
+import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 
 export enum FacultyRoutesEnum {
   CREATE = '/',
@@ -42,9 +43,18 @@ export interface FacultyGetByFacultyIdDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
 export const defaultFacultyGetByFacultyIdData: FunctionalityDefault<FacultyGetByFacultyIdDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
 }
 
 export interface FacultyGetByFacultyIdsDataForFunctionality {
@@ -53,9 +63,18 @@ export interface FacultyGetByFacultyIdsDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
 export const defaultFacultyGetByFacultyIdsData: FunctionalityDefault<FacultyGetByFacultyIdsDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
 }
 
 export interface FacultyGetManyDataForFunctionality {
@@ -64,9 +83,18 @@ export interface FacultyGetManyDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь получить НЕ может
 }
 export const defaultFacultyGetManyData: FunctionalityDefault<FacultyGetManyDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
 }
 
 export interface FacultyUpdateDataForFunctionality {
@@ -75,9 +103,18 @@ export interface FacultyUpdateDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь изменить НЕ может
 }
 export const defaultFacultyUpdateData: FunctionalityDefault<FacultyUpdateDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
 }
 
 export interface FacultyDeleteDataForFunctionality {
@@ -86,7 +123,16 @@ export interface FacultyDeleteDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, которые пользователь удалить НЕ может
 }
 export const defaultFacultyDeleteData: FunctionalityDefault<FacultyDeleteDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
 }

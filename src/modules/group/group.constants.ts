@@ -4,6 +4,7 @@ import { FunctionalityAvailableTypeEnum } from '../../global/enums/Functionality
 import { MongoIdString } from '../../global/types'
 import { FunctionalityDefault } from '../functionality/functionality.constants'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 
 export enum GetGroupsEnum {
   groupId,
@@ -55,9 +56,18 @@ export interface GroupCreateDataForFunctionality {
   forbiddenFaculties: MongoIdString[] // id факультетов, на которые пользователь НЕ может создать группу
 }
 export const defaultGroupCreateData: FunctionalityDefault<GroupCreateDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
 }
 
 export interface GroupGetByGroupIdDataForFunctionality {
@@ -68,11 +78,26 @@ export interface GroupGetByGroupIdDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
 export const defaultGroupGetByGroupIdData: FunctionalityDefault<GroupGetByGroupIdDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }
 
 export interface GroupGetByGroupIdsDataForFunctionality {
@@ -83,11 +108,26 @@ export interface GroupGetByGroupIdsDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
 export const defaultGroupGetByGroupIdsData: FunctionalityDefault<GroupGetByGroupIdsDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }
 
 export interface GroupGetByFacultyIdDataForFunctionality {
@@ -98,11 +138,26 @@ export interface GroupGetByFacultyIdDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id групп, которые пользователь получить НЕ может
 }
 export const defaultGroupGetByFacultyIdData: FunctionalityDefault<GroupGetByFacultyIdDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }
 
 export interface GroupGetManyDataForFunctionality {
@@ -113,11 +168,26 @@ export interface GroupGetManyDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь получить НЕ может
 }
 export const defaultGroupGetManyData: FunctionalityDefault<GroupGetManyDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }
 
 export interface GroupUpdateDataForFunctionality {
@@ -128,11 +198,26 @@ export interface GroupUpdateDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь обновлять НЕ может
 }
 export const defaultGroupUpdateData: FunctionalityDefault<GroupUpdateDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }
 
 export interface GroupDeleteDataForFunctionality {
@@ -143,9 +228,24 @@ export interface GroupDeleteDataForFunctionality {
   forbiddenGroups: MongoIdString[] // id отдельных групп, которые пользователь удалять НЕ может
 }
 export const defaultGroupDeleteData: FunctionalityDefault<GroupDeleteDataForFunctionality> = {
-  availableFacultiesType: FunctionalityAvailableTypeEnum.ALL,
-  availableFaculties: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenFaculties: TypesEnum.MONGO_ID_ARRAY,
-  availableGroups: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenGroups: TypesEnum.MONGO_ID_ARRAY,
+  availableFacultiesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  forbiddenFaculties: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.FACULTY_MODEL,
+  },
+  availableGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
+  forbiddenGroups: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.GROUP_MODEL,
+  },
 }

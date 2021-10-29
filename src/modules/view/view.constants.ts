@@ -3,6 +3,7 @@ import { FunctionalityDefault } from '../functionality/functionality.constants'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { MongoIdString } from '../../global/types'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 
 export enum ViewRoutesEnum {
   CREATE = '/',
@@ -43,9 +44,18 @@ export interface ViewGetByUserIdDataForFunctionality {
   forbiddenUsers: MongoIdString[] // id пользователей, для которых можно загрузить отображения
 }
 export const defaultViewGetByUserIdData: FunctionalityDefault<ViewGetByUserIdDataForFunctionality> = {
-  availableUsersType: FunctionalityAvailableTypeEnum.ALL,
-  availableUsers: TypesEnum.MONGO_ID_ARRAY,
-  forbiddenUsers: TypesEnum.MONGO_ID_ARRAY,
+  availableUsersType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  forbiddenUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
 }
 
 export interface ViewUpdateDataForFunctionality {}

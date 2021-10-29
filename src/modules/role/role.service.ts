@@ -7,6 +7,7 @@ import { Error, FilterQuery, Types } from 'mongoose'
 import {
   FUNCTIONALITY_EXTRA_FIELDS,
   FUNCTIONALITY_INCORRECT_FIELD_TYPE,
+  FUNCTIONALITY_INCORRECT_FIELD_VALUE,
   FUNCTIONALITY_MISSING_FIELDS,
   ROLE_INCORRECT_FIELD_MODEL,
   ROLE_INCORRECT_FIELD_TYPE,
@@ -27,6 +28,7 @@ import { TypesEnum } from '../../global/enums/types.enum'
 import { difference } from 'underscore'
 import { checkTypes } from '../../global/utils/checkTypes'
 import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
+import { getModelWithString } from '@typegoose/typegoose'
 
 @Injectable()
 export class RoleService {
@@ -95,17 +97,36 @@ export class RoleService {
         if (extraFields.length) throw new BadRequestException(FUNCTIONALITY_EXTRA_FIELDS(f.code, extraFields))
         const missingFields = difference(objectKeys(functionality.default), objectKeys(f.data))
         if (missingFields.length) throw new BadRequestException(FUNCTIONALITY_MISSING_FIELDS(f.code, missingFields))
-        objectKeys(f.data).forEach(field => {
+        for (const field of objectKeys(f.data)) {
           if (
-            functionality.default[field] === FunctionalityAvailableTypeEnum.ALL ||
-            functionality.default[field] === FunctionalityAvailableTypeEnum.CUSTOM
+            functionality.default[field].type === FunctionalityAvailableTypeEnum.ALL ||
+            functionality.default[field].type === FunctionalityAvailableTypeEnum.CUSTOM
           ) {
             if (f.data[field] !== FunctionalityAvailableTypeEnum.ALL && f.data[field] !== FunctionalityAvailableTypeEnum.CUSTOM)
               throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
-          } else if (!checkTypes(f.data[field], functionality.default[field] as TypesEnum)) {
-            throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+          } else {
+            if (!checkTypes(f.data[field], functionality.default[field].type as TypesEnum)) {
+              throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_TYPE(field))
+            }
+            if (functionality.default[field].model) {
+              const model = getModelWithString(functionality.default[field].model as string)
+              if (functionality.default[field].type === TypesEnum.MONGO_ID) {
+                if (!(await model?.exists({ _id: f.data[field] }))) {
+                  throw new BadRequestException(
+                    FUNCTIONALITY_INCORRECT_FIELD_VALUE(functionality.default[field].model as string, f.data[field])
+                  )
+                }
+              } else if (functionality.default[field].type === TypesEnum.MONGO_ID_ARRAY) {
+                const ids = f.data[field] as Array<any>
+                for (const id of ids) {
+                  if (!(await model?.exists({ _id: id }))) {
+                    throw new BadRequestException(FUNCTIONALITY_INCORRECT_FIELD_VALUE(functionality.default[field].model as string, id))
+                  }
+                }
+              }
+            }
           }
-        })
+        }
       }
     }
 

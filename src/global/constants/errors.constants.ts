@@ -65,3 +65,5 @@ export const FUNCTIONALITY_EXTRA_FIELDS = (functionalityCode: FunctionalityCodes
 export const FUNCTIONALITY_MISSING_FIELDS = (functionalityCode: FunctionalityCodesEnum, fields: (string | number)[]) =>
   `Недостающие поля в функциональности: ${fields.join(', ')}`
 export const FUNCTIONALITY_INCORRECT_FIELD_TYPE = (field: string | number) => `Для поля ${field} задан неправильный тип`
+export const FUNCTIONALITY_INCORRECT_FIELD_VALUE = (model: string, value: string) =>
+  `В модели ${model} не существует документа с id ${value}`
