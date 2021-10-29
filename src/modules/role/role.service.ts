@@ -8,6 +8,7 @@ import {
   FUNCTIONALITY_EXTRA_FIELDS,
   FUNCTIONALITY_INCORRECT_FIELD_TYPE,
   FUNCTIONALITY_MISSING_FIELDS,
+  ROLE_INCORRECT_FIELD_MODEL,
   ROLE_INCORRECT_FIELD_TYPE,
   ROLE_WITH_ID_NOT_FOUND,
   ROLE_WITH_TITLE_EXISTS,
@@ -25,6 +26,7 @@ import { isEnum } from 'class-validator'
 import { TypesEnum } from '../../global/enums/types.enum'
 import { difference } from 'underscore'
 import { checkTypes } from '../../global/utils/checkTypes'
+import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 
 @Injectable()
 export class RoleService {
@@ -109,7 +111,14 @@ export class RoleService {
 
     if (dto.roleFields)
       for (const field of objectKeys(dto.roleFields)) {
-        if (!isEnum(dto.roleFields[field], TypesEnum)) throw new BadRequestException(ROLE_INCORRECT_FIELD_TYPE(field))
+        if (!isEnum(dto.roleFields[field].type, TypesEnum)) throw new BadRequestException(ROLE_INCORRECT_FIELD_TYPE(field))
+        if (
+          [TypesEnum.MONGO_ID, TypesEnum.MONGO_ID_ARRAY].includes(dto.roleFields[field].type) &&
+          !isEnum(dto.roleFields[field].model, DbModelsEnum)
+        )
+          throw new BadRequestException(ROLE_INCORRECT_FIELD_MODEL(field))
+        if (![TypesEnum.MONGO_ID, TypesEnum.MONGO_ID_ARRAY].includes(dto.roleFields[field].type) && dto.roleFields[field].model !== null)
+          throw new BadRequestException(ROLE_INCORRECT_FIELD_MODEL(field))
       }
 
     await this.roleModel.updateOne({ _id: dto.id }, { $set: dto })

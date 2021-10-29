@@ -43,6 +43,8 @@ export const ROLE_WITH_CODE_NOT_FOUND = (code: string) => `Роль с кодо�
 export const ROLE_EXTRA_FIELDS = (fields: (string | number)[]) => `Лишние поля в роли: ${fields.join(', ')}`
 export const ROLE_MISSING_FIELDS = (fields: (string | number)[]) => `Недостающие поля в роли: ${fields.join(', ')}`
 export const ROLE_INCORRECT_FIELD_TYPE = (field: string | number) => `Для поля ${field} задан неправильный тип`
+export const ROLE_INCORRECT_FIELD_MODEL = (field: string | number) => `Для поля ${field} задана некорректная модель`
+export const ROLE_INCORRECT_FIELD_VALUE = (model: string, value: string) => `В модели ${model} не существует документа с id ${value}`
 
 export const USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Пользователь с id "${id}" не существует`
 export const USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Пользователь с логином "${login}" не существует`

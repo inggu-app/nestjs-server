@@ -7,6 +7,7 @@ import { ViewModel } from '../view/view.model'
 import { Types } from 'mongoose'
 import { TypesEnum } from '../../global/enums/types.enum'
 import { AvailableFunctionality } from '../functionality/functionality.constants'
+import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 
 type Role = {
   [key in RoleFieldsEnum]: any
@@ -37,8 +38,16 @@ export class RoleModel extends TimeStamps implements Role {
 
   @prop({ default: {} })
   roleFields: {
-    [key: string]: TypesEnum
+    [key: string]: RoleField
   }
+}
+
+class RoleField {
+  @prop({ enum: TypesEnum })
+  type: TypesEnum
+
+  @prop({ type: () => DbModelsEnum || undefined || null, default: null })
+  model: DbModelsEnum | undefined | null
 }
 
 class Available implements AvailableFunctionality {

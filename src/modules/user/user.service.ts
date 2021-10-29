@@ -21,6 +21,7 @@ import {
   INCORRECT_CREDENTIALS,
   ROLE_EXTRA_FIELDS,
   ROLE_INCORRECT_FIELD_TYPE,
+  ROLE_INCORRECT_FIELD_VALUE,
   ROLE_MISSING_FIELDS,
   USER_HAS_NO_ROLE_WITH_ID,
   USER_WITH_ID_NOT_FOUND,
@@ -46,6 +47,7 @@ import { FunctionalityService } from '../functionality/functionality.service'
 import { checkTypes } from '../../global/utils/checkTypes'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { TypesEnum } from '../../global/enums/types.enum'
+import { getModelWithString } from '@typegoose/typegoose'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -125,9 +127,23 @@ export class UserService {
         if (extraFields.length) throw new BadRequestException(ROLE_EXTRA_FIELDS(extraFields))
         const missingFields = difference(objectKeys(role.roleFields), objectKeys(roleData.data))
         if (missingFields.length) throw new BadRequestException(ROLE_MISSING_FIELDS(missingFields))
-        objectKeys(roleData.data).forEach(field => {
-          if (!checkTypes(roleData.data[field], role.roleFields[field])) throw new BadRequestException(ROLE_INCORRECT_FIELD_TYPE(field))
-        })
+        for (const field of objectKeys(roleData.data)) {
+          if (!checkTypes(roleData.data[field], role.roleFields[field].type))
+            throw new BadRequestException(ROLE_INCORRECT_FIELD_TYPE(field))
+          else if (role.roleFields[field].model) {
+            const model = getModelWithString(role.roleFields[field].model as string)
+            if (role.roleFields[field].type === TypesEnum.MONGO_ID) {
+              if (!(await model?.exists({ _id: roleData.data[field] })))
+                throw new BadRequestException(ROLE_INCORRECT_FIELD_VALUE(role.roleFields[field].model as string, roleData.data[field]))
+            } else if (role.roleFields[field].type === TypesEnum.MONGO_ID_ARRAY) {
+              const ids = roleData.data[field] as Array<any>
+              for (const id of ids) {
+                if (!(await model?.exists({ _id: id })))
+                  throw new BadRequestException(ROLE_INCORRECT_FIELD_VALUE(role.roleFields[field].model as string, roleData.data[field]))
+              }
+            }
+          }
+        }
       }
     }
 

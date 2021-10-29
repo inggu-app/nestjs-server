@@ -3,6 +3,8 @@ import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.en
 import { MongoIdString } from '../../../global/types'
 import { AvailableFunctionality } from '../../functionality/functionality.constants'
 import { Type } from 'class-transformer'
+import { TypesEnum } from '../../../global/enums/types.enum'
+import { DbModelsEnum } from '../../../global/enums/dbModelsEnum'
 
 export class UpdateRoleDto implements UpdateRoleDtoType {
   @IsMongoId()
@@ -33,13 +35,22 @@ export class UpdateRoleDto implements UpdateRoleDtoType {
   @IsOptional()
   @IsObject()
   roleFields?: {
-    [key: string]: any
+    [key: string]: RoleField
   }
 
   @IsOptional()
   @IsArray()
   @IsMongoId({ each: true })
   views?: MongoIdString[]
+}
+
+class RoleField {
+  @IsEnum(TypesEnum)
+  type: TypesEnum
+
+  @IsOptional()
+  @IsEnum(DbModelsEnum)
+  model: DbModelsEnum | null
 }
 
 export class Functionality implements AvailableFunctionality {
