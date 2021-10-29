@@ -62,11 +62,13 @@ export class InterfaceService {
 
   async checkExists(
     filter: FilterQuery<DocumentType<InterfaceModel>>,
-    options: { error?: ((filter: ObjectByInterface<typeof InterfaceFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+    options?: { error?: ((filter: ObjectByInterface<typeof InterfaceFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
+  ) {
+    options = {
       error: f => new NotFoundException(INTERFACE_WITH_ID_NOT_FOUND(f._id)),
       checkExisting: true,
+      ...options,
     }
-  ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.interfaceModel.exists(f)

@@ -58,11 +58,13 @@ export class ScheduleService {
 
   async checkExists(
     filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase> | ObjectByInterface<typeof LessonFieldsEnum, ModelBase>[],
-    options: { error?: ((filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+    options?: { error?: ((filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
+  ) {
+    options = {
       error: f => new NotFoundException(LESSON_WITH_ID_NOT_FOUND(f._id)),
       checkExisting: true,
+      ...options,
     }
-  ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.lessonModel.exists(f)

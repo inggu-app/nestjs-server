@@ -129,11 +129,13 @@ export class RoleService {
 
   async checkExists(
     filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase> | ObjectByInterface<typeof RoleFieldsEnum, ModelBase>[],
-    options: { error?: ((filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+    options?: { error?: ((filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
+  ) {
+    options = {
       error: f => new NotFoundException(ROLE_WITH_ID_NOT_FOUND(f._id)),
       checkExisting: true,
+      ...options,
     }
-  ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.roleModel.exists(f)

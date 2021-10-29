@@ -123,11 +123,13 @@ export class FacultyService {
 
   async checkExists(
     filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase> | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>[],
-    options: { error?: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+    options?: { error?: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
+  ) {
+    options = {
       error: f => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id)),
       checkExisting: true,
+      ...options,
     }
-  ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.facultyModel.exists(f)

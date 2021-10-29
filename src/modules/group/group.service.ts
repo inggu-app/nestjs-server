@@ -156,11 +156,13 @@ export class GroupService {
 
   async checkExists(
     filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase> | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>[],
-    options: { error?: ((filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+    options?: { error?: ((filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
+  ) {
+    options = {
       error: f => new NotFoundException(GROUP_WITH_ID_NOT_FOUND(f._id)),
       checkExisting: true,
+      ...options,
     }
-  ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.groupModel.exists(f)

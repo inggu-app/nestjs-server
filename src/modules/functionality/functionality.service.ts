@@ -60,11 +60,13 @@ export class FunctionalityService {
 
   checkExists(
     filter: ObjectByInterface<typeof FunctionalityFieldsEnum> | ObjectByInterface<typeof FunctionalityFieldsEnum>[],
-    options: { error?: ((filter: ObjectByInterface<typeof FunctionalityFieldsEnum>) => Error) | Error; checkExisting?: boolean } = {
+    options?: { error?: ((filter: ObjectByInterface<typeof FunctionalityFieldsEnum>) => Error) | Error; checkExisting?: boolean }
+  ) {
+    options = {
       error: f => new NotFoundException(FUNCTIONALITY_WITH_CODE_NOT_FOUND(f.code)),
       checkExisting: true,
+      ...options,
     }
-  ) {
     if (Array.isArray(filter)) {
       for (const f of filter) {
         const candidate = FunctionalityService.initializableFunctionalities.find(functionality => functionality.code === f.code)

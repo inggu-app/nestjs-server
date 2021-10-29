@@ -56,11 +56,13 @@ export class NoteService {
 
   async checkExists(
     filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase> | ObjectByInterface<typeof NoteFieldsEnum, ModelBase>[],
-    options: { error?: ((filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean } = {
+    options?: { error?: ((filter: ObjectByInterface<typeof NoteFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
+  ) {
+    options = {
       error: f => new NotFoundException(NOTE_WITH_ID_NOT_FOUND(f._id)),
       checkExisting: true,
+      ...options,
     }
-  ) {
     if (Array.isArray(filter)) {
       for await (const f of filter) {
         const candidate = await this.noteModel.exists(f)
