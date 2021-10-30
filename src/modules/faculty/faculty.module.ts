@@ -9,6 +9,7 @@ import { GroupModule } from '../group/group.module'
   controllers: [FacultyController],
   providers: [FacultyService],
   imports: [
+    forwardRef(() => GroupModule),
     TypegooseModule.forFeature([
       {
         typegooseClass: FacultyModel,
@@ -17,7 +18,6 @@ import { GroupModule } from '../group/group.module'
         },
       },
     ]),
-    forwardRef(() => GroupModule),
   ],
   exports: [FacultyService],
 })

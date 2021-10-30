@@ -11,6 +11,7 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
   controllers: [GroupController],
   providers: [GroupService],
   imports: [
+    forwardRef(() => FacultyModule),
     TypegooseModule.forFeature([
       {
         typegooseClass: GroupModel,
@@ -19,7 +20,6 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
         },
       },
     ]),
-    forwardRef(() => FacultyModule),
   ],
   exports: [GroupService],
 })

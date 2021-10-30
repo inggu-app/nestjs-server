@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
-import { FacultyModule } from '../faculty/faculty.module'
 import { GroupModule } from '../group/group.module'
 import { ScheduleController } from './schedule.controller'
 import { ScheduleService } from './schedule.service'
@@ -14,15 +13,14 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
   controllers: [ScheduleController],
   providers: [ScheduleService],
   imports: [
+    GroupModule,
+    CallScheduleModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: LessonModel,
         schemaOptions: getModelDefaultOptions('Lesson'),
       },
     ]),
-    FacultyModule,
-    GroupModule,
-    CallScheduleModule,
   ],
   exports: [ScheduleService],
 })
