@@ -17,6 +17,7 @@ import getJWTConfig from '../../configs/jwt.config'
 import { InterfaceModule } from '../interface/interface.module'
 import { ViewModule } from '../view/view.module'
 import { FacultyModule } from '../faculty/faculty.module'
+import { GroupModule } from '../group/group.module'
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { FacultyModule } from '../faculty/faculty.module'
     InterfaceModule,
     ViewModule,
     FacultyModule,
+    GroupModule,
     RouterModule.forRoutes(routesConfig),
     ConfigModule.forRoot({ isGlobal: true }),
     {
