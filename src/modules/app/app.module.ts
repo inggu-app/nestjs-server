@@ -16,6 +16,7 @@ import { JwtModule } from '@nestjs/jwt'
 import getJWTConfig from '../../configs/jwt.config'
 import { InterfaceModule } from '../interface/interface.module'
 import { ViewModule } from '../view/view.module'
+import { FacultyModule } from '../faculty/faculty.module'
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ViewModule } from '../view/view.module'
     FunctionalityModule,
     InterfaceModule,
     ViewModule,
+    FacultyModule,
     RouterModule.forRoutes(routesConfig),
     ConfigModule.forRoot({ isGlobal: true }),
     {
