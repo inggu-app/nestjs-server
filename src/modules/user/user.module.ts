@@ -13,7 +13,7 @@ import { ViewModule } from '../view/view.module'
   controllers: [UserController],
   providers: [UserService],
   imports: [
-    RoleModule,
+    forwardRef(() => RoleModule),
     forwardRef(() => ViewModule),
     TypegooseModule.forFeature([
       {

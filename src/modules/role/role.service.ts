@@ -51,20 +51,44 @@ export class RoleService {
   async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<RoleField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return this.roleModel.findById(
+    const role = (await this.roleModel.findById(
       { _id: id },
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
-    ) as unknown as DocumentType<RoleModel>
+    )) as unknown as DocumentType<RoleModel>
+    if (role?.available) {
+      role.available = role.available.map(functionality => {
+        const res: any = {}
+        functionality.data.forEach(item => (res[item.key] = item.value))
+        return {
+          ...functionality,
+          data: res,
+        }
+      })
+    }
+    return role
   }
 
   async getByTitle(title: string, options?: ServiceGetOptions<RoleField>) {
     await this.checkExists({ title })
-    return this.roleModel.findOne(
-      { title },
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    )
+    const role = await this.roleModel
+      .findOne(
+        { title },
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+        options?.queryOptions
+      )
+      .exec()
+    if (role?.available) {
+      role.available = role.available.map(functionality => {
+        const res: any = {}
+        functionality.data.forEach(item => (res[item.key] = item.value))
+        return {
+          ...functionality,
+          data: res,
+        }
+      })
+    }
+    return true
   }
 
   async getMany(options?: ServiceGetOptions<RoleField, RoleGetManyDataForFunctionality>) {
@@ -76,11 +100,25 @@ export class RoleService {
       }
     }
 
-    return this.roleModel.find(
+    const roles = await this.roleModel.find(
       filter,
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     )
+
+    roles.forEach(role => {
+      if (role?.available) {
+        role.available = role.available.map(functionality => {
+          const res: any = {}
+          functionality.data.forEach(item => (res[item.key] = item.value))
+          return {
+            ...functionality,
+            data: res,
+          }
+        })
+      }
+    })
+    return roles
   }
 
   async update(dto: UpdateRoleDto) {
@@ -142,7 +180,22 @@ export class RoleService {
           throw new BadRequestException(ROLE_INCORRECT_FIELD_MODEL(field))
       }
 
-    await this.roleModel.updateOne({ _id: dto.id }, { $set: dto })
+    const set: any = { ...dto }
+    if (dto.available) {
+      set.available = dto.available?.map(funct => ({
+        ...funct,
+        data: objectKeys(funct.data).map(key => ({
+          key,
+          value: funct.data[key],
+        })),
+      }))
+    }
+    await this.roleModel.updateOne(
+      { _id: dto.id },
+      {
+        $set: set,
+      }
+    )
   }
 
   async deleteById(id: Types.ObjectId) {

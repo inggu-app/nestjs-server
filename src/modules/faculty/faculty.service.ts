@@ -17,10 +17,14 @@ import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { DocumentType } from '@typegoose/typegoose'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
+import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class FacultyService {
-  constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
+  constructor(
+    @InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>,
+    private readonly roleService: RoleService
+  ) {}
 
   async create(dto: CreateFacultyDto) {
     await this.checkExists(
@@ -118,7 +122,9 @@ export class FacultyService {
   async delete(id: Types.ObjectId | MongoIdString) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    await this.facultyModel.deleteOne({ _id: id }).exec()
+    await this.roleService.clearFromId(id)
+    // await this.facultyModel.deleteOne({ _id: id }).exec()
+    return
   }
 
   async checkExists(

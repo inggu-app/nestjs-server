@@ -54,8 +54,14 @@ class Available implements AvailableFunctionality {
   @prop()
   code: FunctionalityCodesEnum
 
+  @prop({ type: () => AvailableItem })
+  data: AvailableItem[]
+}
+
+class AvailableItem {
   @prop()
-  data: {
-    [key: string]: any
-  }
+  key: string
+
+  @prop()
+  value: any
 }

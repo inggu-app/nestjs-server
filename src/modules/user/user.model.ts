@@ -47,18 +47,30 @@ class Available implements AvailableFunctionality {
   @prop()
   code: FunctionalityCodesEnum
 
+  @prop({ type: () => AvailableItem })
+  data: AvailableItem[]
+}
+
+class AvailableItem {
   @prop()
-  data: {
-    [key: string]: any
-  }
+  key: string
+
+  @prop()
+  value: any
 }
 
 export class RoleData {
   @prop({ ref: () => RoleModel })
   role: Ref<RoleModel, Types.ObjectId>
 
+  @prop({ type: () => RoleDataItem })
+  data: RoleDataItem[]
+}
+
+export class RoleDataItem {
   @prop()
-  data: {
-    [key: string]: any
-  }
+  key: string
+
+  @prop()
+  value: any
 }

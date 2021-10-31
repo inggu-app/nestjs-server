@@ -59,8 +59,8 @@ export class UserService {
   constructor(
     @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
     @Inject(forwardRef(() => ViewService)) private readonly viewService: ViewService,
+    @Inject(forwardRef(() => RoleService)) private readonly roleService: RoleService,
     private readonly jwtService: JwtService,
-    private readonly roleService: RoleService,
     private readonly functionalityService: FunctionalityService
   ) {}
 
@@ -86,20 +86,40 @@ export class UserService {
   async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<UserField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return this.userModel.findById(
-      id,
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<UserModel>
+    const user = await this.userModel
+      .findById(id, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .exec()
+    if (user?.available) {
+      user.available = user.available.map(functionality => {
+        const res: any = {}
+        functionality.data.forEach(item => (res[item.key] = item.value))
+        return {
+          ...functionality,
+          data: res,
+        }
+      })
+    }
+    return user as unknown as DocumentType<UserModel>
   }
 
   async getByLogin(login: string, options?: ServiceGetOptions<UserField>) {
     await this.checkExists({ login }, { error: new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND) })
-    return this.userModel.findOne(
+    const user = (await this.userModel.findOne(
       { login },
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
-    ) as unknown as DocumentType<UserModel>
+    )) as unknown as DocumentType<UserModel>
+    if (user?.available) {
+      user.available = user.available.map(functionality => {
+        const res: any = {}
+        functionality.data.forEach(item => (res[item.key] = item.value))
+        return {
+          ...functionality,
+          data: res,
+        }
+      })
+    }
+    return user
   }
 
   async getByRoleId(
@@ -115,7 +135,11 @@ export class UserService {
     const neededRole = user.roles.find(role => role.role.toString() == roleId.toString())
     if (!neededRole) throw new BadRequestException(USER_HAS_NO_ROLE_WITH_ID(roleId))
 
-    return neededRole.data
+    const result: any = {}
+    neededRole.data.forEach(item => {
+      result[item.key] = item.value
+    })
+    return result
   }
 
   async update(dto: UpdateUserDto) {
@@ -193,7 +217,26 @@ export class UserService {
       }
     }
 
-    await this.userModel.updateOne({ _id: dto.id }, { $set: dto })
+    const set: any = { ...dto }
+    if (dto.available) {
+      set.available = dto.available.map(funct => ({
+        ...funct,
+        data: objectKeys(funct.data).map(key => ({
+          key,
+          value: funct.data[key],
+        })),
+      }))
+    }
+    if (dto.roles) {
+      set.roles = dto.roles.map(role => ({
+        ...role,
+        data: objectKeys(role.data).map(key => ({
+          key,
+          value: role.data[key],
+        })),
+      }))
+    }
+    await this.userModel.updateOne({ _id: dto.id }, { $set: set })
   }
 
   async delete(userId: Types.ObjectId) {
