@@ -51,44 +51,22 @@ export class RoleService {
   async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<RoleField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    const role = (await this.roleModel.findById(
+    return this.roleModel.findById(
       { _id: id },
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
-    )) as unknown as DocumentType<RoleModel>
-    if (role?.available) {
-      role.available = role.available.map(functionality => {
-        const res: any = {}
-        functionality.data.forEach(item => (res[item.key] = item.value))
-        return {
-          ...functionality,
-          data: res,
-        }
-      })
-    }
-    return role
+    ) as unknown as DocumentType<RoleModel>
   }
 
   async getByTitle(title: string, options?: ServiceGetOptions<RoleField>) {
     await this.checkExists({ title })
-    const role = await this.roleModel
+    return this.roleModel
       .findOne(
         { title },
         Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
         options?.queryOptions
       )
       .exec()
-    if (role?.available) {
-      role.available = role.available.map(functionality => {
-        const res: any = {}
-        functionality.data.forEach(item => (res[item.key] = item.value))
-        return {
-          ...functionality,
-          data: res,
-        }
-      })
-    }
-    return true
   }
 
   async getMany(options?: ServiceGetOptions<RoleField, RoleGetManyDataForFunctionality>) {
@@ -100,25 +78,11 @@ export class RoleService {
       }
     }
 
-    const roles = await this.roleModel.find(
+    return this.roleModel.find(
       filter,
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
     )
-
-    roles.forEach(role => {
-      if (role?.available) {
-        role.available = role.available.map(functionality => {
-          const res: any = {}
-          functionality.data.forEach(item => (res[item.key] = item.value))
-          return {
-            ...functionality,
-            data: res,
-          }
-        })
-      }
-    })
-    return roles
   }
 
   async update(dto: UpdateRoleDto) {

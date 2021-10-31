@@ -18,9 +18,6 @@ import { ViewModule } from '../view/view.module'
     TypegooseModule.forFeature([
       {
         typegooseClass: UserModel,
-        schemaOptions: {
-          collection: 'User',
-        },
       },
     ]),
   ],

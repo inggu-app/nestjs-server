@@ -86,40 +86,20 @@ export class UserService {
   async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<UserField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    const user = await this.userModel
-      .findById(id, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
-      .exec()
-    if (user?.available) {
-      user.available = user.available.map(functionality => {
-        const res: any = {}
-        functionality.data.forEach(item => (res[item.key] = item.value))
-        return {
-          ...functionality,
-          data: res,
-        }
-      })
-    }
-    return user as unknown as DocumentType<UserModel>
+    return this.userModel.findById(
+      id,
+      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+      options?.queryOptions
+    ) as unknown as DocumentType<UserModel>
   }
 
   async getByLogin(login: string, options?: ServiceGetOptions<UserField>) {
     await this.checkExists({ login }, { error: new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND) })
-    const user = (await this.userModel.findOne(
+    return this.userModel.findOne(
       { login },
       Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
       options?.queryOptions
-    )) as unknown as DocumentType<UserModel>
-    if (user?.available) {
-      user.available = user.available.map(functionality => {
-        const res: any = {}
-        functionality.data.forEach(item => (res[item.key] = item.value))
-        return {
-          ...functionality,
-          data: res,
-        }
-      })
-    }
-    return user
+    ) as unknown as DocumentType<UserModel>
   }
 
   async getByRoleId(

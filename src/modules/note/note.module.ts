@@ -16,7 +16,7 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
     TypegooseModule.forFeature([
       {
         typegooseClass: NoteModel,
-        schemaOptions: getModelDefaultOptions('Note'),
+        schemaOptions: getModelDefaultOptions(),
       },
     ]),
   ],

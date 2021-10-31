@@ -15,9 +15,6 @@ import { ViewModule } from '../view/view.module'
     TypegooseModule.forFeature([
       {
         typegooseClass: RoleModel,
-        schemaOptions: {
-          collection: 'Role',
-        },
       },
     ]),
   ],

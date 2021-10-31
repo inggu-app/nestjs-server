@@ -122,7 +122,6 @@ export class FacultyService {
   async delete(id: Types.ObjectId | MongoIdString) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    await this.roleService.clearFromId(id)
     // await this.facultyModel.deleteOne({ _id: id }).exec()
     return
   }

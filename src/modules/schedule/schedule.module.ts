@@ -18,7 +18,7 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
     TypegooseModule.forFeature([
       {
         typegooseClass: LessonModel,
-        schemaOptions: getModelDefaultOptions('Lesson'),
+        schemaOptions: getModelDefaultOptions(),
       },
     ]),
   ],

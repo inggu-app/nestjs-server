@@ -15,7 +15,35 @@ type Role = {
 
 export interface RoleModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<RoleModel>(),
+  schemaOptions: getModelDefaultOptions<RoleModel>({
+    collection: 'Role',
+    toJSON: {
+      transform: (doc, ret) => {
+        if (ret.available) {
+          ret.available = (ret.available as Available[]).map(functionality => {
+            const res: any = {}
+            functionality.data.forEach(item => (res[item.key] = item.value))
+            return {
+              ...functionality,
+              data: res,
+            }
+          })
+        }
+      },
+    },
+    toObject: {
+      transform: (doc, ret) => {
+        ret.available = (ret.available as Available[]).map(functionality => {
+          const res: any = {}
+          functionality.data.forEach(item => (res[item.key] = item.value))
+          return {
+            ...functionality,
+            data: res,
+          }
+        })
+      },
+    },
+  }),
 })
 export class RoleModel extends TimeStamps implements Role {
   @prop()
@@ -50,7 +78,7 @@ class RoleField {
   model: DbModelsEnum | undefined | null
 }
 
-class Available implements AvailableFunctionality {
+export class Available implements AvailableFunctionality {
   @prop()
   code: FunctionalityCodesEnum
 

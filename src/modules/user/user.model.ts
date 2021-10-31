@@ -15,7 +15,35 @@ type User = {
 
 export interface UserModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<UserModel>(),
+  schemaOptions: getModelDefaultOptions<UserModel>({
+    collection: 'User',
+    toJSON: {
+      transform: (doc, ret) => {
+        if (ret.available) {
+          ret.available = (ret.available as Available[]).map(functionality => {
+            const res: any = {}
+            functionality.data.forEach(item => (res[item.key] = item.value))
+            return {
+              ...functionality,
+              data: res,
+            }
+          })
+        }
+      },
+    },
+    toObject: {
+      transform: (doc, ret) => {
+        ret.available = (ret.available as Available[]).map(functionality => {
+          const res: any = {}
+          functionality.data.forEach(item => (res[item.key] = item.value))
+          return {
+            ...functionality,
+            data: res,
+          }
+        })
+      },
+    },
+  }),
 })
 export class UserModel extends TimeStamps implements User {
   @prop()
