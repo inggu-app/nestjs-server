@@ -5,7 +5,9 @@ import { ALL_SETTINGS_TYPES, IOS_APP_VERSION_TYPE } from '../../settings.constan
 
 export interface IosAppVersionModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<IosAppVersionModel>(),
+  schemaOptions: getModelDefaultOptions<IosAppVersionModel>({
+    collection: 'Settings',
+  }),
 })
 export class IosAppVersionModel extends TimeStamps {
   @prop({

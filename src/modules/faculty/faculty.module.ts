@@ -15,9 +15,6 @@ import { RoleModule } from '../role/role.module'
     TypegooseModule.forFeature([
       {
         typegooseClass: FacultyModel,
-        schemaOptions: {
-          collection: 'Faculty',
-        },
       },
     ]),
   ],

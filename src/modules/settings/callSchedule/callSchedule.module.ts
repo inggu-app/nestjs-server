@@ -11,9 +11,6 @@ import { CallScheduleModel } from './callSchedule.model'
     TypegooseModule.forFeature([
       {
         typegooseClass: CallScheduleModel,
-        schemaOptions: {
-          collection: 'Settings',
-        },
       },
     ]),
   ],

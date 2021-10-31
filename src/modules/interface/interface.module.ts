@@ -13,9 +13,6 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
     TypegooseModule.forFeature([
       {
         typegooseClass: InterfaceModel,
-        schemaOptions: {
-          collection: 'Interface',
-        },
       },
     ]),
   ],

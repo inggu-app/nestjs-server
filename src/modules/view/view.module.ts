@@ -15,9 +15,6 @@ import { InterfaceModule } from '../interface/interface.module'
     TypegooseModule.forFeature([
       {
         typegooseClass: ViewModel,
-        schemaOptions: {
-          collection: 'View',
-        },
       },
     ]),
   ],

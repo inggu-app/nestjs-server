@@ -9,7 +9,9 @@ type Faculty = {
 
 export interface FacultyModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<FacultyModel>(),
+  schemaOptions: getModelDefaultOptions<FacultyModel>({
+    collection: 'Faculty',
+  }),
 })
 export class FacultyModel extends TimeStamps implements Faculty {
   @prop({ unique: true })

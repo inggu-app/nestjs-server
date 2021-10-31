@@ -11,9 +11,6 @@ import { WeeksCountModel } from './weeksCount.model'
     TypegooseModule.forFeature([
       {
         typegooseClass: WeeksCountModel,
-        schemaOptions: {
-          collection: 'Settings',
-        },
       },
     ]),
   ],

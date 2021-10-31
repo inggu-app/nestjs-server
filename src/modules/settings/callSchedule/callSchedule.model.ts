@@ -8,7 +8,9 @@ export interface CallScheduleModel {
 }
 export interface CallScheduleModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<CallScheduleModel>(),
+  schemaOptions: getModelDefaultOptions<CallScheduleModel>({
+    collection: 'Settings',
+  }),
 })
 export class CallScheduleModel extends TimeStamps {
   @prop({

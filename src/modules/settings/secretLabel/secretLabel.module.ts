@@ -11,9 +11,6 @@ import { SecretLabelModel } from './secretLabel.model'
     TypegooseModule.forFeature([
       {
         typegooseClass: SecretLabelModel,
-        schemaOptions: {
-          collection: 'Settings',
-        },
       },
     ]),
   ],

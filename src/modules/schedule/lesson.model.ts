@@ -12,7 +12,9 @@ type Lesson = {
 
 export interface LessonModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<LessonModel>(),
+  schemaOptions: getModelDefaultOptions<LessonModel>({
+    collection: 'Lesson',
+  }),
 })
 export class LessonModel extends TimeStamps implements Lesson {
   @prop()

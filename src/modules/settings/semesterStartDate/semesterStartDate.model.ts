@@ -5,7 +5,9 @@ import { ALL_SETTINGS_TYPES } from '../settings.constants'
 
 export interface SemesterStartDateModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<SemesterStartDateModel>(),
+  schemaOptions: getModelDefaultOptions<SemesterStartDateModel>({
+    collection: 'Settings',
+  }),
 })
 export class SemesterStartDateModel extends TimeStamps {
   @prop({

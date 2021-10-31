@@ -11,7 +11,9 @@ type Interface = {
 export interface InterfaceModel extends CustomModelBase {}
 export interface InterfaceModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<InterfaceModel>(),
+  schemaOptions: getModelDefaultOptions<InterfaceModel>({
+    collection: 'Interface',
+  }),
 })
 export class InterfaceModel implements Interface {
   @prop()

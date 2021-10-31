@@ -5,7 +5,9 @@ import { ALL_SETTINGS_TYPES, ANDROID_APP_VERSION_TYPE } from '../../settings.con
 
 export interface AndroidAppVersionModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<AndroidAppVersionModel>(),
+  schemaOptions: getModelDefaultOptions<AndroidAppVersionModel>({
+    collection: 'Settings',
+  }),
 })
 export class AndroidAppVersionModel extends TimeStamps {
   @prop({

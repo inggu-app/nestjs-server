@@ -5,7 +5,9 @@ import { ALL_SETTINGS_TYPES } from '../settings.constants'
 
 export interface WeeksCountModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<WeeksCountModel>(),
+  schemaOptions: getModelDefaultOptions<WeeksCountModel>({
+    collection: 'Settings',
+  }),
 })
 export class WeeksCountModel extends TimeStamps {
   @prop({

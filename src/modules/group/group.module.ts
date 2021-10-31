@@ -15,9 +15,6 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
     TypegooseModule.forFeature([
       {
         typegooseClass: GroupModel,
-        schemaOptions: {
-          collection: 'Group',
-        },
       },
     ]),
   ],

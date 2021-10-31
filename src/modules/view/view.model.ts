@@ -13,7 +13,9 @@ type View = {
 export interface ViewModel extends CustomModelBase {}
 export interface ViewModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<ViewModel>(),
+  schemaOptions: getModelDefaultOptions<ViewModel>({
+    collection: 'View',
+  }),
 })
 export class ViewModel extends TimeStamps implements View {
   @prop()

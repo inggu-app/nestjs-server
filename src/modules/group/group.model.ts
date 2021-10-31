@@ -13,7 +13,9 @@ type Group = {
 export interface GroupModel extends CustomModelBase {}
 export interface GroupModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<GroupModel>(),
+  schemaOptions: getModelDefaultOptions<GroupModel>({
+    collection: 'Group',
+  }),
 })
 export class GroupModel extends TimeStamps implements Group {
   @prop()

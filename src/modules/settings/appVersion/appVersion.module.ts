@@ -14,15 +14,9 @@ import { ModuleRoutesEnum } from '../../../global/enums/moduleRoutes.enum'
     TypegooseModule.forFeature([
       {
         typegooseClass: AndroidAppVersionModel,
-        schemaOptions: {
-          collection: 'Settings',
-        },
       },
       {
         typegooseClass: IosAppVersionModel,
-        schemaOptions: {
-          collection: 'Settings',
-        },
       },
     ]),
   ],

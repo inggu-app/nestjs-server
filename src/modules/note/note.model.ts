@@ -12,7 +12,9 @@ type Note = {
 
 export interface NoteModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<NoteModel>(),
+  schemaOptions: getModelDefaultOptions<NoteModel>({
+    collection: 'Note',
+  }),
 })
 export class NoteModel extends TimeStamps implements Note {
   @prop()

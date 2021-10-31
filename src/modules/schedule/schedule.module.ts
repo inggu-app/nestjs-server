@@ -5,7 +5,6 @@ import { ScheduleService } from './schedule.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
 import { CallScheduleModule } from '../settings/callSchedule/callSchedule.module'
-import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { ScheduleGetRoutesMiddleware } from './scheduleGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 
@@ -18,7 +17,6 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
     TypegooseModule.forFeature([
       {
         typegooseClass: LessonModel,
-        schemaOptions: getModelDefaultOptions(),
       },
     ]),
   ],

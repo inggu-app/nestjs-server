@@ -11,9 +11,6 @@ import { SemesterStartDateController } from './semesterStartDate.controller'
     TypegooseModule.forFeature([
       {
         typegooseClass: SemesterStartDateModel,
-        schemaOptions: {
-          collection: 'Settings',
-        },
       },
     ]),
   ],

@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { NoteService } from './note.service'
 import { NoteController } from './note.controller'
 import { TypegooseModule } from 'nestjs-typegoose'
-import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { NoteModel } from './note.model'
 import { ScheduleModule } from '../schedule/schedule.module'
 import { NoteGetRoutesMiddleware } from './noteGetRoutes.middleware'
@@ -16,7 +15,6 @@ import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
     TypegooseModule.forFeature([
       {
         typegooseClass: NoteModel,
-        schemaOptions: getModelDefaultOptions(),
       },
     ]),
   ],

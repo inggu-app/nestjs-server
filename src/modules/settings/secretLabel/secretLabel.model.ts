@@ -5,7 +5,9 @@ import { ALL_SETTINGS_TYPES } from '../settings.constants'
 
 export interface SecretLabelModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<SecretLabelModel>(),
+  schemaOptions: getModelDefaultOptions<SecretLabelModel>({
+    collection: 'Settings',
+  }),
 })
 export class SecretLabelModel extends TimeStamps {
   @prop({
