@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { RoleModel } from './role.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
@@ -34,7 +34,7 @@ import { getModelWithString } from '@typegoose/typegoose'
 export class RoleService {
   constructor(
     @InjectModel(RoleModel) private readonly roleModel: ModelType<RoleModel>,
-    private readonly viewService: ViewService,
+    @Inject(forwardRef(() => ViewService)) private readonly viewService: ViewService,
     private readonly functionalityService: FunctionalityService
   ) {}
 

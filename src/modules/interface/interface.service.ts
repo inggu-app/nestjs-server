@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { InterfaceModel } from './interface.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
@@ -15,10 +15,16 @@ import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { DocumentType } from '@typegoose/typegoose'
 import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { UpdateInterfaceDto } from './dto/updateInterface.dto'
+import { UserService } from '../user/user.service'
+import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class InterfaceService {
-  constructor(@InjectModel(InterfaceModel) private readonly interfaceModel: ModelType<InterfaceModel>) {}
+  constructor(
+    @InjectModel(InterfaceModel) private readonly interfaceModel: ModelType<InterfaceModel>,
+    private readonly userService: UserService,
+    @Inject(forwardRef(() => RoleService)) private readonly roleService: RoleService
+  ) {}
 
   async create(dto: CreateInterfaceDto) {
     await this.checkExists(
@@ -57,6 +63,8 @@ export class InterfaceService {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.interfaceModel.deleteOne({ _id: id })
+    await this.userService.clearFromId(id)
+    await this.roleService.clearFromId(id)
     return
   }
 

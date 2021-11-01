@@ -1,4 +1,4 @@
-import { Global, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
+import { forwardRef, Global, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { RoleController } from './role.controller'
 import { RoleService } from './role.service'
 import { TypegooseModule } from 'nestjs-typegoose'
@@ -12,7 +12,7 @@ import { ViewModule } from '../view/view.module'
   controllers: [RoleController],
   providers: [RoleService],
   imports: [
-    ViewModule,
+    forwardRef(() => ViewModule),
     TypegooseModule.forFeature([
       {
         typegooseClass: RoleModel,
