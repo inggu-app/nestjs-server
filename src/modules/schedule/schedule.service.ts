@@ -9,10 +9,16 @@ import { LessonFieldsEnum, ScheduleField } from './schedule.constants'
 import { LESSON_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
+import { UserService } from '../user/user.service'
+import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class ScheduleService {
-  constructor(@InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>) {}
+  constructor(
+    @InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>,
+    private readonly userService: UserService,
+    private readonly roleService: RoleService
+  ) {}
 
   async create(dto: CreateScheduleDto) {
     const lessons = dto.schedule.map(lesson => ({ ...lesson, group: dto.group }))
@@ -53,7 +59,16 @@ export class ScheduleService {
 
   async delete(groupId: Types.ObjectId | MongoIdString, ids?: Types.ObjectId[]) {
     groupId = stringToObjectId(groupId)
-    await this.lessonModel.deleteMany(ids ? { group: groupId, _id: { $in: ids } } : { groupId }).exec()
+    if (!ids) {
+      const scheduleIds = (await this.getByGroup(groupId, { fields: ['id'] })).map(lesson => lesson.id)
+      await this.lessonModel.deleteMany({ group: groupId })
+      await this.userService.clearFromId(scheduleIds)
+      await this.roleService.clearFromId(scheduleIds)
+    } else {
+      await this.lessonModel.deleteMany({ group: groupId, _id: { $in: ids } })
+      await this.userService.clearFromId(ids)
+      await this.roleService.clearFromId(ids)
+    }
   }
 
   async checkExists(
