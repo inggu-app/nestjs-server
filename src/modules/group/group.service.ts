@@ -19,12 +19,16 @@ import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/c
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
+import { UserService } from '../user/user.service'
+import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class GroupService {
   constructor(
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
-    private readonly facultyService: FacultyService
+    private readonly facultyService: FacultyService,
+    private readonly userService: UserService,
+    private readonly roleService: RoleService
   ) {}
 
   async create(dto: CreateGroupDto) {
@@ -131,6 +135,9 @@ export class GroupService {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.groupModel.deleteOne({ _id: id }).exec()
+    await this.userService.clearFromId(id)
+    await this.roleService.clearFromId(id)
+    return
   }
 
   async deleteAllByFacultyId(facultyId: Types.ObjectId | MongoIdString) {
