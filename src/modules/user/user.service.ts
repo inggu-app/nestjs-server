@@ -245,9 +245,11 @@ export class UserService {
     }
   }
 
-  async clearFromId(id: MongoIdString | Types.ObjectId) {
+  async clearFromId(ids: MongoIdString | Types.ObjectId | (MongoIdString | Types.ObjectId)[]) {
+    if (!Array.isArray(ids)) ids = [ids]
+    ids = ids.map(String)
     const roles = await this.userModel
-      .find({ $or: [{ 'available.data.value': String(id) }, { 'roles.data.value': String(id) }] }, { available: 1, roles: 1 })
+      .find({ $or: [{ 'available.data.value': { $in: ids } }, { 'roles.data.value': { $in: ids } }] }, { available: 1, roles: 1 })
       .exec()
 
     for await (const role of roles) {
@@ -255,7 +257,7 @@ export class UserService {
       arrays.forEach(array => {
         array.map(arrayItem => {
           arrayItem.data = arrayItem.data.map(field => {
-            if (Array.isArray(field.value)) field.value = field.value.filter(item => String(item) !== String(id))
+            if (Array.isArray(field.value)) field.value = field.value.filter(item => !(ids as Array<any>).includes(String(item)))
             return field
           })
           return arrayItem

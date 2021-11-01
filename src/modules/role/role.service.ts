@@ -177,13 +177,15 @@ export class RoleService {
     return
   }
 
-  async clearFromId(id: MongoIdString | Types.ObjectId) {
-    const roles = await this.roleModel.find({ 'available.data.value': String(id) }, { available: 1 }).exec()
+  async clearFromId(ids: MongoIdString | Types.ObjectId | (MongoIdString | Types.ObjectId)[]) {
+    if (!Array.isArray(ids)) ids = [ids]
+    ids = ids.map(String)
+    const roles = await this.roleModel.find({ 'available.data.value': { $in: ids } }, { available: 1 }).exec()
 
     for await (const role of roles) {
       const available = role.available.map(functionality => {
         functionality.data = functionality.data.map(field => {
-          if (Array.isArray(field.value)) field.value = field.value.filter(item => String(item) !== String(id))
+          if (Array.isArray(field.value)) field.value = field.value.filter(item => !(ids as Array<any>).includes(String(item)))
           return field
         })
         return functionality
