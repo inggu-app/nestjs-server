@@ -66,6 +66,13 @@ export class BaseJwtAuthGuard implements CanActivate, JwtAuthGuardValidate {
             const functionality = functionalities.find(functionality => functionality.code === code)
 
             if (functionality) {
+              functionality.data = functionality.data.reduce(
+                (acc, field) => ({
+                  ...acc,
+                  [field.key]: field.value,
+                }),
+                {} as any
+              )
               context.switchToHttp().getRequest<CustomRequest>().user = user
               context.switchToHttp().getRequest<CustomRequest>().functionality = functionality
               return this.validate(functionality, user, context.switchToHttp().getRequest<Request>())

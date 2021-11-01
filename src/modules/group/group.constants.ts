@@ -15,9 +15,8 @@ export enum GetGroupsEnum {
 
 export enum GroupRoutesEnum {
   CREATE = '/',
-  GET_BY_GROUP_ID = '/by-group-id',
-  GET_BY_GROUP_IDS = '/by-group-ids',
-  GET_BY_USER_ID = '/by-user-id',
+  GET_BY_GROUP_ID = '/',
+  GET_BY_GROUP_IDS = '/by-ids',
   GET_BY_FACULTY_ID = '/by-faculty-id',
   GET_MANY = '/many',
   UPDATE = '/',
