@@ -29,13 +29,15 @@ import { difference } from 'underscore'
 import { checkTypes } from '../../global/utils/checkTypes'
 import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
 import { getModelWithString } from '@typegoose/typegoose'
+import { UserService } from '../user/user.service'
 
 @Injectable()
 export class RoleService {
   constructor(
     @InjectModel(RoleModel) private readonly roleModel: ModelType<RoleModel>,
     @Inject(forwardRef(() => ViewService)) private readonly viewService: ViewService,
-    private readonly functionalityService: FunctionalityService
+    private readonly functionalityService: FunctionalityService,
+    private readonly userService: UserService
   ) {}
 
   async create(dto: CreateRoleDto) {
@@ -165,6 +167,7 @@ export class RoleService {
   async deleteById(id: Types.ObjectId) {
     await this.checkExists({ _id: id })
     await this.roleModel.deleteOne({ _id: id })
+    await this.userService.clearFromId(id)
     return
   }
 
