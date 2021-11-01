@@ -10,12 +10,16 @@ import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ScheduleService } from '../schedule/schedule.service'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
+import { UserService } from '../user/user.service'
+import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class NoteService {
   constructor(
     @InjectModel(NoteModel) private readonly noteModel: ModelType<NoteModel>,
-    private readonly scheduleService: ScheduleService
+    private readonly scheduleService: ScheduleService,
+    private readonly userService: UserService,
+    private readonly roleService: RoleService
   ) {}
 
   async create(dto: CreateNoteDto) {
@@ -51,7 +55,10 @@ export class NoteService {
 
   async delete(id: Types.ObjectId | MongoIdString) {
     await this.checkExists({ _id: id })
-    return this.noteModel.findByIdAndDelete(id).exec()
+    await this.noteModel.deleteOne({ _id: id })
+    await this.userService.clearFromId(id)
+    await this.roleService.clearFromId(id)
+    return
   }
 
   async checkExists(
