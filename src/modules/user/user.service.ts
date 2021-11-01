@@ -254,15 +254,18 @@ export class UserService {
       .exec()
 
     for await (const role of roles) {
-      const arrays = [role.roles, role.available]
-      arrays.forEach(array => {
-        array.map(arrayItem => {
-          arrayItem.data = arrayItem.data.map(field => {
-            if (Array.isArray(field.value)) field.value = field.value.filter(item => !(ids as Array<any>).includes(String(item)))
-            return field
+      let arrays = [role.roles, role.available]
+      arrays = arrays.map(array => {
+        array = array
+          .map(arrayItem => {
+            arrayItem.data = arrayItem.data.map(field => {
+              if (Array.isArray(field.value)) field.value = field.value.filter(item => !(ids as Array<any>).includes(String(item)))
+              return field
+            })
+            return arrayItem
           })
-          return arrayItem
-        })
+          .filter(arrayItem => !arrayItem.data.find(field => (ids as Array<any>).includes(field.value))) as any
+        return array
       })
       await this.userModel.updateOne({ _id: role.id }, { $set: { roles: arrays[0], available: arrays[1] } })
     }

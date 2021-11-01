@@ -134,7 +134,7 @@ export class GroupService {
   async delete(id: Types.ObjectId | MongoIdString) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    await this.groupModel.deleteOne({ _id: id }).exec()
+    await this.groupModel.deleteOne({ _id: id })
     await this.userService.clearFromId(id)
     await this.roleService.clearFromId(id)
     return

@@ -184,13 +184,17 @@ export class RoleService {
     const roles = await this.roleModel.find({ 'available.data.value': { $in: ids } }, { available: 1 }).exec()
 
     for await (const role of roles) {
-      const available = role.available.map(functionality => {
-        functionality.data = functionality.data.map(field => {
-          if (Array.isArray(field.value)) field.value = field.value.filter(item => !(ids as Array<any>).includes(String(item)))
-          return field
+      const available = role.available
+        .map(functionality => {
+          functionality.data = functionality.data
+            .map(field => {
+              if (Array.isArray(field.value)) field.value = field.value.filter(item => !(ids as Array<any>).includes(String(item)))
+              return field
+            })
+            .filter(field => Array.isArray(field.value))
+          return functionality
         })
-        return functionality
-      })
+        .filter(arrayItem => !arrayItem.data.find(field => (ids as Array<any>).includes(field.value)))
       await this.roleModel.updateOne({ _id: role.id }, { $set: { available } })
     }
     return
