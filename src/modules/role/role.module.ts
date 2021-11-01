@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
+import { Global, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { RoleController } from './role.controller'
 import { RoleService } from './role.service'
 import { TypegooseModule } from 'nestjs-typegoose'
@@ -7,6 +7,7 @@ import { RoleGetRoutesMiddleware } from './roleGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
 import { ViewModule } from '../view/view.module'
 
+@Global()
 @Module({
   controllers: [RoleController],
   providers: [RoleService],

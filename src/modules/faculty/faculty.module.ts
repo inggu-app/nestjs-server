@@ -4,13 +4,11 @@ import { FacultyService } from './faculty.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { GroupModule } from '../group/group.module'
-import { RoleModule } from '../role/role.module'
 
 @Module({
   controllers: [FacultyController],
   providers: [FacultyService],
   imports: [
-    RoleModule,
     forwardRef(() => GroupModule),
     TypegooseModule.forFeature([
       {
