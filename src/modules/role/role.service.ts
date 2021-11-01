@@ -174,6 +174,22 @@ export class RoleService {
     return
   }
 
+  async clearFromId(id: MongoIdString | Types.ObjectId) {
+    const roles = await this.roleModel.find({ 'available.data.value': String(id) }, { available: 1 }).exec()
+
+    for await (const role of roles) {
+      const available = role.available.map(functionality => {
+        functionality.data = functionality.data.map(field => {
+          if (Array.isArray(field.value)) field.value = field.value.filter(item => String(item) !== String(id))
+          return field
+        })
+        return functionality
+      })
+      await this.roleModel.updateOne({ _id: role.id }, { $set: { available } })
+    }
+    return
+  }
+
   async checkExists(
     filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase> | ObjectByInterface<typeof RoleFieldsEnum, ModelBase>[],
     options?: { error?: ((filter: ObjectByInterface<typeof RoleFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }

@@ -245,6 +245,27 @@ export class UserService {
     }
   }
 
+  async clearFromId(id: MongoIdString | Types.ObjectId) {
+    const roles = await this.userModel
+      .find({ $or: [{ 'available.data.value': String(id) }, { 'roles.data.value': String(id) }] }, { available: 1, roles: 1 })
+      .exec()
+
+    for await (const role of roles) {
+      const arrays = [role.roles, role.available]
+      arrays.forEach(array => {
+        array.map(arrayItem => {
+          arrayItem.data = arrayItem.data.map(field => {
+            if (Array.isArray(field.value)) field.value = field.value.filter(item => String(item) !== String(id))
+            return field
+          })
+          return arrayItem
+        })
+      })
+      await this.userModel.updateOne({ _id: role.id }, { $set: { roles: arrays[0], available: arrays[1] } })
+    }
+    return
+  }
+
   async checkExists(
     filter: ObjectByInterface<typeof UserFieldsEnum, ModelBase> | ObjectByInterface<typeof UserFieldsEnum, ModelBase>[],
     options?: { error?: ((filter: ObjectByInterface<typeof UserFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
