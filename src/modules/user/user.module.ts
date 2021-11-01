@@ -5,7 +5,6 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { UserModel } from './user.model'
 import { UserGetRoutesMiddleware } from './userGetRoutes.middleware'
 import { ModuleRoutesEnum } from '../../global/enums/moduleRoutes.enum'
-import { RoleModule } from '../role/role.module'
 import { ViewModule } from '../view/view.module'
 
 @Global()
@@ -13,7 +12,6 @@ import { ViewModule } from '../view/view.module'
   controllers: [UserController],
   providers: [UserService],
   imports: [
-    forwardRef(() => RoleModule),
     forwardRef(() => ViewModule),
     TypegooseModule.forFeature([
       {

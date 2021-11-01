@@ -20,12 +20,14 @@ import { UserService } from '../user/user.service'
 import { RoleModel } from '../role/role.model'
 import { InterfaceModel } from '../interface/interface.model'
 import { InterfaceService } from '../interface/interface.service'
+import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class ViewService {
   constructor(
     @InjectModel(ViewModel) private readonly viewModel: ModelType<ViewModel>,
     @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
+    @Inject(forwardRef(() => RoleService)) private readonly roleService: RoleService,
     private readonly interfaceService: InterfaceService
   ) {}
 
@@ -108,6 +110,8 @@ export class ViewService {
   async delete(id: Types.ObjectId | MongoIdString) {
     await this.checkExists({ _id: id })
     await this.viewModel.deleteOne({ _id: id })
+    await this.userService.clearFromId(id)
+    await this.roleService.clearFromId(id)
     return
   }
 

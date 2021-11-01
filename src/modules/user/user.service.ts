@@ -221,8 +221,9 @@ export class UserService {
 
   async delete(userId: Types.ObjectId) {
     await this.checkExists({ _id: userId })
-
     await this.userModel.deleteOne({ _id: userId })
+    await this.clearFromId(userId)
+    await this.roleService.clearFromId(userId)
   }
 
   async login(dto: LoginUserDto) {

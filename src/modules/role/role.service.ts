@@ -168,6 +168,7 @@ export class RoleService {
     await this.checkExists({ _id: id })
     await this.roleModel.deleteOne({ _id: id })
     await this.userService.clearFromId(id)
+    await this.clearFromId(id)
     return
   }
 
