@@ -20,7 +20,7 @@ export class SemesterRangeDateController {
 
   @UsePipes(new ValidationPipe())
   @Functionality({
-    code: FunctionalityCodesEnum.SEMESTER_START_DATE__CREATE,
+    code: FunctionalityCodesEnum.SEMESTER_RANGE_DATE__CREATE,
     default: defaultSemesterRangeDateCreateData,
     title: 'Установить начало старта семестра',
   })
@@ -33,7 +33,7 @@ export class SemesterRangeDateController {
   }
 
   @Functionality({
-    code: FunctionalityCodesEnum.SEMESTER_START_DATE__GET,
+    code: FunctionalityCodesEnum.SEMESTER_RANGE_DATE__GET,
     default: defaultSemesterRangeDateGetData,
     title: 'Получить дату старта семестра',
   })

@@ -82,8 +82,8 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
     case FunctionalityCodesEnum.SECRET_LABEL__CREATE:
     case FunctionalityCodesEnum.SECRET_LABEL__GET:
       return SecretLabelJwtAuthGuard
-    case FunctionalityCodesEnum.SEMESTER_START_DATE__CREATE:
-    case FunctionalityCodesEnum.SEMESTER_START_DATE__GET:
+    case FunctionalityCodesEnum.SEMESTER_RANGE_DATE__CREATE:
+    case FunctionalityCodesEnum.SEMESTER_RANGE_DATE__GET:
       return SemesterRangeDateJwtAuthGuard
     default:
       return BaseJwtAuthGuard

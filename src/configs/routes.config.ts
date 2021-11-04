@@ -65,7 +65,7 @@ export const routesConfig: Routes = [
         module: SecretLabelModule,
       },
       {
-        path: ModuleRoutesEnum.SEMESTER_START_DATE_MODULE,
+        path: ModuleRoutesEnum.SEMESTER_RANGE_DATE_MODULE,
         module: SemesterRangeDateModule,
       },
       {

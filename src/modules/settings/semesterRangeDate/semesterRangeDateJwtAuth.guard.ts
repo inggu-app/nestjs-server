@@ -6,9 +6,9 @@ import { ForbiddenException } from '@nestjs/common'
 export class SemesterRangeDateJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality) {
     switch (functionality.code) {
-      case FunctionalityCodesEnum.SEMESTER_START_DATE__CREATE:
+      case FunctionalityCodesEnum.SEMESTER_RANGE_DATE__CREATE:
         return true
-      case FunctionalityCodesEnum.SEMESTER_START_DATE__GET:
+      case FunctionalityCodesEnum.SEMESTER_RANGE_DATE__GET:
         return true
     }
 
