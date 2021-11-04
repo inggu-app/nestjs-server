@@ -18,7 +18,7 @@ export class SemesterRangeDateService {
         isActive: true,
         settingType: SEMESTER_RANGE_TYPE,
       },
-      { date: 1, updatedAt: 1, _id: 0 }
+      { startDate: 1, endDate: 1, updatedAt: 1, _id: 0 }
     )
   }
 
