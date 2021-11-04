@@ -18,7 +18,7 @@ export class CallScheduleModel extends TimeStamps {
   })
   settingType: string
 
-  @prop({ type: () => CallScheduleItem })
+  @prop()
   schedule: CallScheduleItem[]
 
   @prop({ default: true })
