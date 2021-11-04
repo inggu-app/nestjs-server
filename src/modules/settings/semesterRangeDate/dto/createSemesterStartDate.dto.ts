@@ -3,5 +3,8 @@ import { dateRegExp } from '../../../../global/regex'
 
 export class CreateSemesterStartDateDto {
   @Matches(dateRegExp)
-  date: Date
+  startDate: Date
+
+  @Matches(dateRegExp)
+  endDate: Date
 }

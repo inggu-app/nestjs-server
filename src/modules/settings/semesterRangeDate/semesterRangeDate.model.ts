@@ -3,20 +3,23 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../../configs/modelDefaultOptions.config'
 import { ALL_SETTINGS_TYPES } from '../settings.constants'
 
-export interface SemesterStartDateModel extends Base {}
+export interface SemesterRangeDateModel extends Base {}
 @modelOptions({
-  schemaOptions: getModelDefaultOptions<SemesterStartDateModel>({
+  schemaOptions: getModelDefaultOptions<SemesterRangeDateModel>({
     collection: 'Settings',
   }),
 })
-export class SemesterStartDateModel extends TimeStamps {
+export class SemesterRangeDateModel extends TimeStamps {
   @prop({
     enum: ALL_SETTINGS_TYPES,
   })
   settingType: string
 
   @prop()
-  date: Date
+  startDate: Date
+
+  @prop()
+  endDate: Date
 
   @prop()
   isActive: boolean

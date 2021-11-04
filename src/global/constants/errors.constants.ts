@@ -67,3 +67,5 @@ export const FUNCTIONALITY_MISSING_FIELDS = (functionalityCode: FunctionalityCod
 export const FUNCTIONALITY_INCORRECT_FIELD_TYPE = (field: string | number) => `Для поля ${field} задан неправильный тип`
 export const FUNCTIONALITY_INCORRECT_FIELD_VALUE = (model: string, value: string) =>
   `В модели ${model} не существует документа с id ${value}`
+
+export const SEMESTER_RANGE_DATE_INCORRECT_RANGE = `Некорректный промежуток дат`

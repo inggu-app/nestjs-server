@@ -1,22 +1,22 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { SemesterStartDateModel } from './semesterStartDate.model'
-import { SEMESTER_START_TIME_TYPE } from '../settings.constants'
+import { SemesterRangeDateModel } from './semesterRangeDate.model'
+import { SEMESTER_RANGE_TYPE } from '../settings.constants'
 import { CreateSemesterStartDateDto } from './dto/createSemesterStartDate.dto'
 
 @Injectable()
-export class SemesterStartDateService {
+export class SemesterRangeDateService {
   constructor(
-    @InjectModel(SemesterStartDateModel)
-    private readonly semesterStartDateModel: ModelType<SemesterStartDateModel>
+    @InjectModel(SemesterRangeDateModel)
+    private readonly semesterStartDateModel: ModelType<SemesterRangeDateModel>
   ) {}
 
   getActiveSemesterStartDate() {
     return this.semesterStartDateModel.findOne(
       {
         isActive: true,
-        settingType: SEMESTER_START_TIME_TYPE,
+        settingType: SEMESTER_RANGE_TYPE,
       },
       { date: 1, updatedAt: 1, _id: 0 }
     )
@@ -25,14 +25,15 @@ export class SemesterStartDateService {
   deleteActiveSemesterStartDate() {
     return this.semesterStartDateModel.deleteOne({
       isActive: true,
-      settingType: SEMESTER_START_TIME_TYPE,
+      settingType: SEMESTER_RANGE_TYPE,
     })
   }
 
   createSemesterStartDate(dto: CreateSemesterStartDateDto) {
     return this.semesterStartDateModel.create({
-      date: dto.date,
-      settingType: SEMESTER_START_TIME_TYPE,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      settingType: SEMESTER_RANGE_TYPE,
       isActive: true,
     })
   }

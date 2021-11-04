@@ -3,7 +3,7 @@ import { AvailableFunctionality } from '../../functionality/functionality.consta
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 import { ForbiddenException } from '@nestjs/common'
 
-export class SemesterStartDateJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
+export class SemesterRangeDateJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardValidate {
   async validate(functionality: AvailableFunctionality) {
     switch (functionality.code) {
       case FunctionalityCodesEnum.SEMESTER_START_DATE__CREATE:
