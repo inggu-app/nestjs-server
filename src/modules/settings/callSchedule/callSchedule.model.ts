@@ -18,7 +18,7 @@ export class CallScheduleModel extends TimeStamps {
   })
   settingType: string
 
-  @prop({ ref: () => CallScheduleItem })
+  @prop({ type: () => CallScheduleItem })
   schedule: CallScheduleItem[]
 
   @prop({ default: true })
@@ -26,9 +26,12 @@ export class CallScheduleModel extends TimeStamps {
 }
 
 class CallScheduleItem {
+  @prop()
   lessonNumber: number
 
+  @prop()
   start: Date
 
+  @prop()
   end: Date
 }
