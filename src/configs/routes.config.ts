@@ -6,7 +6,6 @@ import { SettingsModule } from '../modules/settings/settings.module'
 import { CallScheduleModule } from '../modules/settings/callSchedule/callSchedule.module'
 import { SecretLabelModule } from '../modules/settings/secretLabel/secretLabel.module'
 import { SemesterRangeDateModule } from '../modules/settings/semesterRangeDate/semesterRangeDate.module'
-import { WeeksCountModule } from '../modules/settings/weeksCount/weeksCount.module'
 import { AppVersionModule } from '../modules/settings/appVersion/appVersion.module'
 import { NoteModule } from '../modules/note/note.module'
 import { UserModule } from '../modules/user/user.module'
@@ -68,10 +67,6 @@ export const routesConfig: Routes = [
       {
         path: ModuleRoutesEnum.SEMESTER_START_DATE_MODULE,
         module: SemesterRangeDateModule,
-      },
-      {
-        path: ModuleRoutesEnum.WEEKS_COUNT_MODULE,
-        module: WeeksCountModule,
       },
       {
         path: ModuleRoutesEnum.APP_VERSION_MODULE,

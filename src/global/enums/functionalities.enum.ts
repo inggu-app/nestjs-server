@@ -63,9 +63,6 @@ export enum FunctionalityCodesEnum {
 
   SEMESTER_START_DATE__CREATE = 'SEMESTER_START_DATE__CREATE',
   SEMESTER_START_DATE__GET = 'SEMESTER_START_DATE__GET',
-
-  WEEKS_COUNT__CREATE = 'WEEKS_COUNT__CREATE',
-  WEEKS_COUNT__GET = 'WEEKS_COUNT__GET',
 }
 
 enumKeyValuesMatch(FunctionalityCodesEnum)
