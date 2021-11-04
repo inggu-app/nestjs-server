@@ -1,7 +1,7 @@
 import { Matches } from 'class-validator'
 import { dateRegExp } from '../../../../global/regex'
 
-export class CreateSemesterStartDateDto {
+export class CreateSemesterRangeDto {
   @Matches(dateRegExp)
   startDate: Date
 

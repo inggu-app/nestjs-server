@@ -12,5 +12,5 @@ export enum ModuleRoutesEnum {
   APP_VERSION_MODULE = '/app-version',
   CALL_SCHEDULE_MODULE = '/call-schedule',
   SECRET_LABEL_MODULE = '/secret-label',
-  SEMESTER_RANGE_DATE_MODULE = '/semester-range-date',
+  SEMESTER_RANGE_MODULE = '/semester-range',
 }

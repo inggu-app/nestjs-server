@@ -1,13 +1,9 @@
 import { BadRequestException, Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
-import { SemesterRangeDateService } from './semesterRangeDate.service'
-import { CreateSemesterStartDateDto } from './dto/createSemesterStartDate.dto'
+import { SemesterRangeService } from './semesterRange.service'
+import { CreateSemesterRangeDto } from './dto/createSemesterRange.dto'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 import checkAlternativeQueryParameters from '../../../global/utils/alternativeQueryParameters'
-import {
-  defaultSemesterRangeDateCreateData,
-  defaultSemesterRangeDateGetData,
-  SemesterRangeDateRoutesEnum,
-} from './semesterRangeDate.constants'
+import { defaultSemesterRangeDateCreateData, defaultSemesterRangeDateGetData, SemesterRangeDateRoutesEnum } from './semesterRange.constants'
 import { Functionality } from '../../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
 import { ApiTags } from '@nestjs/swagger'
@@ -15,17 +11,17 @@ import { SEMESTER_RANGE_DATE_INCORRECT_RANGE } from '../../../global/constants/e
 
 @ApiTags('Дата старта семестра')
 @Controller()
-export class SemesterRangeDateController {
-  constructor(private readonly semesterStartDateService: SemesterRangeDateService) {}
+export class SemesterRangeController {
+  constructor(private readonly semesterStartDateService: SemesterRangeService) {}
 
   @UsePipes(new ValidationPipe())
   @Functionality({
-    code: FunctionalityCodesEnum.SEMESTER_RANGE_DATE__CREATE,
+    code: FunctionalityCodesEnum.SEMESTER_RANGE__CREATE,
     default: defaultSemesterRangeDateCreateData,
     title: 'Установить начало старта семестра',
   })
   @Post(SemesterRangeDateRoutesEnum.CREATE)
-  async createSemesterStartTime(@Body() dto: CreateSemesterStartDateDto) {
+  async createSemesterStartTime(@Body() dto: CreateSemesterRangeDto) {
     if (dto.startDate >= dto.endDate) throw new BadRequestException(SEMESTER_RANGE_DATE_INCORRECT_RANGE)
     await this.semesterStartDateService.deleteActiveSemesterStartDate()
 
@@ -33,7 +29,7 @@ export class SemesterRangeDateController {
   }
 
   @Functionality({
-    code: FunctionalityCodesEnum.SEMESTER_RANGE_DATE__GET,
+    code: FunctionalityCodesEnum.SEMESTER_RANGE__GET,
     default: defaultSemesterRangeDateGetData,
     title: 'Получить дату старта семестра',
   })

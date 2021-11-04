@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { SemesterRangeDateModel } from './semesterRangeDate.model'
+import { SemesterRangeModel } from './semesterRange.model'
 import { SEMESTER_RANGE_TYPE } from '../settings.constants'
-import { CreateSemesterStartDateDto } from './dto/createSemesterStartDate.dto'
+import { CreateSemesterRangeDto } from './dto/createSemesterRange.dto'
 
 @Injectable()
-export class SemesterRangeDateService {
+export class SemesterRangeService {
   constructor(
-    @InjectModel(SemesterRangeDateModel)
-    private readonly semesterStartDateModel: ModelType<SemesterRangeDateModel>
+    @InjectModel(SemesterRangeModel)
+    private readonly semesterStartDateModel: ModelType<SemesterRangeModel>
   ) {}
 
   getActiveSemesterStartDate() {
@@ -29,7 +29,7 @@ export class SemesterRangeDateService {
     })
   }
 
-  createSemesterStartDate(dto: CreateSemesterStartDateDto) {
+  createSemesterStartDate(dto: CreateSemesterRangeDto) {
     return this.semesterStartDateModel.create({
       startDate: dto.startDate,
       endDate: dto.endDate,
