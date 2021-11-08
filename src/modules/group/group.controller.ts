@@ -17,6 +17,7 @@ import {
   GroupField,
   GroupFieldsEnum,
   GroupGetByFacultyIdDataForFunctionality,
+  GroupGetManyDataForFunctionality,
   GroupGetQueryParametersEnum,
   GroupRoutesEnum,
 } from './group.constants'
@@ -96,12 +97,13 @@ export class GroupController {
   private async getMany(
     @Query(GroupGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
     @Query(GroupGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
+    @Req() { functionality }: CustomRequest<any, GroupGetManyDataForFunctionality>,
     @Query(GroupGetQueryParametersEnum.TITLE) title?: string,
     @GetGroupFields() fields?: GroupField[]
   ) {
     return {
-      groups: normalizeFields(await this.groupService.getAll(page, count, title, { fields }), { fields }),
-      count: await this.groupService.countAll(title),
+      groups: normalizeFields(await this.groupService.getAll(page, count, title, { fields, functionality }), { fields }),
+      count: await this.groupService.countAll(title, { functionality }),
     }
   }
 
