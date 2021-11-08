@@ -33,14 +33,16 @@ export interface RoleModel extends Base {}
     },
     toObject: {
       transform: (doc, ret) => {
-        ret.available = (ret.available as Available[]).map(functionality => {
-          const res: any = {}
-          functionality.data.forEach(item => (res[item.key] = item.value))
-          return {
-            ...functionality,
-            data: res,
-          }
-        })
+        if (ret.available) {
+          ret.available = (ret.available as Available[]).map(functionality => {
+            const res: any = {}
+            functionality.data.forEach(item => (res[item.key] = item.value))
+            return {
+              ...functionality,
+              data: res,
+            }
+          })
+        }
       },
     },
   }),

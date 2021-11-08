@@ -80,11 +80,9 @@ export class RoleService {
       }
     }
 
-    return this.roleModel.find(
-      filter,
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    )
+    return this.roleModel
+      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .map(doc => doc.map(item => item.toObject()))
   }
 
   async update(dto: UpdateRoleDto) {

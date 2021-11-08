@@ -134,13 +134,11 @@ export class UserService {
         filter['roles.role'] = { $in: options.functionality.data.availableRoles, $nin: options.functionality.data.forbiddenRoles }
     }
 
-    console.log(filter)
-
     return this.userModel
       .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .map(doc => doc.map(item => item.toObject()))
       .skip((page - 1) * count)
       .limit(count)
-      .exec()
   }
 
   countAll(name?: string, options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>) {
@@ -155,7 +153,7 @@ export class UserService {
         filter['roles.role'] = { $in: options.functionality.data.availableRoles, $nin: options.functionality.data.forbiddenRoles }
     }
 
-    return this.userModel.countDocuments(filter).exec()
+    return this.userModel.countDocuments(filter)
   }
 
   async update(dto: UpdateUserDto) {

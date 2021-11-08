@@ -29,18 +29,40 @@ export interface UserModel extends Base {}
             }
           })
         }
+        if (ret.roles) {
+          ret.roles = (ret.roles as Available[]).map(role => {
+            const res: any = {}
+            role.data.forEach(item => (res[item.key] = item.value))
+            return {
+              ...role,
+              data: res,
+            }
+          })
+        }
       },
     },
     toObject: {
       transform: (doc, ret) => {
-        ret.available = (ret.available as Available[]).map(functionality => {
-          const res: any = {}
-          functionality.data.forEach(item => (res[item.key] = item.value))
-          return {
-            ...functionality,
-            data: res,
-          }
-        })
+        if (ret.available) {
+          ret.available = (ret.available as Available[]).map(functionality => {
+            const res: any = {}
+            functionality.data.forEach(item => (res[item.key] = item.value))
+            return {
+              ...functionality,
+              data: res,
+            }
+          })
+        }
+        if (ret.roles) {
+          ret.roles = (ret.roles as Available[]).map(role => {
+            const res: any = {}
+            role.data.forEach(item => (res[item.key] = item.value))
+            return {
+              ...role,
+              data: res,
+            }
+          })
+        }
       },
     },
   }),
@@ -64,7 +86,7 @@ export class UserModel extends TimeStamps implements User {
   @prop()
   hashedUniqueKey: string
 
-  @prop({ default: [], type: () => RoleData })
+  @prop({ default: [], type: () => RoleData, _id: false })
   roles: RoleData[]
 
   @prop({ default: [], ref: () => ViewModel })
@@ -75,7 +97,7 @@ class Available implements AvailableFunctionality {
   @prop()
   code: FunctionalityCodesEnum
 
-  @prop({ type: () => AvailableItem })
+  @prop()
   data: AvailableItem[]
 }
 
@@ -91,7 +113,7 @@ export class RoleData {
   @prop({ ref: () => RoleModel })
   role: Ref<RoleModel, Types.ObjectId>
 
-  @prop({ type: () => RoleDataItem })
+  @prop()
   data: RoleDataItem[]
 }
 
