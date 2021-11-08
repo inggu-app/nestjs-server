@@ -97,6 +97,8 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         )
           return true
         break
+      case FunctionalityCodesEnum.USER__GET_MANY:
+        return true
       case FunctionalityCodesEnum.USER__UPDATE:
         castedFunctionality = functionality as AvailableFunctionality<UserUpdateDataForFunctionality>
 

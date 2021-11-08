@@ -13,7 +13,7 @@ import { UserModel } from './user.model'
 import { DocumentType, ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateUserDto } from './dto/createUser.dto'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
-import { Error, Types } from 'mongoose'
+import { Error, FilterQuery, Types } from 'mongoose'
 import {
   FUNCTIONALITY_EXTRA_FIELDS,
   FUNCTIONALITY_INCORRECT_FIELD_TYPE,
@@ -29,7 +29,7 @@ import {
   USER_WITH_LOGIN_EXISTS,
   USER_WITH_LOGIN_NOT_FOUND,
 } from '../../global/constants/errors.constants'
-import { UserField, UserFieldsEnum } from './user.constants'
+import { UserField, UserFieldsEnum, UserGetManyDataForFunctionality } from './user.constants'
 import generatePassword from '../../global/utils/generatePassword'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
@@ -120,6 +120,42 @@ export class UserService {
       result[item.key] = item.value
     })
     return result
+  }
+
+  getMany(page: number, count: number, name?: string, options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<UserModel>> = {}
+    if (name) filter.name = { $regex: name, $options: 'i' }
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenUsers }
+      filter['roles.role'] = { $nin: options.functionality.data.forbiddenRoles }
+      if (options.functionality.data.availableUsersType === FunctionalityAvailableTypeEnum.CUSTOM)
+        filter._id = { $in: options.functionality.data.availableUsers, $nin: options.functionality.data.forbiddenRoles }
+      if (options.functionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM)
+        filter['roles.role'] = { $in: options.functionality.data.availableRoles, $nin: options.functionality.data.forbiddenRoles }
+    }
+
+    console.log(filter)
+
+    return this.userModel
+      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .skip((page - 1) * count)
+      .limit(count)
+      .exec()
+  }
+
+  countAll(name?: string, options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<UserModel>> = {}
+    if (name) filter.name = { $regex: name, $options: 'i' }
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenUsers }
+      filter['roles.role'] = { $nin: options.functionality.data.forbiddenRoles }
+      if (options.functionality.data.availableUsersType === FunctionalityAvailableTypeEnum.CUSTOM)
+        filter._id = { $in: options.functionality.data.availableUsers, $nin: options.functionality.data.forbiddenRoles }
+      if (options.functionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM)
+        filter['roles.role'] = { $in: options.functionality.data.availableRoles, $nin: options.functionality.data.forbiddenRoles }
+    }
+
+    return this.userModel.countDocuments(filter).exec()
   }
 
   async update(dto: UpdateUserDto) {

@@ -55,6 +55,8 @@ function getAuthGuard(functionalityCode: FunctionalityCodesEnum) {
       return RoleJwtAuthGuard
     case FunctionalityCodesEnum.USER__CREATE:
     case FunctionalityCodesEnum.USER__GET_BY_USER_ID:
+    case FunctionalityCodesEnum.USER__GET_BY_ROLE_ID:
+    case FunctionalityCodesEnum.USER__GET_MANY:
     case FunctionalityCodesEnum.USER__UPDATE:
     case FunctionalityCodesEnum.USER__DELETE:
       return UserJwtAuthGuard

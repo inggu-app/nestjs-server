@@ -12,6 +12,7 @@ export enum UserRoutesEnum {
   CREATE = '/',
   GET_BY_USER_ID = '/by-user-id',
   GET_BY_ROLE_ID = '/by-role-id',
+  GET_MANY = '/many',
   UPDATE = '/',
   DELETE = '/',
   LOGIN = '/login',
@@ -20,6 +21,9 @@ export enum UserRoutesEnum {
 export enum UserGetQueryParametersEnum {
   USER_ID = 'userId',
   ROLE_ID = 'roleId',
+  PAGE = 'page',
+  COUNT = 'count',
+  NAME = 'name',
   FIELDS = 'fields',
 }
 
@@ -88,6 +92,41 @@ export interface UserGetByRoleIdDataForFunctionality {
   forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми нельзя получить
 }
 export const defaultUserGetByRoleIdData: FunctionalityDefault<UserGetByRoleIdDataForFunctionality> = {
+  availableUsersType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  forbiddenUsers: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.USER_MODEL,
+  },
+  availableRolesType: {
+    type: FunctionalityAvailableTypeEnum.ALL,
+    model: null,
+  },
+  availableRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+  forbiddenRoles: {
+    type: TypesEnum.MONGO_ID_ARRAY,
+    model: DbModelsEnum.ROLE_MODEL,
+  },
+}
+
+export interface UserGetManyDataForFunctionality {
+  availableUsersType: FunctionalityAvailableTypeEnum // доступность пользователей, которых можно загрузить
+  availableUsers: MongoIdString[] // id пользователей, которых можно загрузить
+  forbiddenUsers: MongoIdString[] // id пользователей, которых нельзя загрузить
+  availableRolesType: FunctionalityAvailableTypeEnum // доступность ролей, пользователей с которыми можно загрузить
+  availableRoles: MongoIdString[] // id ролей, пользователей с которыми можно загрузить
+  forbiddenRoles: MongoIdString[] // id ролей, пользователей с которыми нельзя загрузить
+}
+export const defaultUserGetManyData: FunctionalityDefault<UserGetManyDataForFunctionality> = {
   availableUsersType: {
     type: FunctionalityAvailableTypeEnum.ALL,
     model: null,

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/createUser.dto'
 import { Types } from 'mongoose'
@@ -10,11 +10,13 @@ import {
   defaultUserDeleteData,
   defaultUserGetByRoleIdData,
   defaultUserGetByUserIdData,
+  defaultUserGetManyData,
   defaultUserUpdateData,
   UserAdditionalFieldsEnum,
   UserField,
   UserFieldsEnum,
   UserForbiddenFieldsEnum,
+  UserGetManyDataForFunctionality,
   UserGetQueryParametersEnum,
   UserRoutesEnum,
 } from './user.constants'
@@ -26,6 +28,8 @@ import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { objectWithKeys } from '../../global/utils/objectWithKeys'
 import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ApiTags } from '@nestjs/swagger'
+import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
+import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -70,6 +74,25 @@ export class UserController {
         forbiddenFields: ['roles', ...getEnumValues(UserForbiddenFieldsEnum)],
       }),
       ...(await this.userService.getByRoleId(userId, roleId)),
+    }
+  }
+
+  @Functionality({
+    code: FunctionalityCodesEnum.USER__GET_MANY,
+    default: defaultUserGetManyData,
+    title: 'Получить список пользователей',
+  })
+  @Get(UserRoutesEnum.GET_MANY)
+  async getMany(
+    @Query(UserGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
+    @Query(UserGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
+    @Req() { functionality }: CustomRequest<any, UserGetManyDataForFunctionality>,
+    @Query(UserGetQueryParametersEnum.NAME) name?: string,
+    @GetUserFields() fields?: UserField[]
+  ) {
+    return {
+      users: normalizeFields(await this.userService.getMany(page, count, name, { fields, functionality }), { fields }),
+      count: await this.userService.countAll(name, { functionality }),
     }
   }
 
