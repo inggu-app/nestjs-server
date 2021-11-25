@@ -55,8 +55,11 @@ export class RoleController {
     title: 'Запросить список ролей',
   })
   @Get(RoleRoutesEnum.GET_MANY)
-  getMany(@Req() { functionality }: CustomRequest<any, RoleGetManyDataForFunctionality>, @GetRoleFields() fields?: RoleField[]) {
-    return this.roleService.getMany({ fields, functionality })
+  async getMany(@Req() { functionality }: CustomRequest<any, RoleGetManyDataForFunctionality>, @GetRoleFields() fields?: RoleField[]) {
+    return {
+      roles: await this.roleService.getMany({ fields, functionality }),
+      count: await this.roleService.countMany({ functionality }),
+    }
   }
 
   @UsePipes(new ValidationPipe())

@@ -85,6 +85,18 @@ export class RoleService {
       .map(doc => doc.map(item => item.toObject()))
   }
 
+  async countMany(options?: ServiceGetOptions<RoleField, RoleGetManyDataForFunctionality>) {
+    const filter: FilterQuery<DocumentType<RoleModel>> = {}
+    if (options?.functionality) {
+      filter._id = { $nin: options.functionality.data.forbiddenRoles }
+      if (options.functionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM) {
+        filter._id = { $in: options.functionality.data.availableRoles, $nin: options.functionality.data.forbiddenRoles }
+      }
+    }
+
+    return this.roleModel.countDocuments(filter)
+  }
+
   async update(dto: UpdateRoleDto) {
     await this.checkExists({ _id: dto.id })
 
