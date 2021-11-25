@@ -24,6 +24,7 @@ export enum UserGetQueryParametersEnum {
   PAGE = 'page',
   COUNT = 'count',
   NAME = 'name',
+  ROLE_IDS = 'roleIds',
   FIELDS = 'fields',
 }
 

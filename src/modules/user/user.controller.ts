@@ -30,6 +30,7 @@ import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ApiTags } from '@nestjs/swagger'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
+import { MongoIdString } from '../../global/types'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -88,11 +89,12 @@ export class UserController {
     @Query(UserGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
     @Req() { functionality }: CustomRequest<any, UserGetManyDataForFunctionality>,
     @Query(UserGetQueryParametersEnum.NAME) name?: string,
+    @MongoId(UserGetQueryParametersEnum.ROLE_IDS, { multiple: true, required: false }) roleIds?: MongoIdString[],
     @GetUserFields() fields?: UserField[]
   ) {
     return {
-      users: normalizeFields(await this.userService.getMany(page, count, name, { fields, functionality }), { fields }),
-      count: await this.userService.countAll(name, { functionality }),
+      users: normalizeFields(await this.userService.getMany({ page, count, name, roleIds }, { fields, functionality }), { fields }),
+      count: await this.userService.countAll({ name, roleIds }, { functionality }),
     }
   }
 
