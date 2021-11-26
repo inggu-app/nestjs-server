@@ -30,7 +30,8 @@ import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ApiTags } from '@nestjs/swagger'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
-import { MongoIdString } from '../../global/types'
+import { RoleDto } from './dto/role.dto'
+import { ObjectValidationPipe } from '../../global/pipes/objectValidation.pipe'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -78,6 +79,7 @@ export class UserController {
     }
   }
 
+  @UsePipes(new ValidationPipe())
   @Functionality({
     code: FunctionalityCodesEnum.USER__GET_MANY,
     default: defaultUserGetManyData,
@@ -88,13 +90,17 @@ export class UserController {
     @Query(UserGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
     @Query(UserGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
     @Req() { functionality }: CustomRequest<any, UserGetManyDataForFunctionality>,
+    @Query(
+      UserGetQueryParametersEnum.ROLES,
+      new ObjectValidationPipe({ isArray: true, dto: RoleDto, parameterName: UserGetQueryParametersEnum.ROLES })
+    )
+    roles: RoleDto[],
     @Query(UserGetQueryParametersEnum.NAME) name?: string,
-    @MongoId(UserGetQueryParametersEnum.ROLE_IDS, { multiple: true, required: false }) roleIds?: MongoIdString[],
     @GetUserFields() fields?: UserField[]
   ) {
     return {
-      users: normalizeFields(await this.userService.getMany({ page, count, name, roleIds }, { fields, functionality }), { fields }),
-      count: await this.userService.countAll({ name, roleIds }, { functionality }),
+      users: normalizeFields(await this.userService.getMany({ page, count, name, roles }, { fields, functionality }), { fields }),
+      count: await this.userService.countAll({ name, roles }, { functionality }),
     }
   }
 

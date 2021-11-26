@@ -49,6 +49,7 @@ import { checkTypes } from '../../global/utils/checkTypes'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { TypesEnum } from '../../global/enums/types.enum'
 import { getModelWithString } from '@typegoose/typegoose'
+import { RoleDto } from './dto/role.dto'
 
 export interface UserAccessTokenData {
   id: Types.ObjectId
@@ -123,53 +124,91 @@ export class UserService {
   }
 
   async getMany(
-    params: { page: number; count: number; roleIds?: MongoIdString[]; name?: string },
+    params: { page: number; count: number; roles?: RoleDto[]; name?: string },
     options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>
   ) {
     const filter: FilterQuery<DocumentType<UserModel>> = {}
     if (params.name) filter.name = { $regex: params.name, $options: 'i' }
-    if (params.roleIds) {
-      await this.roleService.checkExists(params.roleIds.map(id => ({ _id: id })))
-      filter['roles.role'] = { $in: params.roleIds }
-    }
     if (options?.functionality) {
       filter._id = { $nin: options.functionality.data.forbiddenUsers }
-      filter['roles.role'] = { ...(filter['roles.role'] || {}), $nin: options.functionality.data.forbiddenRoles }
+      filter['roles.role'] = { $nin: options.functionality.data.forbiddenRoles }
       if (options.functionality.data.availableUsersType === FunctionalityAvailableTypeEnum.CUSTOM)
         filter._id = { $in: options.functionality.data.availableUsers, $nin: options.functionality.data.forbiddenRoles }
       if (options.functionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM)
         filter['roles.role'] = {
-          $in: filter['roles.role'] ?? options.functionality.data.availableRoles,
+          $in: options.functionality.data.availableRoles,
           $nin: options.functionality.data.forbiddenRoles,
         }
     }
 
+    console.log(params.roles, typeof params.roles)
+    const rolesQuery = {
+      $or: params.roles?.map(role => {
+        const condition: Record<string, any> = {
+          'roles.role': role.role,
+        }
+        const data = role.data
+        if (data) {
+          condition['roles.data'] = {
+            $all: objectKeys(data).map(key => ({
+              $elemMatch: {
+                key,
+                value: data[key],
+              },
+            })),
+          }
+        }
+        return condition
+      }),
+    }
+
     return this.userModel
-      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .find(
+        { $and: [rolesQuery, filter as any] },
+        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
+        options?.queryOptions
+      )
       .map(doc => doc.map(item => item.toObject()))
       .skip((params.page - 1) * params.count)
       .limit(params.count)
   }
 
-  countAll(params: { name?: string; roleIds?: MongoIdString[] }, options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>) {
+  countAll(params: { name?: string; roles?: RoleDto[] }, options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<UserModel>> = {}
     if (params.name) filter.name = { $regex: params.name, $options: 'i' }
-    if (params.roleIds) {
-      filter['roles.role'] = { $in: params.roleIds }
-    }
     if (options?.functionality) {
       filter._id = { $nin: options.functionality.data.forbiddenUsers }
-      filter['roles.role'] = { ...(filter['roles.role'] || {}), $nin: options.functionality.data.forbiddenRoles }
+      filter['roles.role'] = { $nin: options.functionality.data.forbiddenRoles }
       if (options.functionality.data.availableUsersType === FunctionalityAvailableTypeEnum.CUSTOM)
         filter._id = { $in: options.functionality.data.availableUsers, $nin: options.functionality.data.forbiddenRoles }
       if (options.functionality.data.availableRolesType === FunctionalityAvailableTypeEnum.CUSTOM)
         filter['roles.role'] = {
-          $in: filter['roles.role'] ?? options.functionality.data.availableRoles,
+          $in: options.functionality.data.availableRoles,
           $nin: options.functionality.data.forbiddenRoles,
         }
     }
 
-    return this.userModel.countDocuments(filter)
+    const rolesQuery = {
+      $or: params.roles?.map(role => {
+        const condition: Record<string, any> = {
+          'roles.role': role.role,
+        }
+        const data = role.data
+        if (data) {
+          condition['roles.data'] = {
+            $all: objectKeys(data).map(key => ({
+              $elemMatch: {
+                key,
+                value: data[key],
+              },
+            })),
+          }
+        }
+        return condition
+      }),
+    }
+
+    return this.userModel.countDocuments({ $and: [rolesQuery, filter as any] })
   }
 
   async update(dto: UpdateUserDto) {
