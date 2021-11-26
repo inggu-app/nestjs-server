@@ -92,9 +92,9 @@ export class UserController {
     @Req() { functionality }: CustomRequest<any, UserGetManyDataForFunctionality>,
     @Query(
       UserGetQueryParametersEnum.ROLES,
-      new ObjectValidationPipe({ isArray: true, dto: RoleDto, parameterName: UserGetQueryParametersEnum.ROLES })
+      new ObjectValidationPipe({ isArray: true, dto: RoleDto, parameterName: UserGetQueryParametersEnum.ROLES, required: false })
     )
-    roles: RoleDto[],
+    roles?: RoleDto[],
     @Query(UserGetQueryParametersEnum.NAME) name?: string,
     @GetUserFields() fields?: UserField[]
   ) {

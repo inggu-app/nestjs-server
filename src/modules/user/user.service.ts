@@ -141,7 +141,6 @@ export class UserService {
         }
     }
 
-    console.log(params.roles, typeof params.roles)
     const rolesQuery = {
       $or: params.roles?.map(role => {
         const condition: Record<string, any> = {
@@ -164,7 +163,7 @@ export class UserService {
 
     return this.userModel
       .find(
-        { $and: [rolesQuery, filter as any] },
+        params.roles ? { $and: [rolesQuery, filter as any] } : filter,
         Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
         options?.queryOptions
       )
@@ -208,7 +207,7 @@ export class UserService {
       }),
     }
 
-    return this.userModel.countDocuments({ $and: [rolesQuery, filter as any] })
+    return this.userModel.countDocuments(params.roles ? { $and: [rolesQuery, filter as any] } : filter)
   }
 
   async update(dto: UpdateUserDto) {
