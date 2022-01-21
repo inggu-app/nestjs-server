@@ -24,7 +24,7 @@ export class ObjectValidationPipe implements PipeTransform {
   }
 
   async transform(value: any) {
-    if (!this.options.required) return value
+    if (!this.options.required && value === undefined) return value
     let parsedParameter
     try {
       parsedParameter = JSON.parse(value)
