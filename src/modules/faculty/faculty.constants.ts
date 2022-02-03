@@ -1,5 +1,4 @@
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
-import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { MongoIdString } from '../../global/types'
 import { TypesEnum } from '../../global/enums/types.enum'
@@ -22,16 +21,13 @@ export enum FacultyGetQueryParametersEnum {
   COUNT = 'count',
   TITLE = 'title',
   FIELDS = 'fields',
+  QUERY_OPTIONS = 'queryOptions',
 }
 
 export enum FacultyFieldsEnum {
   title = 'title',
 }
 
-export const FacultyAdditionalFieldsEnum = {
-  ...DefaultFieldsEnum,
-}
-export type FacultyField = keyof typeof FacultyFieldsEnum
 enumKeyValuesMatch(FacultyFieldsEnum)
 
 export interface FacultyCreateDataForFunctionality {}

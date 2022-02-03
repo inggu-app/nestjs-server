@@ -29,12 +29,11 @@ import {
   USER_WITH_LOGIN_EXISTS,
   USER_WITH_LOGIN_NOT_FOUND,
 } from '../../global/constants/errors.constants'
-import { UserField, UserFieldsEnum, UserGetManyDataForFunctionality } from './user.constants'
+import { UserFieldsEnum, UserGetManyDataForFunctionality } from './user.constants'
 import generatePassword from '../../global/utils/generatePassword'
 import generateUniqueKey from '../../global/utils/generateUniqueKey'
 import { hashSalt } from '../../global/constants/other.constants'
 import { UpdateUserDto } from './dto/updateUser.dto'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { LoginUserDto } from './dto/loginUser.dto'
 import { JwtService } from '@nestjs/jwt'
@@ -84,33 +83,20 @@ export class UserService {
     }
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<UserField>) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return this.userModel.findById(
-      id,
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<UserModel>
+    return this.userModel.findById(id, undefined, options?.queryOptions) as unknown as DocumentType<UserModel>
   }
 
-  async getByLogin(login: string, options?: ServiceGetOptions<UserField>) {
+  async getByLogin(login: string, options?: ServiceGetOptions) {
     await this.checkExists({ login }, { error: new HttpException(USER_WITH_LOGIN_NOT_FOUND(login), HttpStatus.NOT_FOUND) })
-    return this.userModel.findOne(
-      { login },
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<UserModel>
+    return this.userModel.findOne({ login }, undefined, options?.queryOptions) as unknown as DocumentType<UserModel>
   }
 
-  async getByRoleId(
-    userId: Types.ObjectId | MongoIdString,
-    roleId: Types.ObjectId | MongoIdString,
-    options?: ServiceGetOptions<UserField>
-  ) {
+  async getByRoleId(userId: Types.ObjectId | MongoIdString, roleId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions) {
     await this.roleService.checkExists({ _id: roleId })
     const user = await this.getById(userId, {
-      fields: Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields, ['roles']) : { ...options?.fields, roles: 1 },
       queryOptions: options?.queryOptions,
     })
     const neededRole = user.roles.find(role => role.role.toString() == roleId.toString())
@@ -125,7 +111,7 @@ export class UserService {
 
   async getMany(
     params: { page: number; count: number; roles?: RoleDto[]; name?: string },
-    options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>
+    options?: ServiceGetOptions<UserGetManyDataForFunctionality>
   ) {
     const filter: FilterQuery<DocumentType<UserModel>> = {}
     if (params.name) filter.name = { $regex: params.name, $options: 'i' }
@@ -162,17 +148,13 @@ export class UserService {
     }
 
     return this.userModel
-      .find(
-        params.roles ? { $and: [rolesQuery, filter as any] } : filter,
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-        options?.queryOptions
-      )
+      .find(params.roles ? { $and: [rolesQuery, filter as any] } : filter, undefined, options?.queryOptions)
       .map(doc => doc.map(item => item.toObject()))
       .skip((params.page - 1) * params.count)
       .limit(params.count)
   }
 
-  countAll(params: { name?: string; roles?: RoleDto[] }, options?: ServiceGetOptions<UserField, UserGetManyDataForFunctionality>) {
+  countAll(params: { name?: string; roles?: RoleDto[] }, options?: ServiceGetOptions<UserGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<UserModel>> = {}
     if (params.name) filter.name = { $regex: params.name, $options: 'i' }
     if (options?.functionality) {

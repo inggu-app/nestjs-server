@@ -6,7 +6,6 @@ import { DocumentType } from '@typegoose/typegoose'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { Error, FilterQuery, Types } from 'mongoose'
 import {
-  GroupField,
   GroupFieldsEnum,
   GroupGetByFacultyIdDataForFunctionality,
   GroupGetByGroupIdsDataForFunctionality,
@@ -14,7 +13,6 @@ import {
 } from './group.constants'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
@@ -40,12 +38,10 @@ export class GroupService {
     return this.groupModel.create(dto)
   }
 
-  async getById(groupId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions<GroupField>) {
+  async getById(groupId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions) {
     groupId = stringToObjectId(groupId)
 
-    const candidate = await this.groupModel
-      .findById(groupId, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
-      .exec()
+    const candidate = await this.groupModel.findById(groupId, undefined, options?.queryOptions).exec()
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
@@ -54,10 +50,7 @@ export class GroupService {
     return candidate
   }
 
-  async getByGroupIds(
-    groupIds: MongoIdString[] | Types.ObjectId[],
-    options?: ServiceGetOptions<GroupField, GroupGetByGroupIdsDataForFunctionality>
-  ) {
+  async getByGroupIds(groupIds: MongoIdString[] | Types.ObjectId[], options?: ServiceGetOptions<GroupGetByGroupIdsDataForFunctionality>) {
     groupIds = groupIds.map(stringToObjectId)
     await this.checkExists(groupIds.map(id => ({ _id: id })))
     const filter: FilterQuery<DocumentType<GroupModel>> = { _id: { $in: groupIds } }
@@ -73,14 +66,10 @@ export class GroupService {
       }
     }
 
-    return this.groupModel.find(
-      filter,
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    )
+    return this.groupModel.find(filter, undefined, options?.queryOptions)
   }
 
-  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<GroupField, GroupGetManyDataForFunctionality>) {
+  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<GroupGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<GroupModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
     if (options?.functionality) {
@@ -92,13 +81,13 @@ export class GroupService {
       }
     }
     return this.groupModel
-      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .find(filter, undefined, options?.queryOptions)
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
-  countAll(title?: string, options?: ServiceGetOptions<GroupField, GroupGetManyDataForFunctionality>) {
+  countAll(title?: string, options?: ServiceGetOptions<GroupGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<GroupModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
     if (options?.functionality) {
@@ -112,10 +101,7 @@ export class GroupService {
     return this.groupModel.countDocuments(filter).exec()
   }
 
-  async getByFacultyId(
-    facultyId: Types.ObjectId | MongoIdString,
-    options?: ServiceGetOptions<GroupField, GroupGetByFacultyIdDataForFunctionality>
-  ) {
+  async getByFacultyId(facultyId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<GroupGetByFacultyIdDataForFunctionality>) {
     facultyId = stringToObjectId(facultyId)
     await this.facultyService.checkExists({ _id: facultyId })
     const filter: FilterQuery<DocumentType<GroupModel>> = { faculty: facultyId }
@@ -126,9 +112,7 @@ export class GroupService {
       }
     }
 
-    return this.groupModel
-      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
-      .exec()
+    return this.groupModel.find(filter, undefined, options?.queryOptions).exec()
   }
 
   async delete(id: Types.ObjectId | MongoIdString) {

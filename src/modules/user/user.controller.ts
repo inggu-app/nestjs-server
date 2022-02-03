@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/createUser.dto'
-import { Types } from 'mongoose'
+import { QueryOptions, Types } from 'mongoose'
 import { UpdateUserDto } from './dto/updateUser.dto'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
@@ -12,26 +12,18 @@ import {
   defaultUserGetByUserIdData,
   defaultUserGetManyData,
   defaultUserUpdateData,
-  UserAdditionalFieldsEnum,
-  UserField,
-  UserFieldsEnum,
-  UserForbiddenFieldsEnum,
   UserGetManyDataForFunctionality,
   UserGetQueryParametersEnum,
   UserRoutesEnum,
 } from './user.constants'
-import { Fields } from '../../global/decorators/Fields.decorator'
 import { LoginUserDto } from './dto/loginUser.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
-import normalizeFields from '../../global/utils/normalizeFields'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
-import { objectWithKeys } from '../../global/utils/objectWithKeys'
-import { getEnumValues } from '../../global/utils/enumKeysValues'
 import { ApiTags } from '@nestjs/swagger'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
 import { RoleDto } from './dto/role.dto'
 import { ObjectValidationPipe } from '../../global/pipes/objectValidation.pipe'
+import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -55,8 +47,8 @@ export class UserController {
     title: 'Получить пользователя по id',
   })
   @Get(UserRoutesEnum.GET_BY_USER_ID)
-  getByUserId(@MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @GetUserFields() fields?: UserField[]) {
-    return this.userService.getById(userId, { fields })
+  getByUserId(@MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+    return this.userService.getById(userId, { queryOptions })
   }
 
   @Functionality({
@@ -68,13 +60,10 @@ export class UserController {
   async getByRoleId(
     @MongoId(UserGetQueryParametersEnum.USER_ID) userId: Types.ObjectId,
     @MongoId(UserGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId,
-    @GetUserFields({ forbiddenFields: ['roles'] }) fields?: UserField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      ...normalizeFields(await this.userService.getById(userId, { fields: fieldsArrayToProjection(fields, undefined, ['roles']) }), {
-        fields,
-        forbiddenFields: ['roles', ...getEnumValues(UserForbiddenFieldsEnum)],
-      }),
+      ...(await this.userService.getById(userId, { queryOptions })),
       ...(await this.userService.getByRoleId(userId, roleId)),
     }
   }
@@ -96,10 +85,10 @@ export class UserController {
     )
     roles?: RoleDto[],
     @Query(UserGetQueryParametersEnum.NAME) name?: string,
-    @GetUserFields() fields?: UserField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      users: normalizeFields(await this.userService.getMany({ page, count, name, roles }, { fields, functionality }), { fields }),
+      users: await this.userService.getMany({ page, count, name, roles }, { functionality, queryOptions }),
       count: await this.userService.countAll({ name, roles }, { functionality }),
     }
   }
@@ -130,15 +119,4 @@ export class UserController {
   login(@Body() dto: LoginUserDto) {
     return this.userService.login(dto)
   }
-}
-
-function GetUserFields(options: { forbiddenFields?: string[] } = { forbiddenFields: [] }) {
-  return Fields({
-    fieldsEnum: UserFieldsEnum,
-    additionalFieldsEnum: UserAdditionalFieldsEnum,
-    forbiddenFieldsEnum: {
-      ...UserForbiddenFieldsEnum,
-      ...(options.forbiddenFields ? objectWithKeys(options.forbiddenFields, ...options.forbiddenFields) : {}),
-    },
-  })
 }

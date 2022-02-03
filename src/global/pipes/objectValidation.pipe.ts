@@ -7,6 +7,7 @@ interface Options {
   parameterName: string
   required?: boolean
   isArray?: boolean
+  onlyDtoFields?: boolean
 }
 
 const defaultOptions: Options = {
@@ -14,6 +15,7 @@ const defaultOptions: Options = {
   parameterName: '',
   required: true,
   isArray: false,
+  onlyDtoFields: true,
 }
 
 @Injectable()
@@ -44,8 +46,8 @@ export class ObjectValidationPipe implements PipeTransform {
     }
 
     for await (const param of objects) {
-      const object = plainToClass(this.options.dto, param)
-      const errorsList = await validate(object)
+      const object = plainToClass(this.options.dto, param, { exposeDefaultValues: true })
+      const errorsList = await validate(object, { whitelist: true, forbidNonWhitelisted: true })
       if (errorsList.length > 0) {
         throw new BadRequestException(errorsList.map(error => (error.constraints ? Object.values(error.constraints) : [])).flat())
       }

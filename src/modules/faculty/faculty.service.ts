@@ -3,15 +3,9 @@ import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import {
-  FacultyField,
-  FacultyFieldsEnum,
-  FacultyGetByFacultyIdsDataForFunctionality,
-  FacultyGetManyDataForFunctionality,
-} from './faculty.constants'
+import { FacultyFieldsEnum, FacultyGetByFacultyIdsDataForFunctionality, FacultyGetManyDataForFunctionality } from './faculty.constants'
 import { Error, FilterQuery, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
@@ -37,15 +31,9 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
-  async getById(facultyId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions<FacultyField>) {
+  async getById(facultyId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions) {
     facultyId = stringToObjectId(facultyId)
-    const candidate = await this.facultyModel
-      .findById(
-        facultyId,
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-        options?.queryOptions
-      )
-      .exec()
+    const candidate = await this.facultyModel.findById(facultyId, undefined, options?.queryOptions).exec()
 
     if (!candidate) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
@@ -54,10 +42,7 @@ export class FacultyService {
     return candidate
   }
 
-  async getByIds(
-    facultyIds: Types.ObjectId[] | MongoIdString[],
-    options?: ServiceGetOptions<FacultyField, FacultyGetByFacultyIdsDataForFunctionality>
-  ) {
+  async getByIds(facultyIds: Types.ObjectId[] | MongoIdString[], options?: ServiceGetOptions<FacultyGetByFacultyIdsDataForFunctionality>) {
     facultyIds = facultyIds.map(stringToObjectId)
     await this.checkExists(facultyIds.map(id => ({ _id: id })))
 
@@ -72,14 +57,10 @@ export class FacultyService {
       }
     }
 
-    return this.facultyModel.find(
-      filter,
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    )
+    return this.facultyModel.find(filter, undefined, options?.queryOptions)
   }
 
-  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<FacultyField, FacultyGetManyDataForFunctionality>) {
+  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<FacultyGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
     if (options?.functionality) {
@@ -89,13 +70,13 @@ export class FacultyService {
       }
     }
     return this.facultyModel
-      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
+      .find(filter, undefined, options?.queryOptions)
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
-  countAll(title?: string, options?: ServiceGetOptions<FacultyField, FacultyGetManyDataForFunctionality>) {
+  countAll(title?: string, options?: ServiceGetOptions<FacultyGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
     if (options?.functionality) {

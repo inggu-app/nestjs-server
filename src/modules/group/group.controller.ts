@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
-import { Types } from 'mongoose'
+import { QueryOptions, Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
@@ -13,21 +13,17 @@ import {
   defaultGroupGetByGroupIdsData,
   defaultGroupGetManyData,
   defaultGroupUpdateData,
-  GroupAdditionalFieldsEnum,
-  GroupField,
-  GroupFieldsEnum,
   GroupGetByFacultyIdDataForFunctionality,
   GroupGetManyDataForFunctionality,
   GroupGetQueryParametersEnum,
   GroupRoutesEnum,
 } from './group.constants'
-import normalizeFields from '../../global/utils/normalizeFields'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
-import { Fields } from '../../global/decorators/Fields.decorator'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
 import { ApiTags } from '@nestjs/swagger'
+import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
 @ApiTags('Группы')
 @Controller()
@@ -53,8 +49,11 @@ export class GroupController {
     title: 'Запросить одну группу по id',
   })
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
-  async getByGroupId(@MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId, @GetGroupFields() fields?: GroupField[]) {
-    return normalizeFields(await this.groupService.getById(groupId, { fields }), { fields })
+  async getByGroupId(
+    @MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
+    @MongoQueryOptions() queryOptions?: QueryOptions
+  ) {
+    return this.groupService.getById(groupId, { queryOptions })
   }
 
   @Functionality({
@@ -65,10 +64,10 @@ export class GroupController {
   @Get(GroupRoutesEnum.GET_BY_GROUP_IDS)
   async getByGroupIds(
     @MongoId(GroupGetQueryParametersEnum.GROUP_IDS, { multiple: true }) groupIds: Types.ObjectId[],
-    @GetGroupFields() fields?: GroupField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      groups: normalizeFields(await this.groupService.getByGroupIds(groupIds, { fields }), { fields }),
+      groups: await this.groupService.getByGroupIds(groupIds, { queryOptions }),
     }
   }
 
@@ -81,10 +80,10 @@ export class GroupController {
   private async getByFacultyId(
     @MongoId(GroupGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
     @Req() { functionality }: CustomRequest<any, GroupGetByFacultyIdDataForFunctionality>,
-    @GetGroupFields() fields?: GroupField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      groups: normalizeFields(await this.groupService.getByFacultyId(facultyId, { fields, functionality }), { fields }),
+      groups: await this.groupService.getByFacultyId(facultyId, { functionality, queryOptions }),
     }
   }
 
@@ -99,10 +98,10 @@ export class GroupController {
     @Query(GroupGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
     @Req() { functionality }: CustomRequest<any, GroupGetManyDataForFunctionality>,
     @Query(GroupGetQueryParametersEnum.TITLE) title?: string,
-    @GetGroupFields() fields?: GroupField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      groups: normalizeFields(await this.groupService.getAll(page, count, title, { fields, functionality }), { fields }),
+      groups: await this.groupService.getAll(page, count, title, { functionality, queryOptions }),
       count: await this.groupService.countAll(title, { functionality }),
     }
   }
@@ -127,8 +126,4 @@ export class GroupController {
   delete(@MongoId('groupId') groupId: Types.ObjectId) {
     return this.groupService.delete(groupId)
   }
-}
-
-function GetGroupFields() {
-  return Fields({ fieldsEnum: GroupFieldsEnum, additionalFieldsEnum: GroupAdditionalFieldsEnum })
 }

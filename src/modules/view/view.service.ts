@@ -13,7 +13,6 @@ import {
   VIEW_WITH_CODE_NOT_FOUND,
   VIEW_WITH_ID_NOT_FOUND,
 } from '../../global/constants/errors.constants'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { DocumentType } from '@typegoose/typegoose'
 import { UpdateViewDto } from './dto/updateView.dto'
 import { UserService } from '../user/user.service'
@@ -42,29 +41,21 @@ export class ViewService {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
 
-    return this.viewModel.findById(
-      id,
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<ViewModel>
+    return this.viewModel.findById(id, undefined, options?.queryOptions) as unknown as DocumentType<ViewModel>
   }
 
   async getByCode(code: string, options?: ServiceGetOptions<ViewField>) {
     await this.checkExists({ code }, { error: new BadRequestException(VIEW_WITH_CODE_NOT_FOUND(code)) })
 
-    return this.viewModel.findOne(
-      { code },
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<ViewModel>
+    return this.viewModel.findOne({ code }, undefined, options?.queryOptions) as unknown as DocumentType<ViewModel>
   }
 
   async getByUserId(userId: Types.ObjectId | MongoIdString, intrfc?: string, options?: ServiceGetOptions<ViewField>) {
     const user = await this.userService.getById(userId, {
       queryOptions: {
         populate: [
-          { path: 'views', select: options?.fields, populate: { path: 'interface' } },
-          { path: 'roles.role', populate: { path: 'views', select: options?.fields, populate: { path: 'interface' } } },
+          { path: 'views', select: options?.queryOptions?.fields, populate: { path: 'interface' } },
+          { path: 'roles.role', populate: { path: 'views', select: options?.queryOptions?.fields, populate: { path: 'interface' } } },
         ],
         projection: { views: 1, roles: 1 },
       },

@@ -4,7 +4,6 @@ import { Error, Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { LessonFieldsEnum, ScheduleField } from './schedule.constants'
 import { LESSON_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
@@ -27,20 +26,12 @@ export class ScheduleService {
 
   getByGroup(groupId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<ScheduleField>) {
     groupId = stringToObjectId(groupId)
-    return this.lessonModel
-      .find(
-        { group: groupId },
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields, ['number']) : options?.fields,
-        options?.queryOptions
-      )
-      .exec()
+    return this.lessonModel.find({ group: groupId }, undefined, options?.queryOptions).exec()
   }
 
   async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<ScheduleField>) {
     id = stringToObjectId(id)
-    const candidate = await this.lessonModel
-      .findById(id, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
-      .exec()
+    const candidate = await this.lessonModel.findById(id, undefined, options?.queryOptions).exec()
 
     if (!candidate) {
       throw new HttpException(LESSON_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -60,7 +51,7 @@ export class ScheduleService {
   async delete(groupId: Types.ObjectId | MongoIdString, ids?: Types.ObjectId[]) {
     groupId = stringToObjectId(groupId)
     if (!ids) {
-      const scheduleIds = (await this.getByGroup(groupId, { fields: ['id'] })).map(lesson => lesson.id)
+      const scheduleIds = (await this.getByGroup(groupId, { queryOptions: { fields: ['id'] } })).map(lesson => lesson.id)
       await this.lessonModel.deleteMany({ group: groupId })
       await this.userService.clearFromId(scheduleIds)
       await this.roleService.clearFromId(scheduleIds)

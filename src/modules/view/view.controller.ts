@@ -6,22 +6,18 @@ import {
   defaultViewGetByCodeData,
   defaultViewGetByUserIdData,
   defaultViewUpdateData,
-  ViewAdditionalFieldsEnum,
-  ViewField,
-  ViewFieldsEnum,
   ViewGetQueryParametersEnum,
   ViewRoutesEnum,
 } from './view.constants'
 import { CreateViewDto } from './dto/createView.dto'
-import { Fields } from '../../global/decorators/Fields.decorator'
 import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
 import { UpdateViewDto } from './dto/updateView.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
-import { Types } from 'mongoose'
-import normalizeFields from '../../global/utils/normalizeFields'
+import { QueryOptions, Types } from 'mongoose'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { ApiTags } from '@nestjs/swagger'
+import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
 @ApiTags('Отображения')
 @Controller()
@@ -45,8 +41,11 @@ export class ViewController {
     title: 'Получить отображение по коду',
   })
   @Get(ViewRoutesEnum.GET_BY_CODE)
-  getByCode(@Query(ViewGetQueryParametersEnum.CODE, new CustomParseStringPipe()) code: string, @ViewGetFields() fields?: ViewField[]) {
-    return this.viewService.getByCode(code, { fields })
+  getByCode(
+    @Query(ViewGetQueryParametersEnum.CODE, new CustomParseStringPipe()) code: string,
+    @MongoQueryOptions() queryOptions?: QueryOptions
+  ) {
+    return this.viewService.getByCode(code, { queryOptions })
   }
 
   @Functionality({
@@ -58,9 +57,9 @@ export class ViewController {
   async getByUserId(
     @MongoId(ViewGetQueryParametersEnum.USER_ID) userId: Types.ObjectId,
     @Query(ViewGetQueryParametersEnum.INTERFACE) intrfc?: string,
-    @ViewGetFields() fields?: ViewField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
-    return normalizeFields(await this.viewService.getByUserId(userId, intrfc, { fields }), { fields })
+    return this.viewService.getByUserId(userId, intrfc, { queryOptions })
   }
 
   @UsePipes(new ValidationPipe())
@@ -83,8 +82,4 @@ export class ViewController {
   delete(@MongoId('viewId') viewId: Types.ObjectId) {
     return this.viewService.delete(viewId)
   }
-}
-
-function ViewGetFields() {
-  return Fields({ fieldsEnum: ViewFieldsEnum, additionalFieldsEnum: ViewAdditionalFieldsEnum })
 }

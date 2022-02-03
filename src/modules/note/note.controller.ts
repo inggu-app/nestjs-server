@@ -7,23 +7,18 @@ import {
   defaultNoteDeleteData,
   defaultNoteGetByLessonIdData,
   defaultNoteGetByNoteIdData,
-  NoteAdditionalFieldsEnum,
-  NoteField,
-  NoteFieldsEnum,
-  NoteForbiddenFieldsEnum,
   NoteGetQueryParametersEnum,
   NoteRoutesEnum,
 } from './note.constants'
-import { Types } from 'mongoose'
+import { QueryOptions, Types } from 'mongoose'
 import { DeviceId } from '../../global/types'
 import { INVALID_NOTE_DEVICE_ID } from '../../global/constants/errors.constants'
 import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
-import normalizeFields from '../../global/utils/normalizeFields'
-import { Fields } from '../../global/decorators/Fields.decorator'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { ApiTags } from '@nestjs/swagger'
+import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
 @ApiTags('Заметки')
 @Controller()
@@ -47,11 +42,8 @@ export class NoteController {
     title: 'Получить заметку по id',
   })
   @Get(NoteRoutesEnum.GET_BY_NOTE_ID)
-  async getByNoteId(@MongoId(NoteGetQueryParametersEnum.NOTE_ID) noteId: Types.ObjectId, @GetNoteFields() fields?: NoteField[]) {
-    return normalizeFields(await this.noteService.getById(noteId, { fields }), {
-      fields,
-      forbiddenFields: NoteForbiddenFieldsEnum,
-    })
+  async getByNoteId(@MongoId(NoteGetQueryParametersEnum.NOTE_ID) noteId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+    return this.noteService.getById(noteId, { queryOptions })
   }
 
   @Functionality({
@@ -63,9 +55,9 @@ export class NoteController {
   async getByLessonId(
     @MongoId(NoteGetQueryParametersEnum.LESSON_ID) lessonId: Types.ObjectId,
     @Query(NoteGetQueryParametersEnum.WEEK, new CustomParseIntPipe()) week: number,
-    @GetNoteFields() fields?: NoteField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
-    return normalizeFields(await this.noteService.get(lessonId, week, { fields }), { fields, forbiddenFields: NoteForbiddenFieldsEnum })
+    return this.noteService.get(lessonId, week, { queryOptions })
   }
 
   @Functionality({
@@ -75,7 +67,7 @@ export class NoteController {
   })
   @Delete(NoteRoutesEnum.DELETE)
   async delete(@MongoId('noteId') noteId: Types.ObjectId, @Query('deviceId', new CustomParseStringPipe()) deviceId: DeviceId) {
-    const candidate = await this.noteService.getById(noteId, { fields: ['deviceId'] })
+    const candidate = await this.noteService.getById(noteId)
 
     if (deviceId !== candidate.deviceId) {
       throw new HttpException(INVALID_NOTE_DEVICE_ID(noteId, deviceId), HttpStatus.BAD_REQUEST)
@@ -83,12 +75,4 @@ export class NoteController {
 
     return this.noteService.delete(noteId)
   }
-}
-
-function GetNoteFields() {
-  return Fields({
-    fieldsEnum: NoteFieldsEnum,
-    additionalFieldsEnum: NoteAdditionalFieldsEnum,
-    forbiddenFieldsEnum: NoteForbiddenFieldsEnum,
-  })
 }

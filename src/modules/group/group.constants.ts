@@ -1,5 +1,4 @@
 import enumKeyValuesMatch from '../../global/utils/enumKeyValuesMatch'
-import { DefaultFieldsEnum } from '../../global/enums/defaultFields.enum'
 import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
 import { MongoIdString } from '../../global/types'
 import { FunctionalityDefault } from '../functionality/functionality.constants'
@@ -39,10 +38,6 @@ export enum GroupFieldsEnum {
   faculty = 'faculty',
   lastScheduleUpdate = 'lastScheduleUpdate',
   isHaveSchedule = 'isHaveSchedule',
-}
-
-export const GroupAdditionalFieldsEnum = {
-  ...DefaultFieldsEnum,
 }
 
 export type GroupField = keyof typeof GroupFieldsEnum

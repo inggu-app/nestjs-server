@@ -8,20 +8,17 @@ import {
   defaultRoleGetByRoleIdData,
   defaultRoleGetManyData,
   defaultRoleUpdateData,
-  RoleAdditionalFieldsEnum,
-  RoleField,
-  RoleFieldsEnum,
   RoleGetManyDataForFunctionality,
   RoleGetQueryParametersEnum,
   RoleRoutesEnum,
 } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
-import { Types } from 'mongoose'
-import { Fields } from '../../global/decorators/Fields.decorator'
+import { QueryOptions, Types } from 'mongoose'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
 import { ApiTags } from '@nestjs/swagger'
+import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
 @ApiTags('Роли')
 @Controller()
@@ -45,8 +42,8 @@ export class RoleController {
     title: 'Запросить роль по id',
   })
   @Get(RoleRoutesEnum.GET_BY_ROLE_ID)
-  getByRoleId(@MongoId(RoleGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId, @GetRoleFields() fields?: RoleField[]) {
-    return this.roleService.getById(roleId, { fields })
+  getByRoleId(@MongoId(RoleGetQueryParametersEnum.ROLE_ID) roleId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+    return this.roleService.getById(roleId, { queryOptions })
   }
 
   @Functionality({
@@ -55,9 +52,12 @@ export class RoleController {
     title: 'Запросить список ролей',
   })
   @Get(RoleRoutesEnum.GET_MANY)
-  async getMany(@Req() { functionality }: CustomRequest<any, RoleGetManyDataForFunctionality>, @GetRoleFields() fields?: RoleField[]) {
+  async getMany(
+    @Req() { functionality }: CustomRequest<any, RoleGetManyDataForFunctionality>,
+    @MongoQueryOptions() queryOptions?: QueryOptions
+  ) {
     return {
-      roles: await this.roleService.getMany({ fields, functionality }),
+      roles: await this.roleService.getMany({ functionality, queryOptions }),
       count: await this.roleService.countMany({ functionality }),
     }
   }
@@ -82,8 +82,4 @@ export class RoleController {
   delete(@MongoId('roleId') roleId: Types.ObjectId) {
     return this.roleService.deleteById(roleId)
   }
-}
-
-function GetRoleFields() {
-  return Fields({ fieldsEnum: RoleFieldsEnum, additionalFieldsEnum: RoleAdditionalFieldsEnum })
 }

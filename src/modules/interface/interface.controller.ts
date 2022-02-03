@@ -5,20 +5,18 @@ import {
   defaultInterfaceDeleteData,
   defaultInterfaceGetByCodeData,
   defaultInterfaceUpdateData,
-  InterfaceField,
-  InterfaceFieldsEnum,
   InterfaceGetQueryParametersEnum,
   InterfaceRoutesEnum,
 } from './interface.constants'
 import { CreateInterfaceDto } from './dto/createInterface.dto'
 import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
-import { Fields } from '../../global/decorators/Fields.decorator'
 import { UpdateInterfaceDto } from './dto/updateInterface.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
-import { Types } from 'mongoose'
+import { QueryOptions, Types } from 'mongoose'
 import { Functionality } from '../../global/decorators/Functionality.decorator'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { ApiTags } from '@nestjs/swagger'
+import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
 @ApiTags('Интерфейсы')
 @Controller()
@@ -44,9 +42,9 @@ export class InterfaceController {
   @Get(InterfaceRoutesEnum.GET_BY_CODE)
   getByCode(
     @Query(InterfaceGetQueryParametersEnum.CODE, new CustomParseStringPipe()) code: string,
-    @GetInterfaceFields() fields?: InterfaceField[]
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
-    return this.interfaceService.getByCode(code, { fields })
+    return this.interfaceService.getByCode(code, { queryOptions })
   }
 
   @UsePipes(new ValidationPipe())
@@ -69,8 +67,4 @@ export class InterfaceController {
   delete(@MongoId('interfaceId') interfaceId: Types.ObjectId) {
     return this.interfaceService.delete(interfaceId)
   }
-}
-
-function GetInterfaceFields() {
-  return Fields({ fieldsEnum: InterfaceFieldsEnum })
 }

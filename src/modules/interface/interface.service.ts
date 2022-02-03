@@ -13,7 +13,6 @@ import {
 import { InterfaceField, InterfaceFieldsEnum } from './interface.constants'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { DocumentType } from '@typegoose/typegoose'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { UpdateInterfaceDto } from './dto/updateInterface.dto'
 import { UserService } from '../user/user.service'
 import { RoleService } from '../role/role.service'
@@ -37,20 +36,12 @@ export class InterfaceService {
   async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<InterfaceField>) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return this.interfaceModel.findById(
-      id,
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<InterfaceModel>
+    return this.interfaceModel.findById(id, undefined, options?.queryOptions) as unknown as DocumentType<InterfaceModel>
   }
 
   async getByCode(code: string, options?: ServiceGetOptions<InterfaceField>) {
     await this.checkExists({ code }, { error: new BadRequestException(INTERFACE_WITH_CODE_NOT_FOUND(code)) })
-    return this.interfaceModel.findOne(
-      { code },
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<InterfaceModel>
+    return this.interfaceModel.findOne({ code }, undefined, options?.queryOptions) as unknown as DocumentType<InterfaceModel>
   }
 
   async update(dto: UpdateInterfaceDto) {

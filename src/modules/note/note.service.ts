@@ -5,7 +5,6 @@ import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateNoteDto } from './dto/createNoteDto'
 import { Error, Types } from 'mongoose'
 import { NoteField, NoteFieldsEnum } from './note.constants'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ScheduleService } from '../schedule/schedule.service'
 import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
@@ -31,20 +30,12 @@ export class NoteService {
   async get(lesson: Types.ObjectId | MongoIdString, week: number, options?: ServiceGetOptions<NoteField>) {
     await this.scheduleService.checkExists({ _id: lesson })
 
-    return this.noteModel
-      .find(
-        { lesson, week },
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-        options?.queryOptions
-      )
-      .exec()
+    return this.noteModel.find({ lesson, week }, undefined, options?.queryOptions).exec()
   }
 
   async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<NoteField>) {
     id = stringToObjectId(id)
-    const candidate = await this.noteModel
-      .findById(id, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
-      .exec()
+    const candidate = await this.noteModel.findById(id, undefined, options?.queryOptions).exec()
 
     if (!candidate) {
       throw new HttpException(NOTE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)

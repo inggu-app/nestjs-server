@@ -38,7 +38,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         queryParams = parseRequestQueries(getEnumValues(UserGetQueryParametersEnum), request.url)
         if (!queryParams.userId || !isMongoId(queryParams.userId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
-        currentUser = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
+        currentUser = await this.userService.getById(queryParams.userId, { queryOptions: { fields: ['roles'] } })
         if (
           castedFunctionality.data.forbiddenRoles.reduce(
             (acc, role) =>
@@ -71,7 +71,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         queryParams = parseRequestQueries(getEnumValues(UserGetQueryParametersEnum), request.url)
         if (!queryParams.userId || !queryParams.roleId || !isMongoId(queryParams.userId) || !isMongoId(queryParams.roleId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
-        currentUser = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
+        currentUser = await this.userService.getById(queryParams.userId, { queryOptions: { fields: ['roles'] } })
         if (
           castedFunctionality.data.forbiddenRoles.reduce(
             (acc, role) =>
@@ -174,7 +174,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         // Если пользователь пытается обновить специально запрещённых ему пользователей или пользователей с
         // запрещёнными ему ролями, то доступ запрещается
         if (castedFunctionality.data.forbiddenUsers.includes(requestBody.id)) break
-        currentUser = await this.userService.getById(requestBody.id, { fields: ['roles'] })
+        currentUser = await this.userService.getById(requestBody.id, { queryOptions: { fields: ['roles'] } })
         if (castedFunctionality.data.forbiddenRoles.reduce((acc, role) => !!currentUser.roles.find(r => r.toString() === role), false))
           break
         //=====================
@@ -201,7 +201,7 @@ export class UserJwtAuthGuard extends BaseJwtAuthGuard implements JwtAuthGuardVa
         queryParams = parseRequestQueries(['userId'], request.url)
         if (!queryParams.userId || !isMongoId(queryParams.userId)) return true
         if (castedFunctionality.data.forbiddenUsers.includes(queryParams.userId)) break
-        const user = await this.userService.getById(queryParams.userId, { fields: ['roles'] })
+        const user = await this.userService.getById(queryParams.userId, { queryOptions: { fields: ['roles'] } })
         if (castedFunctionality.data.forbiddenRoles.reduce((acc, role) => !!user.roles.find(r => r.toString() === role), false)) break
         if (castedFunctionality.data.availableUsersType === FunctionalityAvailableTypeEnum.ALL) return true
         if (castedFunctionality.data.availableUsers.includes(queryParams.userId)) return true

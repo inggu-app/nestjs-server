@@ -1,17 +1,12 @@
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions, prop, Ref } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
-import { RoleFieldsEnum } from './role.constants'
 import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { ViewModel } from '../view/view.model'
 import { Types } from 'mongoose'
 import { TypesEnum } from '../../global/enums/types.enum'
 import { AvailableFunctionality } from '../functionality/functionality.constants'
 import { DbModelsEnum } from '../../global/enums/dbModelsEnum'
-
-type Role = {
-  [key in RoleFieldsEnum]: any
-}
 
 export interface RoleModel extends Base {}
 @modelOptions({
@@ -47,7 +42,7 @@ export interface RoleModel extends Base {}
     },
   }),
 })
-export class RoleModel extends TimeStamps implements Role {
+export class RoleModel extends TimeStamps {
   @prop()
   title: string
 

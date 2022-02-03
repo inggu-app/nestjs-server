@@ -17,7 +17,6 @@ import {
 import { RoleField, RoleFieldsEnum, RoleGetManyDataForFunctionality } from './role.constants'
 import { CreateRoleDto } from './dto/createRole.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
-import fieldsArrayToProjection from '../../global/utils/fieldsArrayToProjection'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { ViewService } from '../view/view.service'
 import { FunctionalityService } from '../functionality/functionality.service'
@@ -50,28 +49,18 @@ export class RoleService {
     return
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<RoleField>) {
+  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
-    return this.roleModel.findById(
-      { _id: id },
-      Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-      options?.queryOptions
-    ) as unknown as DocumentType<RoleModel>
+    return this.roleModel.findById({ _id: id }, undefined, options?.queryOptions) as unknown as DocumentType<RoleModel>
   }
 
   async getByTitle(title: string, options?: ServiceGetOptions<RoleField>) {
     await this.checkExists({ title })
-    return this.roleModel
-      .findOne(
-        { title },
-        Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields,
-        options?.queryOptions
-      )
-      .exec()
+    return this.roleModel.findOne({ title }, undefined, options?.queryOptions).exec()
   }
 
-  async getMany(options?: ServiceGetOptions<RoleField, RoleGetManyDataForFunctionality>) {
+  async getMany(options?: ServiceGetOptions<RoleGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<RoleModel>> = {}
     if (options?.functionality) {
       filter._id = { $nin: options.functionality.data.forbiddenRoles }
@@ -80,12 +69,10 @@ export class RoleService {
       }
     }
 
-    return this.roleModel
-      .find(filter, Array.isArray(options?.fields) ? fieldsArrayToProjection(options?.fields) : options?.fields, options?.queryOptions)
-      .map(doc => doc.map(item => item.toObject()))
+    return this.roleModel.find(filter, undefined, options?.queryOptions).map(doc => doc.map(item => item.toObject()))
   }
 
-  async countMany(options?: ServiceGetOptions<RoleField, RoleGetManyDataForFunctionality>) {
+  async countMany(options?: ServiceGetOptions<RoleGetManyDataForFunctionality>) {
     const filter: FilterQuery<DocumentType<RoleModel>> = {}
     if (options?.functionality) {
       filter._id = { $nin: options.functionality.data.forbiddenRoles }
