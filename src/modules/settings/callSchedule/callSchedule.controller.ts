@@ -3,13 +3,15 @@ import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 import { CallScheduleRoutesEnum } from './callSchedule.constants'
-import { ApiTags } from '@nestjs/swagger'
+import { AdminUserAuth } from '../../../global/decorators/AdminUserAuth.decorator'
 
-@ApiTags('Расписание звонков')
 @Controller()
 export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}
 
+  @AdminUserAuth({
+    availability: 'canUpdateCallSchedule',
+  })
   @UsePipes(new ValidationPipe())
   @Post(CallScheduleRoutesEnum.CREATE)
   async createCallSchedule(@Body() dto: CreateCallScheduleDto) {

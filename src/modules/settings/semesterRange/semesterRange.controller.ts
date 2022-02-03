@@ -3,14 +3,16 @@ import { SemesterRangeService } from './semesterRange.service'
 import { CreateSemesterRangeDto } from './dto/createSemesterRange.dto'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 import { SemesterRangeDateRoutesEnum } from './semesterRange.constants'
-import { ApiTags } from '@nestjs/swagger'
 import { SEMESTER_RANGE_DATE_INCORRECT_RANGE } from '../../../global/constants/errors.constants'
+import { AdminUserAuth } from '../../../global/decorators/AdminUserAuth.decorator'
 
-@ApiTags('Дата старта семестра')
 @Controller()
 export class SemesterRangeController {
   constructor(private readonly semesterStartDateService: SemesterRangeService) {}
 
+  @AdminUserAuth({
+    availability: 'canUpdateSemesterRange',
+  })
   @UsePipes(new ValidationPipe())
   @Post(SemesterRangeDateRoutesEnum.CREATE)
   async createSemesterStartTime(@Body() dto: CreateSemesterRangeDto) {

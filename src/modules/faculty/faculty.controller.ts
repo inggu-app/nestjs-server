@@ -9,12 +9,16 @@ import { FacultyGetQueryParametersEnum, FacultyRoutesEnum } from './faculty.cons
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { ApiTags } from '@nestjs/swagger'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
+import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 
 @ApiTags('Факультеты')
 @Controller()
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService, private readonly groupService: GroupService) {}
 
+  @AdminUserAuth({
+    availability: 'canCreateFaculty',
+  })
   @UsePipes(new ValidationPipe())
   @Post('/')
   create(@Body() dto: CreateFacultyDto) {
@@ -52,12 +56,18 @@ export class FacultyController {
     }
   }
 
+  @AdminUserAuth({
+    availability: 'canUpdateFaculty',
+  })
   @UsePipes(new ValidationPipe())
   @Patch(FacultyRoutesEnum.UPDATE)
   update(@Body() dto: UpdateFacultyDto) {
     return this.facultyService.update(dto)
   }
 
+  @AdminUserAuth({
+    availability: 'canDeleteFaculty',
+  })
   @Delete(FacultyRoutesEnum.DELETE)
   async delete(@MongoId('facultyId') facultyId: Types.ObjectId) {
     await this.facultyService.delete(facultyId)

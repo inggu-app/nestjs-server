@@ -9,6 +9,7 @@ import { SemesterRangeModule } from '../modules/settings/semesterRange/semesterR
 import { AppVersionModule } from '../modules/settings/appVersion/appVersion.module'
 import { NoteModule } from '../modules/note/note.module'
 import { ModuleRoutesEnum } from '../global/enums/moduleRoutes.enum'
+import { AdminUserModule } from '../modules/adminUser/adminUser.module'
 
 export const routesConfig: Routes = [
   {
@@ -26,6 +27,10 @@ export const routesConfig: Routes = [
   {
     path: ModuleRoutesEnum.NOTE_MODULE,
     module: NoteModule,
+  },
+  {
+    path: ModuleRoutesEnum.ADMIN_USER_MODULE,
+    module: AdminUserModule,
   },
   {
     path: ModuleRoutesEnum.SETTINGS_MODULE,

@@ -8,11 +8,15 @@ import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { GroupGetQueryParametersEnum, GroupRoutesEnum } from './group.constants'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
+import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 
 @Controller()
 export class GroupController {
   constructor(private readonly groupService: GroupService, private readonly facultyService: FacultyService) {}
 
+  @AdminUserAuth({
+    availability: 'canCreateGroup',
+  })
   @UsePipes(new ValidationPipe())
   @Post(GroupRoutesEnum.CREATE)
   async create(@Body() dto: CreateGroupDto) {
@@ -62,12 +66,18 @@ export class GroupController {
     }
   }
 
+  @AdminUserAuth({
+    availability: 'canUpdateGroup',
+  })
   @UsePipes(new ValidationPipe())
   @Patch(GroupRoutesEnum.UPDATE)
   async update(@Body() dto: UpdateGroupDto) {
     return this.groupService.update(dto)
   }
 
+  @AdminUserAuth({
+    availability: 'canDeleteGroup',
+  })
   @Delete(GroupRoutesEnum.DELETE)
   delete(@MongoId('groupId') groupId: Types.ObjectId) {
     return this.groupService.delete(groupId)
