@@ -24,7 +24,7 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
     await this.throwIfNotExists({ _id: id })
-    return this.adminUserModel.findById(id, undefined, queryOptions)
+    return this.adminUserModel.findById(id, undefined, queryOptions) as unknown as DocumentType<AdminUserModel>
   }
 
   async getByIds(ids: Types.ObjectId[], queryOptions?: QueryOptions) {

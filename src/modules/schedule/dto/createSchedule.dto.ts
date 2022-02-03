@@ -1,19 +1,10 @@
 import { IsArray, IsEnum, IsMongoId, IsNumber, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { WeekDaysEnum } from '../../../global/enums/WeekDays.enum'
-import { LessonFieldsEnum, WeeksTypeEnum } from '../schedule.constants'
+import { WeeksTypeEnum } from '../schedule.constants'
 import { MongoIdString } from '../../../global/types'
 
-export interface ICreateScheduleDto {
-  group: MongoIdString
-  schedule: LessonType[]
-}
-
-type LessonType = {
-  [key in keyof Omit<typeof LessonFieldsEnum, 'group'>]: any
-}
-
-export class CreateScheduleDto implements ICreateScheduleDto {
+export class CreateScheduleDto {
   @IsMongoId()
   group: MongoIdString
 
@@ -23,7 +14,7 @@ export class CreateScheduleDto implements ICreateScheduleDto {
   schedule: Lesson[]
 }
 
-export class Lesson implements LessonType {
+export class Lesson {
   @IsOptional()
   @IsMongoId()
   id: MongoIdString | undefined | null

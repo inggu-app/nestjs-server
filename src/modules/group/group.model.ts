@@ -3,9 +3,7 @@ import { modelOptions, prop } from '@typegoose/typegoose'
 import { Types } from 'mongoose'
 import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
-import { CustomModelBase } from '../../global/types'
 
-export interface GroupModel extends CustomModelBase {}
 export interface GroupModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<GroupModel>({

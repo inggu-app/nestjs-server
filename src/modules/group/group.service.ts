@@ -26,7 +26,7 @@ export class GroupService extends CheckExistenceService<GroupModel> {
 
   async getById(groupId: Types.ObjectId, queryOptions?: QueryOptions) {
     await this.throwIfNotExists({ _id: groupId })
-    return this.groupModel.findById(groupId, undefined, queryOptions).exec()
+    return (await this.groupModel.findById(groupId, undefined, queryOptions).exec()) as unknown as DocumentType<GroupModel>
   }
 
   async getByGroupIds(groupIds: Types.ObjectId[], queryOptions?: QueryOptions) {

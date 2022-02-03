@@ -7,6 +7,7 @@ import { QueryOptions, Types } from 'mongoose'
 import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ScheduleService } from '../schedule/schedule.service'
 import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
+import { DocumentType } from '@typegoose/typegoose'
 
 @Injectable()
 export class NoteService extends CheckExistenceService<NoteModel> {
@@ -26,7 +27,7 @@ export class NoteService extends CheckExistenceService<NoteModel> {
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
     await this.throwIfNotExists({ _id: id })
-    return this.noteModel.findById(id, undefined, queryOptions).exec()
+    return (await this.noteModel.findById(id, undefined, queryOptions).exec()) as unknown as DocumentType<NoteModel>
   }
 
   async delete(id: Types.ObjectId) {

@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config'
 import { TypegooseModuleOptions } from 'nestjs-typegoose'
+import { envVariables } from '../global/constants/envVariables.constants'
 
 export const getMongoConfig = async (configService: ConfigService): Promise<TypegooseModuleOptions> => {
   return {
@@ -11,15 +12,15 @@ export const getMongoConfig = async (configService: ConfigService): Promise<Type
 const getMongoString = (configService: ConfigService) => {
   return (
     'mongodb://' +
-    configService.get('MONGO_LOGIN') +
+    configService.get(envVariables.mongoLogin) +
     ':' +
-    configService.get('MONGO_PASSWORD') +
+    configService.get(envVariables.mongoPassword) +
     '@' +
-    configService.get('MONGO_HOST') +
+    configService.get(envVariables.mongoHost) +
     ':' +
-    configService.get('MONGO_PORT') +
+    configService.get(envVariables.mongoPort) +
     '/' +
-    configService.get('MONGO_AUTH_DATABASE')
+    configService.get(envVariables.mongoAuthDatabase)
   )
 }
 

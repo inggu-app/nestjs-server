@@ -28,7 +28,7 @@ export class AdminUserAuthGuard implements CanActivate {
       const token = bearer.substring(7)
 
       try {
-        if (await this.jwtService.verifyAsync(token, { secret: this.configService.get(envVariables.jwtSecretKey) })) {
+        if (await this.jwtService.verifyAsync(token, { secret: this.configService.get(envVariables.tokenJwtSecretKey) })) {
           const tokenData = this.jwtService.decode(token) as ITokenData
 
           const availability: keyof Availability = this.reflector.get('availability', context.getHandler())

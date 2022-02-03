@@ -29,7 +29,7 @@ export class ScheduleService extends CheckExistenceService<LessonModel> {
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
     await this.throwIfNotExists({ _id: id })
-    return this.lessonModel.findById(id, undefined, queryOptions).exec()
+    return (await this.lessonModel.findById(id, undefined, queryOptions).exec()) as unknown as DocumentType<LessonModel>
   }
 
   async updateById(id: Types.ObjectId, lesson: Lesson) {

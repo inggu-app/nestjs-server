@@ -22,7 +22,7 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
 
   async getById(facultyId: Types.ObjectId, queryOptions?: QueryOptions) {
     await this.throwIfNotExists({ _id: facultyId })
-    return this.facultyModel.findById(facultyId, undefined, queryOptions).exec()
+    return (await this.facultyModel.findById(facultyId, undefined, queryOptions).exec()) as unknown as DocumentType<FacultyModel>
   }
 
   async getByIds(facultyIds: Types.ObjectId[], queryOptions?: QueryOptions) {
