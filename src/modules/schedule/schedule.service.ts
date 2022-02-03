@@ -6,7 +6,7 @@ import { LessonModel } from './lesson.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { LessonFieldsEnum } from './schedule.constants'
 import { LESSON_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
@@ -18,12 +18,11 @@ export class ScheduleService {
     return this.lessonModel.create(lessons)
   }
 
-  getByGroup(groupId: Types.ObjectId | MongoIdString, queryOptions?: QueryOptions) {
-    groupId = stringToObjectId(groupId)
+  getByGroup(groupId: Types.ObjectId, queryOptions?: QueryOptions) {
     return this.lessonModel.find({ group: groupId }, undefined, queryOptions).exec()
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, queryOptions?: QueryOptions) {
+  async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
     id = stringToObjectId(id)
     const candidate = await this.lessonModel.findById(id, undefined, queryOptions).exec()
 
@@ -34,7 +33,7 @@ export class ScheduleService {
     return candidate
   }
 
-  async updateById(id: Types.ObjectId | MongoIdString, lesson: Lesson) {
+  async updateById(id: Types.ObjectId, lesson: Lesson) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.lessonModel.updateOne({ _id: id }, { $set: { ...lesson } }).exec()
@@ -42,7 +41,7 @@ export class ScheduleService {
     return
   }
 
-  async delete(groupId: Types.ObjectId | MongoIdString, ids?: Types.ObjectId[]) {
+  async delete(groupId: Types.ObjectId, ids?: Types.ObjectId[]) {
     groupId = stringToObjectId(groupId)
     if (!ids) {
       await this.lessonModel.deleteMany({ group: groupId })

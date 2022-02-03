@@ -1,30 +1,7 @@
-import { ModelOptions, prop } from '@typegoose/typegoose'
+import { ModelOptions, prop, Ref } from '@typegoose/typegoose'
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { FacultyModel } from '../faculty/faculty.model'
-
-export interface AdminUserModel extends Base {}
-@ModelOptions({
-  schemaOptions: getModelDefaultOptions<FacultyModel>({
-    collection: 'AdminUser',
-  }),
-})
-export class AdminUserModel extends TimeStamps {
-  @prop({ required: true })
-  name: string
-
-  @prop()
-  login: string
-
-  @prop({ required: true })
-  hashedPassword: string
-
-  @prop({ required: true })
-  hashedUniqueKey: string
-
-  @prop({ _id: false, required: true })
-  availability: Availability
-}
 
 export class Availability {
   @prop({ default: false })
@@ -50,4 +27,27 @@ export class Availability {
 
   @prop({ default: false })
   canUpdateSemesterRange: boolean // можно ли обновить длительность семестра
+}
+
+export interface AdminUserModel extends Base {}
+@ModelOptions({
+  schemaOptions: getModelDefaultOptions<FacultyModel>({
+    collection: 'AdminUser',
+  }),
+})
+export class AdminUserModel extends TimeStamps {
+  @prop({ required: true })
+  name: string
+
+  @prop()
+  login: string
+
+  @prop({ required: true })
+  hashedPassword: string
+
+  @prop({ required: true })
+  hashedUniqueKey: string
+
+  @prop({ _id: false, required: true, ref: () => Availability })
+  availability: Ref<Availability, undefined>
 }

@@ -7,7 +7,7 @@ import { FacultyFieldsEnum } from './faculty.constants'
 import { Error, FilterQuery, QueryOptions, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { DocumentType } from '@typegoose/typegoose'
 
@@ -24,7 +24,7 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
-  async getById(facultyId: MongoIdString | Types.ObjectId, queryOptions?: QueryOptions) {
+  async getById(facultyId: Types.ObjectId, queryOptions?: QueryOptions) {
     facultyId = stringToObjectId(facultyId)
     const candidate = await this.facultyModel.findById(facultyId, undefined, queryOptions).exec()
 
@@ -35,7 +35,7 @@ export class FacultyService {
     return candidate
   }
 
-  async getByIds(facultyIds: Types.ObjectId[] | MongoIdString[], queryOptions?: QueryOptions) {
+  async getByIds(facultyIds: Types.ObjectId[], queryOptions?: QueryOptions) {
     facultyIds = facultyIds.map(stringToObjectId)
     await this.checkExists(facultyIds.map(id => ({ _id: id })))
 
@@ -74,8 +74,7 @@ export class FacultyService {
     return this.facultyModel.findById(dto.id).exec()
   }
 
-  async delete(id: Types.ObjectId | MongoIdString) {
-    id = stringToObjectId(id)
+  async delete(id: Types.ObjectId) {
     await this.checkExists({ _id: id })
     await this.facultyModel.deleteOne({ _id: id }).exec()
     return

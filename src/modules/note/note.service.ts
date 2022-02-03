@@ -7,7 +7,7 @@ import { Error, QueryOptions, Types } from 'mongoose'
 import { NoteFieldsEnum } from './note.constants'
 import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ScheduleService } from '../schedule/schedule.service'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
@@ -23,13 +23,13 @@ export class NoteService {
     return this.noteModel.create(dto)
   }
 
-  async get(lesson: Types.ObjectId | MongoIdString, week: number, queryOptions?: QueryOptions) {
+  async get(lesson: Types.ObjectId, week: number, queryOptions?: QueryOptions) {
     await this.scheduleService.checkExists({ _id: lesson })
 
     return this.noteModel.find({ lesson, week }, undefined, queryOptions).exec()
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, queryOptions?: QueryOptions) {
+  async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
     id = stringToObjectId(id)
     const candidate = await this.noteModel.findById(id, undefined, queryOptions).exec()
 
@@ -40,7 +40,7 @@ export class NoteService {
     return candidate
   }
 
-  async delete(id: Types.ObjectId | MongoIdString) {
+  async delete(id: Types.ObjectId) {
     await this.checkExists({ _id: id })
     await this.noteModel.deleteOne({ _id: id })
     return

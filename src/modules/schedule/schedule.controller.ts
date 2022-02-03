@@ -3,7 +3,6 @@ import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { QueryOptions, Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
-import { ScheduleGetQueryParametersEnum, ScheduleRoutesEnum } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
@@ -18,7 +17,7 @@ export class ScheduleController {
   ) {}
 
   @UsePipes(new ValidationPipe())
-  @Post(ScheduleRoutesEnum.CREATE)
+  @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
     await this.groupService.checkExists({ _id: dto.group })
 
@@ -26,15 +25,15 @@ export class ScheduleController {
     if (existLessons.length) {
       for await (const lesson of existLessons) {
         if (lesson.id) {
-          await this.scheduleService.updateById(lesson.id, lesson)
+          await this.scheduleService.updateById(new Types.ObjectId(lesson.id), lesson)
         }
       }
     }
 
-    const allLessons = await this.scheduleService.getByGroup(dto.group, { fields: ['id'] })
+    const allLessons = await this.scheduleService.getByGroup(new Types.ObjectId(dto.group), { fields: ['id'] })
     const extraLessons = allLessons.filter(lesson => !existLessons.find(l => l.id === lesson.id))
     await this.scheduleService.delete(
-      dto.group,
+      new Types.ObjectId(dto.group),
       extraLessons.map(l => l.id)
     )
 
@@ -46,10 +45,10 @@ export class ScheduleController {
     return
   }
 
-  @Get(ScheduleRoutesEnum.GET_BY_GROUP_ID)
+  @Get('/by-group-id')
   async getByGroupId(
-    @MongoId(ScheduleGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
-    @Query(ScheduleGetQueryParametersEnum.UPDATED_AT, new ParseDatePipe({ required: false })) updatedAt?: Date,
+    @MongoId('groupId') groupId: Types.ObjectId,
+    @Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     const group = await this.groupService.getById(groupId, { fields: ['lastScheduleUpdate'] })

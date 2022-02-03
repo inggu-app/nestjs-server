@@ -38,13 +38,13 @@ export class ParseMongoIdPipe implements PipeTransform<any, Types.ObjectId | Typ
         }
       }
 
-      return value.split(',').map(Types.ObjectId.createFromHexString)
+      return value.split(',').map(id => new Types.ObjectId(id))
     }
 
     if (!isMongoId(value)) {
       throw new HttpException(INVALID_MONGO_ID, HttpStatus.BAD_REQUEST)
     }
 
-    return Types.ObjectId.createFromHexString(value as string)
+    return new Types.ObjectId(value as string)
   }
 }

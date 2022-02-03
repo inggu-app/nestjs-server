@@ -6,7 +6,7 @@ export const getModelDefaultOptions = <Model>(schemaOptions?: SchemaOptions): Sc
   toObject: {
     ...schemaOptions?.toObject,
     transform: (doc: DocumentType<Model>, ret: any, options: any) => {
-      if (schemaOptions?.toJSON?.transform) {
+      if (schemaOptions?.toJSON?.transform && typeof schemaOptions.toJSON.transform === 'function') {
         schemaOptions?.toJSON?.transform(doc, ret, options)
       }
       delete ret.__v
@@ -17,7 +17,7 @@ export const getModelDefaultOptions = <Model>(schemaOptions?: SchemaOptions): Sc
   toJSON: {
     ...schemaOptions?.toJSON,
     transform: (doc: DocumentType<Model>, ret: any, options: any) => {
-      if (schemaOptions?.toJSON?.transform) {
+      if (schemaOptions?.toJSON?.transform && typeof schemaOptions.toJSON.transform === 'function') {
         schemaOptions?.toJSON?.transform(doc, ret, options)
       }
       delete ret.__v

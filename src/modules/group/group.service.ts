@@ -9,7 +9,7 @@ import { GroupFieldsEnum } from './group.constants'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
+import { ModelBase, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 
 @Injectable()
@@ -28,7 +28,7 @@ export class GroupService {
     return this.groupModel.create(dto)
   }
 
-  async getById(groupId: MongoIdString | Types.ObjectId, queryOptions?: QueryOptions) {
+  async getById(groupId: Types.ObjectId, queryOptions?: QueryOptions) {
     groupId = stringToObjectId(groupId)
 
     const candidate = await this.groupModel.findById(groupId, undefined, queryOptions).exec()
@@ -40,7 +40,7 @@ export class GroupService {
     return candidate
   }
 
-  async getByGroupIds(groupIds: MongoIdString[] | Types.ObjectId[], queryOptions?: QueryOptions) {
+  async getByGroupIds(groupIds: Types.ObjectId[], queryOptions?: QueryOptions) {
     groupIds = groupIds.map(stringToObjectId)
     await this.checkExists(groupIds.map(id => ({ _id: id })))
     const filter: FilterQuery<DocumentType<GroupModel>> = { _id: { $in: groupIds } }
@@ -66,7 +66,7 @@ export class GroupService {
     return this.groupModel.countDocuments(filter).exec()
   }
 
-  async getByFacultyId(facultyId: Types.ObjectId | MongoIdString, queryOptions?: QueryOptions) {
+  async getByFacultyId(facultyId: Types.ObjectId, queryOptions?: QueryOptions) {
     facultyId = stringToObjectId(facultyId)
     await this.facultyService.checkExists({ _id: facultyId })
     const filter: FilterQuery<DocumentType<GroupModel>> = { faculty: facultyId }
@@ -74,14 +74,14 @@ export class GroupService {
     return this.groupModel.find(filter, undefined, queryOptions).exec()
   }
 
-  async delete(id: Types.ObjectId | MongoIdString) {
+  async delete(id: Types.ObjectId) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.groupModel.deleteOne({ _id: id })
     return
   }
 
-  async deleteAllByFacultyId(facultyId: Types.ObjectId | MongoIdString) {
+  async deleteAllByFacultyId(facultyId: Types.ObjectId) {
     facultyId = stringToObjectId(facultyId)
 
     return this.groupModel.deleteMany({ faculty: facultyId }).exec()

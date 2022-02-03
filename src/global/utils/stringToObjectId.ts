@@ -9,5 +9,5 @@ export const stringToObjectId = (id: MongoIdString | Types.ObjectId) => {
     throw new BadRequestException(INVALID_MONGO_ID)
   }
 
-  return typeof id === 'string' ? Types.ObjectId(id) : id
+  return typeof id === 'string' ? new Types.ObjectId(id) : id
 }

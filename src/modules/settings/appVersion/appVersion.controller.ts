@@ -3,7 +3,6 @@ import { AppVersionService } from './appVersion.service'
 import { SetFeaturesDto } from './dto/setFeaturesDto'
 import { OsPipe } from '../../../global/pipes/os.pipe'
 import { AppVersionPipe } from '../../../global/pipes/appVersion.pipe'
-import { AppVersionRoutesEnum } from './appVersion.constants'
 import { SetCurrentVersionDto } from './dto/setCurrentVersionDto'
 import { DeleteVersionDto } from './dto/deleteVersionDto'
 import { OperationSystems } from '../../../global/enums/OS.enum'
@@ -15,18 +14,18 @@ export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}
 
   @UsePipes(new ValidationPipe())
-  @Post(AppVersionRoutesEnum.CREATE)
+  @Post('/')
   setCurrentVersion(@Body() dto: SetCurrentVersionDto) {
     return this.appVersionService.setCurrentVersion(dto.os, dto.version)
   }
 
   @UsePipes(new ValidationPipe())
-  @Patch(AppVersionRoutesEnum.PATCH_FEATURES)
+  @Patch('/')
   setFeatures(@Body() dto: SetFeaturesDto) {
     return this.appVersionService.setFeatures(dto.os, dto)
   }
 
-  @Get(AppVersionRoutesEnum.CHECK)
+  @Get('/check')
   async check(@Query('os', new OsPipe()) os: OperationSystems, @Query('version', new AppVersionPipe()) version: string) {
     return this.appVersionService.get(os, version)
   }

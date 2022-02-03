@@ -33,10 +33,10 @@ export class AdminUserAuthGuard implements CanActivate {
 
           const availability: keyof Availability = this.reflector.get('availability', context.getHandler())
 
-          const adminUser = (await this.adminUserService.getById(Types.ObjectId(tokenData.id), {
+          const adminUser = (await this.adminUserService.getById(new Types.ObjectId(tokenData.id), {
             projection: { _id: 0, availability: 1 },
           })) as Pick<AdminUserModel, 'availability'>
-          if (adminUser) {
+          if (adminUser.availability) {
             return adminUser.availability[availability]
           }
         }

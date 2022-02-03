@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@n
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
-import { CallScheduleRoutesEnum } from './callSchedule.constants'
 import { AdminUserAuth } from '../../../global/decorators/AdminUserAuth.decorator'
 
 @Controller()
@@ -13,14 +12,14 @@ export class CallScheduleController {
     availability: 'canUpdateCallSchedule',
   })
   @UsePipes(new ValidationPipe())
-  @Post(CallScheduleRoutesEnum.CREATE)
+  @Post('/')
   async createCallSchedule(@Body() dto: CreateCallScheduleDto) {
     await this.callScheduleService.deleteActiveCallSchedule()
 
     return this.callScheduleService.createCallSchedule(dto)
   }
 
-  @Get(CallScheduleRoutesEnum.GET)
+  @Get('/')
   async getCallSchedule(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
     const callSchedule = await this.callScheduleService.getActiveCallSchedule()
 

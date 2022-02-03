@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@n
 import { CreateSecretLabelDto } from './dto/createSecretLabel.dto'
 import { SecretLabelService } from './secretLabel.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
-import { SecretLabelRoutesEnum } from './secretLabel.constants'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Секретная надпись')
@@ -11,14 +10,14 @@ export class SecretLabelController {
   constructor(private readonly secretLabelService: SecretLabelService) {}
 
   @UsePipes(new ValidationPipe())
-  @Post(SecretLabelRoutesEnum.CREATE)
+  @Post('/')
   async createSecretLabel(@Body() dto: CreateSecretLabelDto) {
     await this.secretLabelService.deleteActiveSecretLabel()
 
     return this.secretLabelService.createSecretLabel(dto)
   }
 
-  @Get(SecretLabelRoutesEnum.GET)
+  @Get('/')
   async getSecretLabel(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
     const secretLabel = await this.secretLabelService.getActiveSecretLabel()
 

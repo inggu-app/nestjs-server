@@ -5,13 +5,10 @@ import { QueryOptions, Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import { FacultyGetQueryParametersEnum, FacultyRoutesEnum } from './faculty.constants'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
-import { ApiTags } from '@nestjs/swagger'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 
-@ApiTags('Факультеты')
 @Controller()
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService, private readonly groupService: GroupService) {}
@@ -25,17 +22,14 @@ export class FacultyController {
     return this.facultyService.create(dto)
   }
 
-  @Get(FacultyRoutesEnum.GET_BY_FACULTY_ID)
-  async getByFacultyId(
-    @MongoId(FacultyGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
-    @MongoQueryOptions() queryOptions?: QueryOptions
-  ) {
+  @Get('/by-id')
+  async getByFacultyId(@MongoId('facultyId') facultyId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.facultyService.getById(facultyId, queryOptions)
   }
 
-  @Get(FacultyRoutesEnum.GET_BY_FACULTY_IDS)
+  @Get('/by-ids')
   async getByFacultyIds(
-    @MongoId(FacultyGetQueryParametersEnum.FACULTY_IDS, { multiple: true }) facultyIds: Types.ObjectId[],
+    @MongoId('facultyIds', { multiple: true }) facultyIds: Types.ObjectId[],
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
@@ -43,11 +37,11 @@ export class FacultyController {
     }
   }
 
-  @Get(FacultyRoutesEnum.GET_MANY)
+  @Get('/many')
   async getMany(
-    @Query(FacultyGetQueryParametersEnum.PAGE, new CustomParseIntPipe({ intType: 'positive' })) page: number,
-    @Query(FacultyGetQueryParametersEnum.COUNT, new CustomParseIntPipe({ intType: 'positive' })) count: number,
-    @Query(FacultyGetQueryParametersEnum.TITLE) title?: string,
+    @Query('page', new CustomParseIntPipe({ intType: 'positive' })) page: number,
+    @Query('count', new CustomParseIntPipe({ intType: 'positive' })) count: number,
+    @Query('title') title?: string,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
@@ -60,7 +54,7 @@ export class FacultyController {
     availability: 'canUpdateFaculty',
   })
   @UsePipes(new ValidationPipe())
-  @Patch(FacultyRoutesEnum.UPDATE)
+  @Patch('/')
   update(@Body() dto: UpdateFacultyDto) {
     return this.facultyService.update(dto)
   }
@@ -68,7 +62,7 @@ export class FacultyController {
   @AdminUserAuth({
     availability: 'canDeleteFaculty',
   })
-  @Delete(FacultyRoutesEnum.DELETE)
+  @Delete('/')
   async delete(@MongoId('facultyId') facultyId: Types.ObjectId) {
     await this.facultyService.delete(facultyId)
 
