@@ -1,17 +1,22 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { CreateScheduleDto, Lesson } from './dto/createSchedule.dto'
-import { Error, QueryOptions, Types } from 'mongoose'
+import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { LessonFieldsEnum } from './schedule.constants'
 import { LESSON_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
-import { ModelBase, ObjectByInterface } from '../../global/types'
-import { stringToObjectId } from '../../global/utils/stringToObjectId'
+import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
+import { GroupService } from '../group/group.service'
+import { DocumentType } from '@typegoose/typegoose'
 
 @Injectable()
-export class ScheduleService {
-  constructor(@InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>) {}
+export class ScheduleService extends CheckExistenceService<LessonModel> {
+  constructor(
+    @InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>,
+    private readonly groupService: GroupService
+  ) {
+    super(lessonModel, undefined, lesson => LESSON_WITH_ID_NOT_FOUND(lesson._id))
+  }
 
   async create(dto: CreateScheduleDto) {
     const lessons = dto.schedule.map(lesson => ({ ...lesson, group: dto.group }))
@@ -23,66 +28,20 @@ export class ScheduleService {
   }
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
-    id = stringToObjectId(id)
-    const candidate = await this.lessonModel.findById(id, undefined, queryOptions).exec()
-
-    if (!candidate) {
-      throw new HttpException(LESSON_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
-    }
-
-    return candidate
+    await this.throwIfNotExists({ _id: id })
+    return this.lessonModel.findById(id, undefined, queryOptions).exec()
   }
 
   async updateById(id: Types.ObjectId, lesson: Lesson) {
-    id = stringToObjectId(id)
-    await this.checkExists({ _id: id })
-    await this.lessonModel.updateOne({ _id: id }, { $set: { ...lesson } }).exec()
-
-    return
+    await this.throwIfNotExists({ _id: id })
+    return this.lessonModel.updateOne({ _id: id }, { $set: { ...lesson } }).exec()
   }
 
   async delete(groupId: Types.ObjectId, ids?: Types.ObjectId[]) {
-    groupId = stringToObjectId(groupId)
-    if (!ids) {
-      await this.lessonModel.deleteMany({ group: groupId })
-    } else {
-      await this.lessonModel.deleteMany({ group: groupId, _id: { $in: ids } })
-    }
-  }
+    await this.groupService.throwIfNotExists({ _id: groupId })
+    const filter: FilterQuery<DocumentType<LessonModel>> = { group: groupId }
+    if (ids) filter._id = { $in: ids }
 
-  async checkExists(
-    filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase> | ObjectByInterface<typeof LessonFieldsEnum, ModelBase>[],
-    options?: { error?: ((filter: ObjectByInterface<typeof LessonFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
-  ) {
-    options = {
-      error: f => new NotFoundException(LESSON_WITH_ID_NOT_FOUND(f._id)),
-      checkExisting: true,
-      ...options,
-    }
-    if (Array.isArray(filter)) {
-      for await (const f of filter) {
-        const candidate = await this.lessonModel.exists(f)
-
-        if (!candidate && options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        } else if (candidate && !options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        }
-      }
-    } else {
-      const candidate = await this.lessonModel.exists(filter)
-
-      if (!candidate && options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      } else if (candidate && !options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      }
-    }
-
-    return true
+    return this.lessonModel.deleteMany(filter)
   }
 }

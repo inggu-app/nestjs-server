@@ -1,29 +1,34 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { Error, FilterQuery, QueryOptions, Types } from 'mongoose'
+import { Injectable } from '@nestjs/common'
+import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
 import { AdminUserModel } from './adminUser.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { ModelBase, ObjectByInterface } from '../../global/types'
-import { FacultyFieldsEnum } from '../faculty/faculty.constants'
-import { FACULTY_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
+import { ADMIN_USER_WITH_ID_NOT_FOUND, ADMIN_USER_WITH_LOGIN_EXISTS } from '../../global/constants/errors.constants'
 import { AvailabilityDto, CreateAdminUserDto } from './dto/createAdminUser.dto'
 import { DocumentType } from '@typegoose/typegoose'
 import { UpdateAdminUserDto } from './dto/updateAdminUser.dto'
 import * as bcrypt from 'bcrypt'
+import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
 
 @Injectable()
-export class AdminUserService {
-  constructor(@InjectModel(AdminUserModel) private readonly adminUserModel: ModelType<AdminUserModel>) {}
+export class AdminUserService extends CheckExistenceService<AdminUserModel> {
+  constructor(@InjectModel(AdminUserModel) private readonly adminUserModel: ModelType<AdminUserModel>) {
+    super(adminUserModel, undefined, user => ADMIN_USER_WITH_ID_NOT_FOUND(user._id))
+  }
 
   async create(dto: CreateAdminUserDto) {
+    await this.throwIfExists({ login: dto.login }, { error: ADMIN_USER_WITH_LOGIN_EXISTS(dto.login) })
+
     return this.adminUserModel.create(dto)
   }
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
+    await this.throwIfNotExists({ _id: id })
     return this.adminUserModel.findById(id, undefined, queryOptions)
   }
 
   async getByIds(ids: Types.ObjectId[], queryOptions?: QueryOptions) {
+    await this.throwIfNotExists(ids.map(id => ({ _id: id })))
     return this.adminUserModel.find({ _id: { $in: ids } }, undefined, queryOptions)
   }
 
@@ -46,57 +51,25 @@ export class AdminUserService {
   }
 
   async update(dto: UpdateAdminUserDto) {
+    await this.throwIfNotExists({ _id: Types.ObjectId(dto.id) })
     const { id, ...fields } = dto
     return this.adminUserModel.updateOne({ _id: id }, { $set: fields })
   }
 
   async updatePassword(id: Types.ObjectId, password: string) {
+    await this.throwIfNotExists({ _id: id })
     const hashedPassword = await bcrypt.hash(password, 8)
     return this.adminUserModel.updateOne({ _id: id }, { $set: { hashedPassword } })
   }
 
   async updateAvailability(id: Types.ObjectId, availabilityDto: AvailabilityDto) {
+    await this.throwIfNotExists({ _id: id })
     const adminUser = (await this.getById(id, { projection: { _id: 0, availability: 1 } })) as Pick<AdminUserModel, 'availability'>
     return this.adminUserModel.updateOne({ _id: id }, { $set: { availability: { ...adminUser.availability, ...availabilityDto } } })
   }
 
   async deleteById(id: Types.ObjectId) {
+    await this.throwIfNotExists({ _id: id })
     return this.adminUserModel.deleteOne({ _id: id })
-  }
-
-  async checkExists(
-    filter: any,
-    options?: { error?: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
-  ) {
-    options = {
-      error: f => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id)),
-      checkExisting: true,
-      ...options,
-    }
-    if (Array.isArray(filter)) {
-      for await (const f of filter) {
-        const candidate = await this.adminUserModel.exists(f)
-
-        if (!candidate && options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        } else if (candidate && !options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        }
-      }
-    } else {
-      const candidate = await this.adminUserModel.exists(filter)
-
-      if (!candidate && options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      } else if (candidate && !options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      }
-    }
-
-    return true
   }
 }

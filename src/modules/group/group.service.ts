@@ -1,48 +1,36 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { DocumentType } from '@typegoose/typegoose'
 import { CreateGroupDto } from './dto/createGroup.dto'
-import { Error, FilterQuery, QueryOptions, Types } from 'mongoose'
-import { GroupFieldsEnum } from './group.constants'
+import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, ObjectByInterface } from '../../global/types'
-import { stringToObjectId } from '../../global/utils/stringToObjectId'
+import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
 
 @Injectable()
-export class GroupService {
+export class GroupService extends CheckExistenceService<GroupModel> {
   constructor(
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
     private readonly facultyService: FacultyService
-  ) {}
+  ) {
+    super(groupModel, undefined, group => GROUP_WITH_ID_NOT_FOUND(group._id))
+  }
 
   async create(dto: CreateGroupDto) {
-    await this.checkExists(
-      { title: dto.title, faculty: dto.faculty },
-      { error: new HttpException(GROUP_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST), checkExisting: false }
-    )
-
+    await this.throwIfExists({ title: dto.title, faculty: Types.ObjectId(dto.faculty) }, { error: GROUP_WITH_TITLE_EXISTS(dto.title) })
     return this.groupModel.create(dto)
   }
 
   async getById(groupId: Types.ObjectId, queryOptions?: QueryOptions) {
-    groupId = stringToObjectId(groupId)
-
-    const candidate = await this.groupModel.findById(groupId, undefined, queryOptions).exec()
-
-    if (!candidate) {
-      throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
-    }
-
-    return candidate
+    await this.throwIfNotExists({ _id: groupId })
+    return this.groupModel.findById(groupId, undefined, queryOptions).exec()
   }
 
   async getByGroupIds(groupIds: Types.ObjectId[], queryOptions?: QueryOptions) {
-    groupIds = groupIds.map(stringToObjectId)
-    await this.checkExists(groupIds.map(id => ({ _id: id })))
+    await this.throwIfNotExists(groupIds.map(id => ({ _id: id })))
     const filter: FilterQuery<DocumentType<GroupModel>> = { _id: { $in: groupIds } }
 
     return this.groupModel.find(filter, undefined, queryOptions)
@@ -67,73 +55,24 @@ export class GroupService {
   }
 
   async getByFacultyId(facultyId: Types.ObjectId, queryOptions?: QueryOptions) {
-    facultyId = stringToObjectId(facultyId)
-    await this.facultyService.checkExists({ _id: facultyId })
+    await this.facultyService.throwIfNotExists({ _id: facultyId })
     const filter: FilterQuery<DocumentType<GroupModel>> = { faculty: facultyId }
-
     return this.groupModel.find(filter, undefined, queryOptions).exec()
   }
 
   async delete(id: Types.ObjectId) {
-    id = stringToObjectId(id)
-    await this.checkExists({ _id: id })
-    await this.groupModel.deleteOne({ _id: id })
-    return
+    await this.throwIfNotExists({ _id: id })
+    return this.groupModel.deleteOne({ _id: id })
   }
 
   async deleteAllByFacultyId(facultyId: Types.ObjectId) {
-    facultyId = stringToObjectId(facultyId)
-
+    await this.facultyService.throwIfNotExists({ _id: facultyId })
     return this.groupModel.deleteMany({ faculty: facultyId }).exec()
   }
 
   async update(dto: UpdateGroupDto) {
-    await this.checkExists({ _id: dto.id })
-
-    await this.groupModel
-      .updateOne(
-        { _id: dto.id },
-        {
-          $set: { title: dto.title, faculty: dto.faculty },
-        }
-      )
-      .exec()
-
-    return this.groupModel.findById(dto.id).exec()
-  }
-
-  async checkExists(
-    filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase> | ObjectByInterface<typeof GroupFieldsEnum, ModelBase>[],
-    options?: { error?: ((filter: ObjectByInterface<typeof GroupFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
-  ) {
-    options = {
-      error: f => new NotFoundException(GROUP_WITH_ID_NOT_FOUND(f._id)),
-      checkExisting: true,
-      ...options,
-    }
-    if (Array.isArray(filter)) {
-      for await (const f of filter) {
-        const candidate = await this.groupModel.exists(f)
-
-        if (!candidate && options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        } else if (candidate && !options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        }
-      }
-    } else {
-      const candidate = await this.groupModel.exists(filter)
-      if (!candidate && options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      } else if (candidate && !options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      }
-    }
-
-    return true
+    await this.throwIfNotExists({ _id: Types.ObjectId(dto.id) })
+    const { id, ...fields } = dto
+    return this.groupModel.updateOne({ _id: id }, { $set: fields }).exec()
   }
 }

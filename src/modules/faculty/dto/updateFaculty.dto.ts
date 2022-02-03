@@ -1,8 +1,9 @@
 import { IsMongoId, IsNotEmpty, IsString } from 'class-validator'
+import { MongoIdString } from '../../../global/types'
 
 export class UpdateFacultyDto {
   @IsMongoId()
-  id: string
+  id: MongoIdString
 
   @IsString()
   @IsNotEmpty()

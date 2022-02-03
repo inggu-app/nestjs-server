@@ -1,44 +1,32 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FacultyFieldsEnum } from './faculty.constants'
-import { Error, FilterQuery, QueryOptions, Types } from 'mongoose'
+import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, ObjectByInterface } from '../../global/types'
-import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { DocumentType } from '@typegoose/typegoose'
+import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
 
 @Injectable()
-export class FacultyService {
-  constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
+export class FacultyService extends CheckExistenceService<FacultyModel> {
+  constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {
+    super(facultyModel, undefined, arg => FACULTY_WITH_ID_NOT_FOUND(arg._id))
+  }
 
   async create(dto: CreateFacultyDto) {
-    await this.checkExists(
-      { title: dto.title },
-      { error: new HttpException(FACULTY_WITH_TITLE_EXISTS(dto.title), HttpStatus.BAD_REQUEST), checkExisting: false }
-    )
-
+    await this.throwIfExists({ title: dto.title }, { error: FACULTY_WITH_TITLE_EXISTS(dto.title) })
     return this.facultyModel.create(dto)
   }
 
   async getById(facultyId: Types.ObjectId, queryOptions?: QueryOptions) {
-    facultyId = stringToObjectId(facultyId)
-    const candidate = await this.facultyModel.findById(facultyId, undefined, queryOptions).exec()
-
-    if (!candidate) {
-      throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
-    }
-
-    return candidate
+    await this.throwIfNotExists({ _id: facultyId })
+    return this.facultyModel.findById(facultyId, undefined, queryOptions).exec()
   }
 
   async getByIds(facultyIds: Types.ObjectId[], queryOptions?: QueryOptions) {
-    facultyIds = facultyIds.map(stringToObjectId)
-    await this.checkExists(facultyIds.map(id => ({ _id: id })))
-
+    await this.throwIfNotExists(facultyIds.map(id => ({ _id: id })))
     return this.facultyModel.find({ _id: { $in: facultyIds } }, undefined, queryOptions)
   }
 
@@ -61,7 +49,7 @@ export class FacultyService {
   }
 
   async update(dto: UpdateFacultyDto) {
-    await this.checkExists({ _id: dto.id })
+    await this.throwIfNotExists({ _id: Types.ObjectId(dto.id) })
     await this.facultyModel
       .updateOne(
         { _id: dto.id },
@@ -75,44 +63,8 @@ export class FacultyService {
   }
 
   async delete(id: Types.ObjectId) {
-    await this.checkExists({ _id: id })
+    await this.throwIfNotExists({ _id: id })
     await this.facultyModel.deleteOne({ _id: id }).exec()
     return
-  }
-
-  async checkExists(
-    filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase> | ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>[],
-    options?: { error?: ((filter: ObjectByInterface<typeof FacultyFieldsEnum, ModelBase>) => Error) | Error; checkExisting?: boolean }
-  ) {
-    options = {
-      error: f => new NotFoundException(FACULTY_WITH_ID_NOT_FOUND(f._id)),
-      checkExisting: true,
-      ...options,
-    }
-    if (Array.isArray(filter)) {
-      for await (const f of filter) {
-        const candidate = await this.facultyModel.exists(f)
-
-        if (!candidate && options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        } else if (candidate && !options.checkExisting) {
-          if (typeof options.error === 'function') throw options.error(f)
-          throw options.error
-        }
-      }
-    } else {
-      const candidate = await this.facultyModel.exists(filter)
-
-      if (!candidate && options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      } else if (candidate && !options.checkExisting) {
-        if (typeof options.error === 'function') throw options.error(filter)
-        throw options.error
-      }
-    }
-
-    return true
   }
 }
