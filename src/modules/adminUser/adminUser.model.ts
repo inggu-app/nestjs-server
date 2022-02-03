@@ -13,6 +13,9 @@ export class AdminUserModel extends TimeStamps {
   @prop({ required: true })
   name: string
 
+  @prop()
+  login: string
+
   @prop({ required: true })
   hashedPassword: string
 

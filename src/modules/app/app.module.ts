@@ -13,6 +13,7 @@ import { JwtModule } from '@nestjs/jwt'
 import getJWTConfig from '../../configs/jwt.config'
 import { FacultyModule } from '../faculty/faculty.module'
 import { GroupModule } from '../group/group.module'
+import { AdminUserModule } from '../adminUser/adminUser.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GroupModule } from '../group/group.module'
     FacultyModule,
     GroupModule,
     RouterModule.forRoutes(routesConfig),
+    AdminUserModule,
     ConfigModule.forRoot({ isGlobal: true }),
     {
       ...JwtModule.registerAsync({
