@@ -3,23 +3,12 @@ import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { QueryOptions, Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
-import {
-  defaultScheduleCreateData,
-  defaultScheduleGetByGroupIdData,
-  ScheduleField,
-  ScheduleGetQueryParametersEnum,
-  ScheduleRoutesEnum,
-} from './schedule.constants'
+import { ScheduleGetQueryParametersEnum, ScheduleRoutesEnum } from './schedule.constants'
 import { CallScheduleService } from '../settings/callSchedule/callSchedule.service'
-import normalizeFields from '../../global/utils/normalizeFields'
-import { Functionality } from '../../global/decorators/Functionality.decorator'
-import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
-import { ApiTags } from '@nestjs/swagger'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
-@ApiTags('Расписание')
 @Controller()
 export class ScheduleController {
   constructor(
@@ -29,11 +18,6 @@ export class ScheduleController {
   ) {}
 
   @UsePipes(new ValidationPipe())
-  @Functionality({
-    code: FunctionalityCodesEnum.SCHEDULE__CREATE,
-    default: defaultScheduleCreateData,
-    title: 'Создать или обновить расписание',
-  })
   @Post(ScheduleRoutesEnum.CREATE)
   async create(@Body() dto: CreateScheduleDto) {
     await this.groupService.checkExists({ _id: dto.group })
@@ -47,7 +31,7 @@ export class ScheduleController {
       }
     }
 
-    const allLessons = await this.scheduleService.getByGroup(dto.group, { queryOptions: { fields: ['id'] } })
+    const allLessons = await this.scheduleService.getByGroup(dto.group, { fields: ['id'] })
     const extraLessons = allLessons.filter(lesson => !existLessons.find(l => l.id === lesson.id))
     await this.scheduleService.delete(
       dto.group,
@@ -62,18 +46,13 @@ export class ScheduleController {
     return
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.SCHEDULE__GET_BY_GROUP_ID,
-    default: defaultScheduleGetByGroupIdData,
-    title: 'Получить расписание',
-  })
   @Get(ScheduleRoutesEnum.GET_BY_GROUP_ID)
   async getByGroupId(
     @MongoId(ScheduleGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
     @Query(ScheduleGetQueryParametersEnum.UPDATED_AT, new ParseDatePipe({ required: false })) updatedAt?: Date,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
-    const group = await this.groupService.getById(groupId, { queryOptions: { fields: ['lastScheduleUpdate'] } })
+    const group = await this.groupService.getById(groupId, { fields: ['lastScheduleUpdate'] })
 
     if (updatedAt && updatedAt >= group.lastScheduleUpdate) {
       return {
@@ -82,21 +61,18 @@ export class ScheduleController {
       }
     }
 
-    const lessonsSchedule = await this.scheduleService.getByGroup(groupId, { queryOptions })
+    const lessonsSchedule = await this.scheduleService.getByGroup(groupId, queryOptions)
     const callSchedule = await this.callScheduleService.getActiveCallSchedule()
 
     const lessonsScheduleWithStartEnd = lessonsSchedule.map(lesson => {
       const call = callSchedule?.schedule.find(call => call.lessonNumber === lesson.number)
 
-      return normalizeFields<ScheduleField[]>(
-        {
-          ...lesson.toObject(),
+      return {
+        ...lesson.toObject(),
 
-          startTime: call?.start || new Date(0),
-          endTime: call?.end || new Date(0),
-        },
-        { fields: queryOptions?.fields }
-      )
+        startTime: call?.start || new Date(0),
+        endTime: call?.end || new Date(0),
+      }
     })
 
     return {

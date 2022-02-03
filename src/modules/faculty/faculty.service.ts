@@ -3,24 +3,17 @@ import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { FacultyFieldsEnum, FacultyGetByFacultyIdsDataForFunctionality, FacultyGetManyDataForFunctionality } from './faculty.constants'
-import { Error, FilterQuery, Types } from 'mongoose'
+import { FacultyFieldsEnum } from './faculty.constants'
+import { Error, FilterQuery, QueryOptions, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
 import { DocumentType } from '@typegoose/typegoose'
-import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
-import { RoleService } from '../role/role.service'
-import { UserService } from '../user/user.service'
 
 @Injectable()
 export class FacultyService {
-  constructor(
-    @InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>,
-    private readonly roleService: RoleService,
-    private readonly userService: UserService
-  ) {}
+  constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {}
 
   async create(dto: CreateFacultyDto) {
     await this.checkExists(
@@ -31,9 +24,9 @@ export class FacultyService {
     return this.facultyModel.create(dto)
   }
 
-  async getById(facultyId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions) {
+  async getById(facultyId: MongoIdString | Types.ObjectId, queryOptions?: QueryOptions) {
     facultyId = stringToObjectId(facultyId)
-    const candidate = await this.facultyModel.findById(facultyId, undefined, options?.queryOptions).exec()
+    const candidate = await this.facultyModel.findById(facultyId, undefined, queryOptions).exec()
 
     if (!candidate) {
       throw new HttpException(FACULTY_WITH_ID_NOT_FOUND(facultyId), HttpStatus.NOT_FOUND)
@@ -42,49 +35,28 @@ export class FacultyService {
     return candidate
   }
 
-  async getByIds(facultyIds: Types.ObjectId[] | MongoIdString[], options?: ServiceGetOptions<FacultyGetByFacultyIdsDataForFunctionality>) {
+  async getByIds(facultyIds: Types.ObjectId[] | MongoIdString[], queryOptions?: QueryOptions) {
     facultyIds = facultyIds.map(stringToObjectId)
     await this.checkExists(facultyIds.map(id => ({ _id: id })))
 
-    const filter: FilterQuery<DocumentType<FacultyModel>> = { _id: { $in: facultyIds } }
-    if (options?.functionality) {
-      filter._id = { $in: facultyIds, $nin: options.functionality.data.forbiddenFaculties }
-      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-        filter._id = {
-          $in: facultyIds.filter(id => options.functionality?.data.availableFaculties.includes(id.toString())),
-          $nin: options.functionality.data.forbiddenFaculties,
-        }
-      }
-    }
-
-    return this.facultyModel.find(filter, undefined, options?.queryOptions)
+    return this.facultyModel.find({ _id: { $in: facultyIds } }, undefined, queryOptions)
   }
 
-  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<FacultyGetManyDataForFunctionality>) {
+  getAll(page: number, count: number, title?: string, queryOptions?: QueryOptions) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
-    if (options?.functionality) {
-      filter._id = { $nin: options.functionality.data.forbiddenFaculties }
-      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-        filter._id = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
-      }
-    }
+
     return this.facultyModel
-      .find(filter, undefined, options?.queryOptions)
+      .find(filter, undefined, queryOptions)
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
-  countAll(title?: string, options?: ServiceGetOptions<FacultyGetManyDataForFunctionality>) {
+  countAll(title?: string) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
-    if (options?.functionality) {
-      filter._id = { $nin: options.functionality.data.forbiddenFaculties }
-      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-        filter._id = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
-      }
-    }
+
     return this.facultyModel.countDocuments(filter).exec()
   }
 
@@ -106,8 +78,6 @@ export class FacultyService {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.facultyModel.deleteOne({ _id: id }).exec()
-    await this.roleService.clearFromId(id)
-    await this.userService.clearFromId(id)
     return
   }
 

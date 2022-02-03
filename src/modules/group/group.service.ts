@@ -4,29 +4,19 @@ import { GroupModel } from './group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { DocumentType } from '@typegoose/typegoose'
 import { CreateGroupDto } from './dto/createGroup.dto'
-import { Error, FilterQuery, Types } from 'mongoose'
-import {
-  GroupFieldsEnum,
-  GroupGetByFacultyIdDataForFunctionality,
-  GroupGetByGroupIdsDataForFunctionality,
-  GroupGetManyDataForFunctionality,
-} from './group.constants'
+import { Error, FilterQuery, QueryOptions, Types } from 'mongoose'
+import { GroupFieldsEnum } from './group.constants'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { FacultyService } from '../faculty/faculty.service'
 import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
-import { FunctionalityAvailableTypeEnum } from '../../global/enums/FunctionalityAvailableType.enum'
-import { UserService } from '../user/user.service'
-import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class GroupService {
   constructor(
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
-    private readonly facultyService: FacultyService,
-    private readonly userService: UserService,
-    private readonly roleService: RoleService
+    private readonly facultyService: FacultyService
   ) {}
 
   async create(dto: CreateGroupDto) {
@@ -38,10 +28,10 @@ export class GroupService {
     return this.groupModel.create(dto)
   }
 
-  async getById(groupId: MongoIdString | Types.ObjectId, options?: ServiceGetOptions) {
+  async getById(groupId: MongoIdString | Types.ObjectId, queryOptions?: QueryOptions) {
     groupId = stringToObjectId(groupId)
 
-    const candidate = await this.groupModel.findById(groupId, undefined, options?.queryOptions).exec()
+    const candidate = await this.groupModel.findById(groupId, undefined, queryOptions).exec()
 
     if (!candidate) {
       throw new HttpException(GROUP_WITH_ID_NOT_FOUND(groupId), HttpStatus.NOT_FOUND)
@@ -50,77 +40,44 @@ export class GroupService {
     return candidate
   }
 
-  async getByGroupIds(groupIds: MongoIdString[] | Types.ObjectId[], options?: ServiceGetOptions<GroupGetByGroupIdsDataForFunctionality>) {
+  async getByGroupIds(groupIds: MongoIdString[] | Types.ObjectId[], queryOptions?: QueryOptions) {
     groupIds = groupIds.map(stringToObjectId)
     await this.checkExists(groupIds.map(id => ({ _id: id })))
     const filter: FilterQuery<DocumentType<GroupModel>> = { _id: { $in: groupIds } }
-    if (options?.functionality) {
-      filter._id = { $in: groupIds, $nin: options.functionality.data.forbiddenGroups }
-      filter.faculty = { $nin: options.functionality.data.forbiddenFaculties }
-      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-        filter._id = {
-          $in: groupIds.filter(id => options.functionality?.data.availableGroups.includes(id.toString())),
-          $nin: options.functionality.data.forbiddenGroups,
-        }
-        filter.faculty = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
-      }
-    }
 
-    return this.groupModel.find(filter, undefined, options?.queryOptions)
+    return this.groupModel.find(filter, undefined, queryOptions)
   }
 
-  getAll(page: number, count: number, title?: string, options?: ServiceGetOptions<GroupGetManyDataForFunctionality>) {
+  getAll(page: number, count: number, title?: string, queryOptions?: QueryOptions) {
     const filter: FilterQuery<DocumentType<GroupModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
-    if (options?.functionality) {
-      filter._id = { $nin: options.functionality.data.forbiddenGroups }
-      filter.faculty = { $nin: options.functionality.data.forbiddenFaculties }
-      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-        filter._id = { $in: options.functionality.data.availableGroups, $nin: options.functionality.data.forbiddenGroups }
-        filter.faculty = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
-      }
-    }
+
     return this.groupModel
-      .find(filter, undefined, options?.queryOptions)
+      .find(filter, undefined, queryOptions)
       .skip((page - 1) * count)
       .limit(count)
       .exec()
   }
 
-  countAll(title?: string, options?: ServiceGetOptions<GroupGetManyDataForFunctionality>) {
+  countAll(title?: string) {
     const filter: FilterQuery<DocumentType<GroupModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
-    if (options?.functionality) {
-      filter._id = { $nin: options.functionality.data.forbiddenGroups }
-      filter.faculty = { $nin: options.functionality.data.forbiddenFaculties }
-      if (options.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-        filter._id = { $in: options.functionality.data.availableGroups, $nin: options.functionality.data.forbiddenGroups }
-        filter.faculty = { $in: options.functionality.data.availableFaculties, $nin: options.functionality.data.forbiddenFaculties }
-      }
-    }
+
     return this.groupModel.countDocuments(filter).exec()
   }
 
-  async getByFacultyId(facultyId: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<GroupGetByFacultyIdDataForFunctionality>) {
+  async getByFacultyId(facultyId: Types.ObjectId | MongoIdString, queryOptions?: QueryOptions) {
     facultyId = stringToObjectId(facultyId)
     await this.facultyService.checkExists({ _id: facultyId })
     const filter: FilterQuery<DocumentType<GroupModel>> = { faculty: facultyId }
-    if (options?.functionality) {
-      filter._id = { $nin: options.functionality.data.forbiddenGroups }
-      if (options?.functionality.data.availableFacultiesType === FunctionalityAvailableTypeEnum.CUSTOM) {
-        filter._id = { $in: options.functionality.data.availableGroups, $nin: options.functionality.data.forbiddenGroups }
-      }
-    }
 
-    return this.groupModel.find(filter, undefined, options?.queryOptions).exec()
+    return this.groupModel.find(filter, undefined, queryOptions).exec()
   }
 
   async delete(id: Types.ObjectId | MongoIdString) {
     id = stringToObjectId(id)
     await this.checkExists({ _id: id })
     await this.groupModel.deleteOne({ _id: id })
-    await this.userService.clearFromId(id)
-    await this.roleService.clearFromId(id)
     return
   }
 

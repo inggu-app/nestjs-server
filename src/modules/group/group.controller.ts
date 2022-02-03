@@ -1,41 +1,19 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { QueryOptions, Types } from 'mongoose'
 import { FacultyService } from '../faculty/faculty.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
-import {
-  defaultGroupCreateData,
-  defaultGroupDeleteData,
-  defaultGroupGetByFacultyIdData,
-  defaultGroupGetByGroupIdData,
-  defaultGroupGetByGroupIdsData,
-  defaultGroupGetManyData,
-  defaultGroupUpdateData,
-  GroupGetByFacultyIdDataForFunctionality,
-  GroupGetManyDataForFunctionality,
-  GroupGetQueryParametersEnum,
-  GroupRoutesEnum,
-} from './group.constants'
-import { Functionality } from '../../global/decorators/Functionality.decorator'
-import { FunctionalityCodesEnum } from '../../global/enums/functionalities.enum'
+import { GroupGetQueryParametersEnum, GroupRoutesEnum } from './group.constants'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
-import { CustomRequest } from '../../global/guards/baseJwtAuth.guard'
-import { ApiTags } from '@nestjs/swagger'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
-@ApiTags('Группы')
 @Controller()
 export class GroupController {
   constructor(private readonly groupService: GroupService, private readonly facultyService: FacultyService) {}
 
   @UsePipes(new ValidationPipe())
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__CREATE,
-    default: defaultGroupCreateData,
-    title: 'Создать группу',
-  })
   @Post(GroupRoutesEnum.CREATE)
   async create(@Body() dto: CreateGroupDto) {
     await this.facultyService.getById(dto.faculty)
@@ -43,85 +21,53 @@ export class GroupController {
     return this.groupService.create(dto)
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__GET_BY_GROUP_ID,
-    default: defaultGroupGetByGroupIdData,
-    title: 'Запросить одну группу по id',
-  })
   @Get(GroupRoutesEnum.GET_BY_GROUP_ID)
   async getByGroupId(
     @MongoId(GroupGetQueryParametersEnum.GROUP_ID) groupId: Types.ObjectId,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
-    return this.groupService.getById(groupId, { queryOptions })
+    return this.groupService.getById(groupId, queryOptions)
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__GET_BY_GROUP_IDS,
-    default: defaultGroupGetByGroupIdsData,
-    title: 'Запросить список групп по списку id',
-  })
   @Get(GroupRoutesEnum.GET_BY_GROUP_IDS)
   async getByGroupIds(
     @MongoId(GroupGetQueryParametersEnum.GROUP_IDS, { multiple: true }) groupIds: Types.ObjectId[],
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      groups: await this.groupService.getByGroupIds(groupIds, { queryOptions }),
+      groups: await this.groupService.getByGroupIds(groupIds, queryOptions),
     }
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__GET_BY_FACULTY_ID,
-    default: defaultGroupGetByFacultyIdData,
-    title: 'Запросить по id факультета',
-  })
   @Get(GroupRoutesEnum.GET_BY_FACULTY_ID)
   private async getByFacultyId(
     @MongoId(GroupGetQueryParametersEnum.FACULTY_ID) facultyId: Types.ObjectId,
-    @Req() { functionality }: CustomRequest<any, GroupGetByFacultyIdDataForFunctionality>,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      groups: await this.groupService.getByFacultyId(facultyId, { functionality, queryOptions }),
+      groups: await this.groupService.getByFacultyId(facultyId, queryOptions),
     }
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__GET_MANY,
-    default: defaultGroupGetManyData,
-    title: 'Запросить множество групп',
-  })
   @Get(GroupRoutesEnum.GET_MANY)
   private async getMany(
     @Query(GroupGetQueryParametersEnum.PAGE, new CustomParseIntPipe()) page: number,
     @Query(GroupGetQueryParametersEnum.COUNT, new CustomParseIntPipe()) count: number,
-    @Req() { functionality }: CustomRequest<any, GroupGetManyDataForFunctionality>,
     @Query(GroupGetQueryParametersEnum.TITLE) title?: string,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      groups: await this.groupService.getAll(page, count, title, { functionality, queryOptions }),
-      count: await this.groupService.countAll(title, { functionality }),
+      groups: await this.groupService.getAll(page, count, title, queryOptions),
+      count: await this.groupService.countAll(title),
     }
   }
 
   @UsePipes(new ValidationPipe())
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__UPDATE,
-    default: defaultGroupUpdateData,
-    title: 'Обновить группу',
-  })
   @Patch(GroupRoutesEnum.UPDATE)
   async update(@Body() dto: UpdateGroupDto) {
     return this.groupService.update(dto)
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.GROUP__DELETE,
-    default: defaultGroupDeleteData,
-    title: 'Удалить группу',
-  })
   @Delete(GroupRoutesEnum.DELETE)
   delete(@MongoId('groupId') groupId: Types.ObjectId) {
     return this.groupService.delete(groupId)

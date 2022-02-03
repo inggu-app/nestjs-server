@@ -1,7 +1,4 @@
-import { QueryOptions, Types } from 'mongoose'
-import { DocumentType } from '@typegoose/typegoose'
-import { UserModel } from '../modules/user/user.model'
-import { AvailableFunctionality } from '../modules/functionality/functionality.constants'
+import { Types } from 'mongoose'
 
 export type DeviceId = string
 
@@ -16,11 +13,5 @@ export interface CustomModelBase {
 export type ObjectByInterface<T, F = any, K = any> = Partial<{
   [key in keyof T | keyof F]: K
 }>
-
-export interface ServiceGetOptions<K = { [key: string]: any }> {
-  queryOptions?: QueryOptions
-  functionality?: AvailableFunctionality<K>
-  user?: DocumentType<UserModel>
-}
 
 export type MongoIdString = string

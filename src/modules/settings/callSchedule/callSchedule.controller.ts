@@ -2,9 +2,7 @@ import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@n
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { ParseDatePipe } from '../../../global/pipes/date.pipe'
-import { CallScheduleRoutesEnum, defaultCallScheduleCreateData, defaultCallScheduleGetData } from './callSchedule.constants'
-import { Functionality } from '../../../global/decorators/Functionality.decorator'
-import { FunctionalityCodesEnum } from '../../../global/enums/functionalities.enum'
+import { CallScheduleRoutesEnum } from './callSchedule.constants'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Расписание звонков')
@@ -13,11 +11,6 @@ export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}
 
   @UsePipes(new ValidationPipe())
-  @Functionality({
-    code: FunctionalityCodesEnum.CALL_SCHEDULE__CREATE,
-    default: defaultCallScheduleCreateData,
-    title: 'Установить расписание звонков',
-  })
   @Post(CallScheduleRoutesEnum.CREATE)
   async createCallSchedule(@Body() dto: CreateCallScheduleDto) {
     await this.callScheduleService.deleteActiveCallSchedule()
@@ -25,11 +18,6 @@ export class CallScheduleController {
     return this.callScheduleService.createCallSchedule(dto)
   }
 
-  @Functionality({
-    code: FunctionalityCodesEnum.CALL_SCHEDULE__GET,
-    default: defaultCallScheduleGetData,
-    title: 'Получить расписание звонков',
-  })
   @Get(CallScheduleRoutesEnum.GET)
   async getCallSchedule(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
     const callSchedule = await this.callScheduleService.getActiveCallSchedule()

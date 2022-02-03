@@ -3,22 +3,18 @@ import { InjectModel } from 'nestjs-typegoose'
 import { NoteModel } from './note.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateNoteDto } from './dto/createNoteDto'
-import { Error, Types } from 'mongoose'
-import { NoteField, NoteFieldsEnum } from './note.constants'
+import { Error, QueryOptions, Types } from 'mongoose'
+import { NoteFieldsEnum } from './note.constants'
 import { NOTE_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { ScheduleService } from '../schedule/schedule.service'
-import { ModelBase, MongoIdString, ObjectByInterface, ServiceGetOptions } from '../../global/types'
+import { ModelBase, MongoIdString, ObjectByInterface } from '../../global/types'
 import { stringToObjectId } from '../../global/utils/stringToObjectId'
-import { UserService } from '../user/user.service'
-import { RoleService } from '../role/role.service'
 
 @Injectable()
 export class NoteService {
   constructor(
     @InjectModel(NoteModel) private readonly noteModel: ModelType<NoteModel>,
-    private readonly scheduleService: ScheduleService,
-    private readonly userService: UserService,
-    private readonly roleService: RoleService
+    private readonly scheduleService: ScheduleService
   ) {}
 
   async create(dto: CreateNoteDto) {
@@ -27,15 +23,15 @@ export class NoteService {
     return this.noteModel.create(dto)
   }
 
-  async get(lesson: Types.ObjectId | MongoIdString, week: number, options?: ServiceGetOptions<NoteField>) {
+  async get(lesson: Types.ObjectId | MongoIdString, week: number, queryOptions?: QueryOptions) {
     await this.scheduleService.checkExists({ _id: lesson })
 
-    return this.noteModel.find({ lesson, week }, undefined, options?.queryOptions).exec()
+    return this.noteModel.find({ lesson, week }, undefined, queryOptions).exec()
   }
 
-  async getById(id: Types.ObjectId | MongoIdString, options?: ServiceGetOptions<NoteField>) {
+  async getById(id: Types.ObjectId | MongoIdString, queryOptions?: QueryOptions) {
     id = stringToObjectId(id)
-    const candidate = await this.noteModel.findById(id, undefined, options?.queryOptions).exec()
+    const candidate = await this.noteModel.findById(id, undefined, queryOptions).exec()
 
     if (!candidate) {
       throw new HttpException(NOTE_WITH_ID_NOT_FOUND(id), HttpStatus.NOT_FOUND)
@@ -47,8 +43,6 @@ export class NoteService {
   async delete(id: Types.ObjectId | MongoIdString) {
     await this.checkExists({ _id: id })
     await this.noteModel.deleteOne({ _id: id })
-    await this.userService.clearFromId(id)
-    await this.roleService.clearFromId(id)
     return
   }
 
