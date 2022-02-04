@@ -27,9 +27,11 @@ import { ITokenData } from '../../global/guards/adminUserAuth.guard'
 import * as bcrypt from 'bcrypt'
 import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { Request, Response } from 'express'
-import { TokenDataModel } from './adminUser.model'
+import { AdminUserModel, TokenDataModel } from './adminUser.model'
 import { addDays } from './date'
 import { UpdateAvailabilityDto } from './dto/updateAvailability.dto'
+import { removeFields } from '../../global/utils/removeFields'
+import { DocumentType } from '@typegoose/typegoose'
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
@@ -44,13 +46,16 @@ export class AdminUserController {
   }
 
   @Get('/by-id')
-  getById(@MongoId('adminUserId') adminUserId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
-    return this.adminUserService.getById(adminUserId, queryOptions)
+  async getById(@MongoId('adminUserId') adminUserId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+    return removeAdminUserFields(await this.adminUserService.getById(adminUserId, queryOptions), ['tokens', 'hashedPassword'])
   }
 
   @Get('/by-ids')
-  getByIds(@MongoId('adminUserIds', { multiple: true }) adminUserIds: Types.ObjectId[], @MongoQueryOptions() queryOptions?: QueryOptions) {
-    return this.adminUserService.getByIds(adminUserIds, queryOptions)
+  async getByIds(
+    @MongoId('adminUserIds', { multiple: true }) adminUserIds: Types.ObjectId[],
+    @MongoQueryOptions() queryOptions?: QueryOptions
+  ) {
+    return removeAdminUserFields(await this.adminUserService.getByIds(adminUserIds, queryOptions), ['tokens', 'hashedPassword'])
   }
 
   @Get('/many')
@@ -61,7 +66,7 @@ export class AdminUserController {
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      adminUsers: await this.adminUserService.getMany(page, count, name, queryOptions),
+      adminUsers: removeAdminUserFields(await this.adminUserService.getMany(page, count, name, queryOptions), ['tokens', 'hashedPassword']),
       count: await this.adminUserService.countMany(name),
     }
   }
@@ -139,4 +144,11 @@ export class AdminUserController {
 
     return
   }
+}
+
+function removeAdminUserFields(
+  data: DocumentType<AdminUserModel> | DocumentType<AdminUserModel>[],
+  fieldsToRemove: (keyof AdminUserModel)[]
+) {
+  return removeFields<AdminUserModel>(data, fieldsToRemove)
 }
