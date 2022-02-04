@@ -1,4 +1,4 @@
-import { IsMongoId, IsOptional, IsString, Max } from 'class-validator'
+import { IsMongoId, IsOptional, IsString, MaxLength } from 'class-validator'
 import { MongoIdString } from '../../../global/types'
 
 export class UpdateAdminUserDto {
@@ -7,11 +7,11 @@ export class UpdateAdminUserDto {
 
   @IsOptional()
   @IsString()
-  @Max(60)
+  @MaxLength(60)
   name: string
 
   @IsOptional()
   @IsString()
-  @Max(60)
+  @MaxLength(60)
   login: string
 }

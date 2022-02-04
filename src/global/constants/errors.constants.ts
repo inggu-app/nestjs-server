@@ -9,6 +9,7 @@ export const INCORRECT_INT = 'Некорректное значение цело
 export const INCORRECT_STRING = 'Некорректное значение строки'
 export const UNNECESSARY_SYMBOLS_IN_QUERY_PARAMETER = (parameter: string, symbols: string) =>
   `В значении query-параметра ${parameter} обнаружены лишние символы - ${symbols}`
+export const INCORRECT_CREDENTIALS = 'Неправильные логин или пароль'
 
 export const FACULTY_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Факультета с id "${id}" не существует`
 export const FACULTY_WITH_TITLE_EXISTS = (title: string) => `Факультет с названием "${title}" уже существует`
@@ -24,5 +25,6 @@ export const INVALID_NOTE_DEVICE_ID = (id: Types.ObjectId, deviceId: DeviceId) =
 
 export const ADMIN_USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Админ с id ${id} не существует`
 export const ADMIN_USER_WITH_LOGIN_EXISTS = (login: string) => `Админ с логином ${login} уже существует`
+export const ADMIN_USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Админ с логином ${login} не существует`
 
 export const SEMESTER_RANGE_DATE_INCORRECT_RANGE = `Некорректный промежуток дат`

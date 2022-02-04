@@ -1,6 +1,6 @@
 import { IsString, MaxLength } from 'class-validator'
 
-export class UpdatePasswordDto {
+export class LoginDto {
   @IsString()
   @MaxLength(60)
   login: string

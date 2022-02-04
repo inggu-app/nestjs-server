@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString, Max } from 'class-validator'
+import { IsBoolean, IsObject, IsOptional, IsString, MaxLength } from 'class-validator'
 import { Availability } from '../adminUser.model'
 import { Type } from 'class-transformer'
 
@@ -38,17 +38,18 @@ export class AvailabilityDto implements Availability {
 
 export class CreateAdminUserDto {
   @IsString()
-  @Max(60)
+  @MaxLength(60)
   name: string
 
   @IsString()
-  @Max(60)
+  @MaxLength(60)
   login: string
 
   @IsString()
-  @Max(30)
+  @MaxLength(30)
   password: string
 
+  @IsObject()
   @Type(() => AvailabilityDto)
   availability: AvailabilityDto
 }

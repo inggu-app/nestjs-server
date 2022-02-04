@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
-import { AdminUserModel } from './adminUser.model'
+import { AdminUserModel, TokenDataModel } from './adminUser.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { ADMIN_USER_WITH_ID_NOT_FOUND, ADMIN_USER_WITH_LOGIN_EXISTS } from '../../global/constants/errors.constants'
+import {
+  ADMIN_USER_WITH_ID_NOT_FOUND,
+  ADMIN_USER_WITH_LOGIN_EXISTS,
+  ADMIN_USER_WITH_LOGIN_NOT_FOUND,
+} from '../../global/constants/errors.constants'
 import { AvailabilityDto, CreateAdminUserDto } from './dto/createAdminUser.dto'
 import { DocumentType } from '@typegoose/typegoose'
 import { UpdateAdminUserDto } from './dto/updateAdminUser.dto'
@@ -19,12 +23,20 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
   async create(dto: CreateAdminUserDto) {
     await this.throwIfExists({ login: dto.login }, { error: ADMIN_USER_WITH_LOGIN_EXISTS(dto.login) })
 
-    return this.adminUserModel.create(dto)
+    const { password, ...fields } = dto
+    const hashedPassword = await bcrypt.hash(password, 8)
+    return this.adminUserModel.create({ ...fields, hashedPassword })
   }
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
     await this.throwIfNotExists({ _id: id })
     return this.adminUserModel.findById(id, undefined, queryOptions) as unknown as DocumentType<AdminUserModel>
+  }
+
+  async getByLogin(login: string, queryOptions?: QueryOptions) {
+    await this.throwIfNotExists({ login }, { error: ADMIN_USER_WITH_LOGIN_NOT_FOUND(login) })
+
+    return this.adminUserModel.findOne({ login }, undefined, queryOptions) as unknown as DocumentType<AdminUserModel>
   }
 
   async getByIds(ids: Types.ObjectId[], queryOptions?: QueryOptions) {
@@ -56,16 +68,31 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
     return this.adminUserModel.updateOne({ _id: id }, { $set: fields })
   }
 
-  async updatePassword(id: Types.ObjectId, password: string) {
-    await this.throwIfNotExists({ _id: id })
+  async updatePassword(login: string, password: string) {
+    await this.throwIfNotExists({ login })
     const hashedPassword = await bcrypt.hash(password, 8)
-    return this.adminUserModel.updateOne({ _id: id }, { $set: { hashedPassword } })
+    return this.adminUserModel.updateOne({ login }, { $set: { hashedPassword, tokens: [] } })
   }
 
   async updateAvailability(id: Types.ObjectId, availabilityDto: AvailabilityDto) {
     await this.throwIfNotExists({ _id: id })
-    const adminUser = (await this.getById(id, { projection: { _id: 0, availability: 1 } })) as Pick<AdminUserModel, 'availability'>
-    return this.adminUserModel.updateOne({ _id: id }, { $set: { availability: { ...adminUser.availability, ...availabilityDto } } })
+    const adminUser = await this.getById(id, { projection: { _id: 0, availability: 1 } })
+    return this.adminUserModel.updateOne(
+      { _id: id },
+      { $set: { availability: { ...(adminUser.toObject() as DocumentType<AdminUserModel>).availability, ...availabilityDto } } }
+    )
+  }
+
+  async addToken(id: Types.ObjectId, tokenData: TokenDataModel) {
+    return this.adminUserModel.updateOne({ _id: id }, { $push: { tokens: tokenData } })
+  }
+
+  async deleteToken(id: Types.ObjectId, token: string) {
+    return this.adminUserModel.updateOne({ _id: id }, { $pull: { tokens: { token } } })
+  }
+
+  async checkTokenExists(id: Types.ObjectId, token: string) {
+    return this.adminUserModel.exists({ _id: id, 'tokens.token': token })
   }
 
   async deleteById(id: Types.ObjectId) {

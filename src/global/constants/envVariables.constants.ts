@@ -6,5 +6,5 @@ export const envVariables = {
   mongoAuthDatabase: 'MONGO_AUTH_DATABASE',
 
   tokenJwtSecretKey: 'TOKEN_JWT_SECRET_KEY',
-  passwordsJwtSecretKey: 'PASSWORDS_JWT_SECRET_KEY',
+  passwordsHashSecretKey: 'PASSWORDS_HASH_SECRET_KEY',
 }

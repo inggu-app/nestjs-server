@@ -29,6 +29,19 @@ export class Availability {
   canUpdateSemesterRange: boolean // можно ли обновить длительность семестра
 }
 
+export class TokenDataModel {
+  constructor(token: string, expiresIn: Date) {
+    this.token = token
+    this.expiresIn = expiresIn
+  }
+
+  @prop()
+  token: string
+
+  @prop()
+  expiresIn: Date
+}
+
 export interface AdminUserModel extends Base {}
 @ModelOptions({
   schemaOptions: getModelDefaultOptions<FacultyModel>({
@@ -39,15 +52,15 @@ export class AdminUserModel extends TimeStamps {
   @prop({ required: true })
   name: string
 
-  @prop()
+  @prop({ required: true })
   login: string
 
   @prop({ required: true })
   hashedPassword: string
 
-  @prop({ required: true })
-  hashedUniqueKey: string
-
-  @prop({ _id: false, required: true, ref: () => Availability })
+  @prop({ _id: false, required: true, type: () => Availability })
   availability: Ref<Availability, undefined>
+
+  @prop({ _id: false, required: true, default: [], type: () => TokenDataModel })
+  tokens: Ref<TokenDataModel, undefined>[]
 }
