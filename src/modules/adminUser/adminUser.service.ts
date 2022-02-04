@@ -95,6 +95,13 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
     return this.adminUserModel.exists({ _id: id, 'tokens.token': token })
   }
 
+  deleteExpiredTokens() {
+    return this.adminUserModel.updateMany(
+      { 'tokens.expiresIn': { $lt: new Date() } },
+      { $pull: { tokens: { expiresIn: { $lt: new Date() } } } }
+    )
+  }
+
   async deleteById(id: Types.ObjectId) {
     await this.throwIfNotExists({ _id: id })
     return this.adminUserModel.deleteOne({ _id: id })

@@ -34,7 +34,9 @@ import { UpdateAvailabilityDto } from './dto/updateAvailability.dto'
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class AdminUserController {
-  constructor(private readonly adminUserService: AdminUserService, private readonly jwtService: JwtService) {}
+  constructor(private readonly adminUserService: AdminUserService, private readonly jwtService: JwtService) {
+    setInterval(async () => await this.adminUserService.deleteExpiredTokens(), 60000)
+  }
 
   @Post('/')
   create(@Body() dto: CreateAdminUserDto) {
