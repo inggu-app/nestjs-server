@@ -1,12 +1,9 @@
 import { QueryOptions } from 'mongoose'
-import { IsObject, IsOptional } from 'class-validator'
+import { IsOptional } from 'class-validator'
+import { MongoModelProjection } from '../decorators/MongoModelProjection.decorator'
 
 export class MongoQueryOptionsDto implements QueryOptions {
   @IsOptional()
-  @IsObject()
-  fields?: Record<string, number>
-
-  @IsOptional()
-  @IsObject()
+  @MongoModelProjection()
   projection?: Record<string, number>
 }

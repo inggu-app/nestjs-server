@@ -3,5 +3,13 @@ import { ObjectValidationPipe } from '../pipes/objectValidation.pipe'
 import { MongoQueryOptionsDto } from '../dto/mongoQueryOptions.dto'
 
 export const MongoQueryOptions = () => {
-  return Query('queryOptions', new ObjectValidationPipe({ dto: MongoQueryOptionsDto, parameterName: 'queryOptions', required: false }))
+  return Query(
+    'queryOptions',
+    new ObjectValidationPipe({
+      dto: MongoQueryOptionsDto,
+      parameterName: 'queryOptions',
+      required: false,
+      replaceableKeys: { 'projection.id': 'projection._id' },
+    })
+  )
 }

@@ -1,13 +1,14 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common'
 import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
+import { deleteNested, getNested, setNested } from '../utils/nestedObject'
 
 interface Options {
   dto: any
   parameterName: string
   required?: boolean
   isArray?: boolean
-  onlyDtoFields?: boolean
+  replaceableKeys?: Record<string, string>
 }
 
 const defaultOptions: Options = {
@@ -15,7 +16,7 @@ const defaultOptions: Options = {
   parameterName: '',
   required: true,
   isArray: false,
-  onlyDtoFields: true,
+  replaceableKeys: {},
 }
 
 @Injectable()
@@ -51,8 +52,21 @@ export class ObjectValidationPipe implements PipeTransform {
       if (errorsList.length > 0) {
         throw new BadRequestException(errorsList.map(error => (error.constraints ? Object.values(error.constraints) : [])).flat())
       }
+
+      if (this.options.replaceableKeys && Object.keys(this.options.replaceableKeys).length) {
+        for (const key of Object.keys(this.options.replaceableKeys)) {
+          if (getNested(param, key) !== undefined) {
+            setNested(param, getNested(param, key), this.options.replaceableKeys[key])
+            deleteNested(param, key)
+          }
+        }
+      }
     }
 
-    return parsedParameter
+    if (Array.isArray(parsedParameter)) {
+      return objects
+    } else {
+      return objects[0]
+    }
   }
 }
