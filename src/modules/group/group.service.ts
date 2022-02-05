@@ -77,6 +77,11 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     return this.groupModel.updateOne({ _id: id }, { $set: fields }).exec()
   }
 
+  async updateLastScheduleUpdate(id: Types.ObjectId, date: Date) {
+    await this.throwIfNotExists({ _id: id })
+    return this.groupModel.updateOne({ _id: id }, { $set: { lastScheduleUpdate: date } })
+  }
+
   async delete(id: Types.ObjectId) {
     await this.throwIfNotExists({ _id: id })
     await this.scheduleService.deleteByGroupId(id)

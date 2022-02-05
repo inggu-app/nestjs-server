@@ -31,14 +31,17 @@ export class ScheduleController {
     // Удаляем ненужные занятия и прикреплённые к ним заметки
     const groupSchedule = await this.scheduleService.getByGroup(new Types.ObjectId(dto.group), { projection: { _id: 1 } })
     const extraLessonIds = groupSchedule.filter(lesson => !existLessons.find(l => l.id === lesson.id)).map(l => l.id as Types.ObjectId)
-    await this.scheduleService.deleteMany(extraLessonIds)
     await this.noteService.deleteAllByLessonIds(extraLessonIds)
+    await this.scheduleService.deleteMany(extraLessonIds)
 
     // Создаём новые занятия
     const newLessons = dto.schedule.filter(lesson => !lesson.id)
     if (newLessons.length) {
       await this.scheduleService.create({ group: dto.group, schedule: newLessons })
     }
+
+    // Обновляем поле lastScheduleUpdate для группы
+    await this.groupService.updateLastScheduleUpdate(Types.ObjectId(dto.group), new Date())
 
     return
   }
