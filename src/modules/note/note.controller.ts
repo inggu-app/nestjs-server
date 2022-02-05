@@ -31,7 +31,9 @@ export class NoteController {
     @Query('week', new CustomParseIntPipe()) week: number,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
-    return this.noteService.get(lessonId, week, queryOptions)
+    return {
+      notes: await this.noteService.get(lessonId, week, queryOptions),
+    }
   }
 
   @Delete('/')
@@ -42,6 +44,6 @@ export class NoteController {
       throw new HttpException(INVALID_NOTE_DEVICE_ID(noteId, deviceId), HttpStatus.BAD_REQUEST)
     }
 
-    return this.noteService.delete(noteId)
+    await this.noteService.delete(noteId)
   }
 }
