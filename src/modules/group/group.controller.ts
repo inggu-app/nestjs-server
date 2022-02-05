@@ -50,8 +50,8 @@ export class GroupController {
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      groups: await this.groupService.getAll(page, count, title, queryOptions),
-      count: await this.groupService.countAll(title),
+      groups: await this.groupService.getMany(page, count, title, queryOptions),
+      count: await this.groupService.countMany(title),
     }
   }
 

@@ -24,6 +24,6 @@ export class GroupModel extends TimeStamps {
   @prop({ default: false })
   isHaveSchedule: boolean
 
-  @prop({ ref: () => CallScheduleModel })
+  @prop({ ref: () => CallScheduleModel, default: null })
   callSchedule: Ref<CallScheduleModel, Types.ObjectId> | null
 }
