@@ -9,7 +9,7 @@ export interface CallScheduleModel extends Base {}
   }),
 })
 export class CallScheduleModel extends TimeStamps {
-  @prop({ required: true })
+  @prop({ required: true, ref: () => CallScheduleModel })
   schedule: CallScheduleItemModel[]
 
   @prop({ required: true, unique: true })
@@ -17,9 +17,6 @@ export class CallScheduleModel extends TimeStamps {
 
   @prop({ default: false })
   isDefault: boolean
-
-  @prop({ default: true })
-  isActive: boolean
 
   @prop({ default: new Date() })
   scheduleUpdatedAt: Date
