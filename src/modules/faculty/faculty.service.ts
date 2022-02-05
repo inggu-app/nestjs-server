@@ -38,33 +38,22 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
       .find(filter, undefined, queryOptions)
       .skip((page - 1) * count)
       .limit(count)
-      .exec()
   }
 
   countAll(title?: string) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
-
-    return this.facultyModel.countDocuments(filter).exec()
+    return this.facultyModel.countDocuments(filter)
   }
 
   async update(dto: UpdateFacultyDto) {
-    await this.throwIfNotExists({ _id: Types.ObjectId(dto.id) })
-    await this.facultyModel
-      .updateOne(
-        { _id: dto.id },
-        {
-          $set: { title: dto.title },
-        }
-      )
-      .exec()
-
-    return this.facultyModel.findById(dto.id).exec()
+    const { id, ...fields } = dto
+    await this.throwIfNotExists({ _id: Types.ObjectId(id) })
+    await this.facultyModel.updateOne({ _id: id }, { $set: fields })
   }
 
   async delete(id: Types.ObjectId) {
     await this.throwIfNotExists({ _id: id })
-    await this.facultyModel.deleteOne({ _id: id }).exec()
-    return
+    await this.facultyModel.deleteOne({ _id: id })
   }
 }
