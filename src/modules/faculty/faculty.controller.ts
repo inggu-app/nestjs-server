@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/commo
 import { FacultyService } from './faculty.service'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { QueryOptions, Types } from 'mongoose'
-import { GroupService } from '../group/group.service'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
@@ -12,7 +11,7 @@ import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedVa
 
 @Controller()
 export class FacultyController {
-  constructor(private readonly facultyService: FacultyService, private readonly groupService: GroupService) {}
+  constructor(private readonly facultyService: FacultyService) {}
 
   @AdminUserAuth({
     availability: 'canCreateFaculty',
@@ -65,7 +64,6 @@ export class FacultyController {
   })
   @Delete('/')
   async delete(@MongoId('facultyId') facultyId: Types.ObjectId) {
-    await this.groupService.deleteAllByFacultyId(facultyId)
     await this.facultyService.delete(facultyId)
   }
 }

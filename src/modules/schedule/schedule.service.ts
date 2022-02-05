@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { CreateScheduleDto, Lesson } from './dto/createSchedule.dto'
 import { QueryOptions, Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
@@ -7,10 +7,16 @@ import { ModelType } from '@typegoose/typegoose/lib/types'
 import { LESSON_WITH_ID_NOT_FOUND } from '../../global/constants/errors.constants'
 import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
 import { DocumentType } from '@typegoose/typegoose'
+import { GroupService } from '../group/group.service'
+import { NoteService } from '../note/note.service'
 
 @Injectable()
 export class ScheduleService extends CheckExistenceService<LessonModel> {
-  constructor(@InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>) {
+  constructor(
+    @InjectModel(LessonModel) private readonly lessonModel: ModelType<LessonModel, LessonModel>,
+    @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService,
+    private readonly noteService: NoteService
+  ) {
     super(lessonModel, undefined, lesson => LESSON_WITH_ID_NOT_FOUND(lesson._id))
   }
 
@@ -20,7 +26,11 @@ export class ScheduleService extends CheckExistenceService<LessonModel> {
   }
 
   getByGroup(groupId: Types.ObjectId, queryOptions?: QueryOptions) {
-    return this.lessonModel.find({ group: groupId }, undefined, queryOptions).exec()
+    return this.lessonModel.find({ group: groupId }, undefined, queryOptions)
+  }
+
+  getByGroupIds(groupIds: Types.ObjectId[], queryOptions?: QueryOptions) {
+    return this.lessonModel.find({ group: { $in: groupIds } }, undefined, queryOptions)
   }
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
@@ -34,16 +44,28 @@ export class ScheduleService extends CheckExistenceService<LessonModel> {
   }
 
   async deleteByGroupId(groupId: Types.ObjectId) {
+    await this.groupService.throwIfNotExists({ _id: groupId })
+    const lessons = await this.getByGroup(groupId, { projection: { _id: 1 } })
+    await this.noteService.deleteAllByLessonIds(lessons.map(lesson => lesson._id))
     return this.lessonModel.deleteMany({ group: groupId })
+  }
+
+  async deleteAllByGroupIds(groupIds: Types.ObjectId[]) {
+    await this.groupService.throwIfNotExists(groupIds.map(id => ({ _id: id })))
+    const lessons = await this.getByGroupIds(groupIds, { projection: { _id: 1 } })
+    await this.noteService.deleteAllByLessonIds(lessons.map(lesson => lesson._id))
+    return this.lessonModel.deleteMany({ group: { $in: groupIds } })
   }
 
   async deleteById(id: Types.ObjectId) {
     await this.throwIfNotExists({ _id: id })
+    await this.noteService.deleteByLessonId(id)
     return this.lessonModel.deleteOne({ _id: id })
   }
 
   async deleteMany(ids: Types.ObjectId[]) {
     await this.throwIfNotExists(ids.map(id => ({ _id: id })))
+    await this.noteService.deleteAllByLessonIds(ids)
     return this.lessonModel.deleteMany({ _id: { $in: ids } })
   }
 }

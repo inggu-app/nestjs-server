@@ -11,5 +11,5 @@ export class CreateGroupDto {
 
   @IsOptional()
   @IsMongoId()
-  callScheduleId: MongoIdString
+  callSchedule: MongoIdString
 }

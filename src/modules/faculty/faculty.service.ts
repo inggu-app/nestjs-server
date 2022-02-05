@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { InjectModel } from 'nestjs-typegoose'
 import { FacultyModel } from './faculty.model'
@@ -8,10 +8,14 @@ import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
 import { DocumentType } from '@typegoose/typegoose'
 import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
+import { GroupService } from '../group/group.service'
 
 @Injectable()
 export class FacultyService extends CheckExistenceService<FacultyModel> {
-  constructor(@InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>) {
+  constructor(
+    @InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>,
+    @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService
+  ) {
     super(facultyModel, undefined, arg => FACULTY_WITH_ID_NOT_FOUND(arg._id))
   }
 
@@ -54,6 +58,7 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
 
   async delete(id: Types.ObjectId) {
     await this.throwIfNotExists({ _id: id })
-    await this.facultyModel.deleteOne({ _id: id })
+    await this.groupService.deleteAllByFacultyId(id)
+    return this.facultyModel.deleteOne({ _id: id })
   }
 }

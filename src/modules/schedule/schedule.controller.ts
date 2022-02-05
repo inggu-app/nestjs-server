@@ -32,7 +32,7 @@ export class ScheduleController {
     const groupSchedule = await this.scheduleService.getByGroup(new Types.ObjectId(dto.group), { projection: { _id: 1 } })
     const extraLessonIds = groupSchedule.filter(lesson => !existLessons.find(l => l.id === lesson.id)).map(l => l.id as Types.ObjectId)
     await this.scheduleService.deleteMany(extraLessonIds)
-    await this.noteService.deleteByLessonIds(extraLessonIds)
+    await this.noteService.deleteAllByLessonIds(extraLessonIds)
 
     // Создаём новые занятия
     const newLessons = dto.schedule.filter(lesson => !lesson.id)

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { NoteModel } from './note.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
@@ -11,7 +11,10 @@ import { DocumentType } from '@typegoose/typegoose'
 
 @Injectable()
 export class NoteService extends CheckExistenceService<NoteModel> {
-  constructor(@InjectModel(NoteModel) private readonly noteModel: ModelType<NoteModel>, private readonly scheduleService: ScheduleService) {
+  constructor(
+    @InjectModel(NoteModel) private readonly noteModel: ModelType<NoteModel>,
+    @Inject(forwardRef(() => ScheduleService)) private readonly scheduleService: ScheduleService
+  ) {
     super(noteModel, undefined, note => NOTE_WITH_ID_NOT_FOUND(note._id))
   }
 
@@ -35,7 +38,13 @@ export class NoteService extends CheckExistenceService<NoteModel> {
     return this.noteModel.deleteOne({ _id: id })
   }
 
-  async deleteByLessonIds(lessonIds: Types.ObjectId[]) {
+  async deleteAllByLessonIds(lessonIds: Types.ObjectId[]) {
+    await this.scheduleService.throwIfNotExists(lessonIds.map(id => ({ _id: id })))
     return this.noteModel.deleteMany({ lesson: { $in: lessonIds } })
+  }
+
+  async deleteByLessonId(lessonId: Types.ObjectId) {
+    await this.scheduleService.throwIfNotExists({ _id: lessonId })
+    return this.noteModel.deleteOne({ _id: lessonId })
   }
 }

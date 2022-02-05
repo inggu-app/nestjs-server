@@ -16,5 +16,5 @@ export class UpdateGroupDto {
 
   @IsOptional()
   @IsMongoId()
-  callScheduleId: MongoIdString
+  callSchedule: MongoIdString
 }

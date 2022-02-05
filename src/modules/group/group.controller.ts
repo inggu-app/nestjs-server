@@ -62,14 +62,15 @@ export class GroupController {
   @WhitelistedValidationPipe()
   @Patch('/')
   async update(@Body() dto: UpdateGroupDto) {
-    return this.groupService.update(dto)
+    await this.groupService.update(dto)
+    return this.groupService.getById(Types.ObjectId(dto.id))
   }
 
   @AdminUserAuth({
     availability: 'canDeleteGroup',
   })
   @Delete('/')
-  delete(@MongoId('groupId') groupId: Types.ObjectId) {
-    return this.groupService.delete(groupId)
+  async delete(@MongoId('groupId') groupId: Types.ObjectId) {
+    await this.groupService.delete(groupId)
   }
 }
