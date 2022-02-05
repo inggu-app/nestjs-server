@@ -65,7 +65,7 @@ export class FacultyController {
   })
   @Delete('/')
   async delete(@MongoId('facultyId') facultyId: Types.ObjectId) {
-    await this.facultyService.delete(facultyId)
     await this.groupService.deleteAllByFacultyId(facultyId)
+    await this.facultyService.delete(facultyId)
   }
 }
