@@ -27,4 +27,9 @@ export const ADMIN_USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Админ 
 export const ADMIN_USER_WITH_LOGIN_EXISTS = (login: string) => `Админ с логином ${login} уже существует`
 export const ADMIN_USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Админ с логином ${login} не существует`
 
+export const CALL_SCHEDULE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Расписание звонков с id ${id} не существует`
+export const CALL_SCHEDULE_WITH_NAME_EXISTS = (name: string) => `Расписание звонков с названием ${name} уже существует`
+export const CALL_SCHEDULE_WITH_NAME_NOT_FOUND = (name: string) => `Расписание звонков с названием ${name} не существует`
+export const DEFAULT_CALL_SCHEDULE_NOT_FOUND = `Дефолтное расписание звонков не существует`
+
 export const SEMESTER_RANGE_DATE_INCORRECT_RANGE = `Некорректный промежуток дат`

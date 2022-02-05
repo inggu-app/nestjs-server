@@ -1,31 +1,31 @@
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions, prop } from '@typegoose/typegoose'
-import { getModelDefaultOptions } from '../../../configs/modelDefaultOptions.config'
-import { ALL_SETTINGS_TYPES } from '../settings.constants'
+import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 
-export interface CallScheduleModel {
-  updatedAt: Date
-}
 export interface CallScheduleModel extends Base {}
 @modelOptions({
   schemaOptions: getModelDefaultOptions<CallScheduleModel>({
-    collection: 'Settings',
+    collection: 'CallSchedule',
   }),
 })
 export class CallScheduleModel extends TimeStamps {
-  @prop({
-    enum: ALL_SETTINGS_TYPES,
-  })
-  settingType: string
+  @prop({ required: true })
+  schedule: CallScheduleItemModel[]
 
-  @prop()
-  schedule: CallScheduleItem[]
+  @prop({ required: true, unique: true })
+  name: string
+
+  @prop({ default: false })
+  isDefault: boolean
 
   @prop({ default: true })
   isActive: boolean
+
+  @prop({ default: new Date() })
+  scheduleUpdatedAt: Date
 }
 
-class CallScheduleItem {
+export class CallScheduleItemModel {
   @prop()
   lessonNumber: number
 

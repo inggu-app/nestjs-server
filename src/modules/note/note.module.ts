@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { NoteService } from './note.service'
 import { NoteController } from './note.controller'
 import { TypegooseModule } from 'nestjs-typegoose'
@@ -9,12 +9,13 @@ import { ScheduleModule } from '../schedule/schedule.module'
   providers: [NoteService],
   controllers: [NoteController],
   imports: [
-    ScheduleModule,
+    forwardRef(() => ScheduleModule),
     TypegooseModule.forFeature([
       {
         typegooseClass: NoteModel,
       },
     ]),
   ],
+  exports: [NoteService],
 })
 export class NoteModule {}

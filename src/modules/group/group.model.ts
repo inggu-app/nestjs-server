@@ -1,8 +1,9 @@
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
-import { modelOptions, prop } from '@typegoose/typegoose'
+import { modelOptions, prop, Ref } from '@typegoose/typegoose'
 import { Types } from 'mongoose'
 import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
+import { CallScheduleModel } from '../callSchedule/callSchedule.model'
 
 export interface GroupModel extends Base {}
 @modelOptions({
@@ -22,4 +23,7 @@ export class GroupModel extends TimeStamps {
 
   @prop({ default: false })
   isHaveSchedule: boolean
+
+  @prop({ ref: () => CallScheduleModel })
+  callSchedule: Ref<CallScheduleModel, Types.ObjectId> | null
 }

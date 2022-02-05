@@ -9,6 +9,7 @@ import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 
+@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class GroupController {
   constructor(private readonly groupService: GroupService, private readonly facultyService: FacultyService) {}
@@ -16,24 +17,19 @@ export class GroupController {
   @AdminUserAuth({
     availability: 'canCreateGroup',
   })
-  @UsePipes(new ValidationPipe())
   @Post('/')
   async create(@Body() dto: CreateGroupDto) {
-    await this.facultyService.getById(new Types.ObjectId(dto.faculty))
-
+    await this.facultyService.throwIfNotExists({ _id: Types.ObjectId(dto.faculty) })
     return this.groupService.create(dto)
   }
 
   @Get('/by-id')
-  async getByGroupId(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getById(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.groupService.getById(groupId, queryOptions)
   }
 
   @Get('/by-ids')
-  async getByGroupIds(
-    @MongoId('groupIds', { multiple: true }) groupIds: Types.ObjectId[],
-    @MongoQueryOptions() queryOptions?: QueryOptions
-  ) {
+  async getByIds(@MongoId('groupIds', { multiple: true }) groupIds: Types.ObjectId[], @MongoQueryOptions() queryOptions?: QueryOptions) {
     return {
       groups: await this.groupService.getByGroupIds(groupIds, queryOptions),
     }
@@ -62,7 +58,6 @@ export class GroupController {
   @AdminUserAuth({
     availability: 'canUpdateGroup',
   })
-  @UsePipes(new ValidationPipe())
   @Patch('/')
   async update(@Body() dto: UpdateGroupDto) {
     return this.groupService.update(dto)

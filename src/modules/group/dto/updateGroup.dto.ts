@@ -11,4 +11,7 @@ export class UpdateGroupDto {
 
   @IsMongoId()
   faculty: MongoIdString
+
+  @IsMongoId()
+  callScheduleId: MongoIdString
 }

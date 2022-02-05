@@ -9,6 +9,7 @@ import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 
+@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService, private readonly groupService: GroupService) {}
@@ -16,19 +17,18 @@ export class FacultyController {
   @AdminUserAuth({
     availability: 'canCreateFaculty',
   })
-  @UsePipes(new ValidationPipe())
   @Post('/')
   create(@Body() dto: CreateFacultyDto) {
     return this.facultyService.create(dto)
   }
 
   @Get('/by-id')
-  async getByFacultyId(@MongoId('facultyId') facultyId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getById(@MongoId('facultyId') facultyId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.facultyService.getById(facultyId, queryOptions)
   }
 
   @Get('/by-ids')
-  async getByFacultyIds(
+  async getByIds(
     @MongoId('facultyIds', { multiple: true }) facultyIds: Types.ObjectId[],
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
@@ -53,7 +53,6 @@ export class FacultyController {
   @AdminUserAuth({
     availability: 'canUpdateFaculty',
   })
-  @UsePipes(new ValidationPipe())
   @Patch('/')
   update(@Body() dto: UpdateFacultyDto) {
     return this.facultyService.update(dto)
@@ -65,7 +64,6 @@ export class FacultyController {
   @Delete('/')
   async delete(@MongoId('facultyId') facultyId: Types.ObjectId) {
     await this.facultyService.delete(facultyId)
-
     await this.groupService.deleteAllByFacultyId(facultyId)
   }
 }

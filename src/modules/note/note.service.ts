@@ -34,4 +34,8 @@ export class NoteService extends CheckExistenceService<NoteModel> {
     await this.throwIfNotExists({ _id: id })
     return this.noteModel.deleteOne({ _id: id })
   }
+
+  async deleteByLessonIds(lessonIds: Types.ObjectId[]) {
+    return this.noteModel.deleteMany({ lesson: { $in: lessonIds } })
+  }
 }
