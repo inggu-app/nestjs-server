@@ -9,18 +9,18 @@ import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 
+@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
-  @UsePipes(new ValidationPipe())
   @Post('/')
   create(@Body() dto: CreateNoteDto) {
     return this.noteService.create(dto)
   }
 
   @Get('/by-id')
-  async getByNoteId(@MongoId('noteId') noteId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getById(@MongoId('noteId') noteId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.noteService.getById(noteId, queryOptions)
   }
 

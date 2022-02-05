@@ -1,4 +1,4 @@
-import { modelOptions, prop } from '@typegoose/typegoose'
+import { modelOptions, prop, Ref } from '@typegoose/typegoose'
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { DeviceId } from '../../global/types'
@@ -22,5 +22,5 @@ export class NoteModel extends TimeStamps {
   week: number
 
   @prop({ ref: () => LessonModel })
-  lesson: Types.ObjectId
+  lesson: Ref<LessonModel, Types.ObjectId>
 }
