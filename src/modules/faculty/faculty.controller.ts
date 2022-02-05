@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common'
 import { FacultyService } from './faculty.service'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { QueryOptions, Types } from 'mongoose'
@@ -8,8 +8,8 @@ import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
+import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 
-@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService, private readonly groupService: GroupService) {}
@@ -17,6 +17,7 @@ export class FacultyController {
   @AdminUserAuth({
     availability: 'canCreateFaculty',
   })
+  @WhitelistedValidationPipe()
   @Post('/')
   create(@Body() dto: CreateFacultyDto) {
     return this.facultyService.create(dto)
@@ -53,6 +54,7 @@ export class FacultyController {
   @AdminUserAuth({
     availability: 'canUpdateFaculty',
   })
+  @WhitelistedValidationPipe()
   @Patch('/')
   update(@Body() dto: UpdateFacultyDto) {
     return this.facultyService.update(dto)

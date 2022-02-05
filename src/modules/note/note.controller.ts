@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Query } from '@nestjs/common'
 import { NoteService } from './note.service'
 import { CreateNoteDto } from './dto/createNoteDto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
@@ -8,12 +8,13 @@ import { INVALID_NOTE_DEVICE_ID } from '../../global/constants/errors.constants'
 import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
+import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 
-@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
+  @WhitelistedValidationPipe()
   @Post('/')
   create(@Body() dto: CreateNoteDto) {
     return this.noteService.create(dto)

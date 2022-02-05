@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { QueryOptions, Types } from 'mongoose'
@@ -7,8 +7,8 @@ import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import { NoteService } from '../note/note.service'
+import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 
-@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class ScheduleController {
   constructor(
@@ -17,6 +17,7 @@ export class ScheduleController {
     private readonly noteService: NoteService
   ) {}
 
+  @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
     await this.groupService.throwIfNotExists({ _id: Types.ObjectId(dto.group) })

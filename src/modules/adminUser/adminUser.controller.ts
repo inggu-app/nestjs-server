@@ -1,18 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Query,
-  Req,
-  Res,
-  UnauthorizedException,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, Patch, Post, Query, Req, Res, UnauthorizedException } from '@nestjs/common'
 import { CreateAdminUserDto } from './dto/createAdminUser.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
@@ -32,14 +18,15 @@ import { addDays } from './date'
 import { UpdateAvailabilityDto } from './dto/updateAvailability.dto'
 import { removeFields } from '../../global/utils/removeFields'
 import { DocumentType } from '@typegoose/typegoose'
+import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 
-@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class AdminUserController {
   constructor(private readonly adminUserService: AdminUserService, private readonly jwtService: JwtService) {
     setInterval(async () => await this.adminUserService.deleteExpiredTokens(), 60000)
   }
 
+  @WhitelistedValidationPipe()
   @Post('/')
   create(@Body() dto: CreateAdminUserDto) {
     return this.adminUserService.create(dto)
@@ -71,6 +58,7 @@ export class AdminUserController {
     }
   }
 
+  @WhitelistedValidationPipe()
   @Get('/login')
   async login(@Body() dto: LoginDto, @Res() response: Response) {
     const adminUser = await this.adminUserService.getByLogin(dto.login, { projection: { _id: 1, hashedPassword: 1 } })
@@ -117,12 +105,14 @@ export class AdminUserController {
     } else throw new UnauthorizedException()
   }
 
+  @WhitelistedValidationPipe()
   @Patch('/')
   async update(@Body() dto: UpdateAdminUserDto) {
     await this.adminUserService.update(dto)
     return this.adminUserService.getById(Types.ObjectId(dto.id))
   }
 
+  @WhitelistedValidationPipe()
   @Patch('/update-password')
   async updatePassword(@Body() dto: UpdatePasswordDto) {
     await this.adminUserService.updatePassword(dto.login, dto.password)
@@ -131,6 +121,7 @@ export class AdminUserController {
     }
   }
 
+  @WhitelistedValidationPipe()
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
     await this.adminUserService.updateAvailability(Types.ObjectId(dto.id), dto.availability)

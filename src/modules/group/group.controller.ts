@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { QueryOptions, Types } from 'mongoose'
@@ -8,8 +8,8 @@ import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
+import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 
-@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class GroupController {
   constructor(private readonly groupService: GroupService, private readonly facultyService: FacultyService) {}
@@ -17,6 +17,7 @@ export class GroupController {
   @AdminUserAuth({
     availability: 'canCreateGroup',
   })
+  @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateGroupDto) {
     await this.facultyService.throwIfNotExists({ _id: Types.ObjectId(dto.faculty) })
@@ -58,6 +59,7 @@ export class GroupController {
   @AdminUserAuth({
     availability: 'canUpdateGroup',
   })
+  @WhitelistedValidationPipe()
   @Patch('/')
   async update(@Body() dto: UpdateGroupDto) {
     return this.groupService.update(dto)
