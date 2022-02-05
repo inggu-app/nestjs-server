@@ -1,2 +1,2 @@
-export const dateRegExp = /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/
-export const bearerTokenRegExp = /Bearer\s[\d|a-z].[\d|a-z].[\d|a-z]/i
+export const dateTimeRegExp = /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/ // yyyy-MM-ddTHH:mm:ss.SSSZ
+export const timeRegExp = /\d\d:\d\d/ // HH:mm

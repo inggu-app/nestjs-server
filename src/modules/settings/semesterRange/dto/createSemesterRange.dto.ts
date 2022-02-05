@@ -1,10 +1,10 @@
 import { Matches } from 'class-validator'
-import { dateRegExp } from '../../../../global/regex'
+import { dateTimeRegExp } from '../../../../global/regex'
 
 export class CreateSemesterRangeDto {
-  @Matches(dateRegExp)
+  @Matches(dateTimeRegExp)
   startDate: Date
 
-  @Matches(dateRegExp)
+  @Matches(dateTimeRegExp)
   endDate: Date
 }

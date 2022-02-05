@@ -51,7 +51,7 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
     return this.callScheduleModel.updateOne({ _id: dto.id }, { $set: fields })
   }
 
-  async updateIsDefaultSchedule(id: Types.ObjectId) {
+  async updateDefaultSchedule(id: Types.ObjectId) {
     await this.throwIfNotExists({ _id: id })
     await this.callScheduleModel.updateOne({ isDefault: true }, { $set: { isDefault: false } })
     return this.callScheduleModel.updateOne({ _id: id }, { $set: { isDefault: true } })
@@ -63,7 +63,7 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
   }
 
   async deleteByName(name: string) {
-    await this.throwIfNotExists({ name })
+    await this.throwIfNotExists({ name }, { error: CALL_SCHEDULE_WITH_NAME_NOT_FOUND(name) })
     return this.callScheduleModel.deleteOne({ name })
   }
 }

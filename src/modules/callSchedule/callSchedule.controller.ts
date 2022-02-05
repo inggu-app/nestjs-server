@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
@@ -7,8 +7,8 @@ import { QueryOptions, Types } from 'mongoose'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
 import { UpdateCallScheduleDto } from './dto/updateCallSchedule.dto'
+import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 
-@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller()
 export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}
@@ -16,6 +16,7 @@ export class CallScheduleController {
   @AdminUserAuth({
     availability: 'canUpdateCallSchedule',
   })
+  @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateCallScheduleDto) {
     await this.callScheduleService.create(dto)
@@ -32,28 +33,31 @@ export class CallScheduleController {
     return this.callScheduleService.getByName(name, queryOptions)
   }
 
-  @Get('/default-schedule')
+  @Get('/default')
   getDefaultSchedule(@MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.callScheduleService.getDefaultSchedule(queryOptions)
   }
 
+  @WhitelistedValidationPipe()
   @Patch('/')
-  update(@Body() dto: UpdateCallScheduleDto) {
-    return this.callScheduleService.update(dto)
+  async update(@Body() dto: UpdateCallScheduleDto) {
+    await this.callScheduleService.update(dto)
+    return this.callScheduleService.getById(Types.ObjectId(dto.id))
   }
 
-  @Patch('/is-default')
-  updateIsDefaultSchedule(@MongoId('callScheduleId') id: Types.ObjectId) {
-    return this.callScheduleService.updateIsDefaultSchedule(id)
+  @Patch('/default')
+  async updateDefaultSchedule(@MongoId('callScheduleId') id: Types.ObjectId) {
+    await this.callScheduleService.updateDefaultSchedule(id)
+    return this.callScheduleService.getDefaultSchedule()
   }
 
   @Delete('/by-id')
-  deleteById(@MongoId('callScheduleId') id: Types.ObjectId) {
-    return this.callScheduleService.deleteById(id)
+  async deleteById(@MongoId('callScheduleId') id: Types.ObjectId) {
+    await this.callScheduleService.deleteById(id)
   }
 
   @Delete('/by-name')
-  deleteByName(@Query('callScheduleName', new CustomParseStringPipe()) name: string) {
-    return this.callScheduleService.deleteByName(name)
+  async deleteByName(@Query('callScheduleName', new CustomParseStringPipe()) name: string) {
+    await this.callScheduleService.deleteByName(name)
   }
 }

@@ -1,6 +1,18 @@
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions, prop } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
+import { timeRegExp } from '../../global/regex'
+
+export class CallScheduleItemModel {
+  @prop()
+  lessonNumber: number
+
+  @prop({ match: timeRegExp })
+  start: string
+
+  @prop({ match: timeRegExp })
+  end: string
+}
 
 export interface CallScheduleModel extends Base {}
 @modelOptions({
@@ -9,7 +21,7 @@ export interface CallScheduleModel extends Base {}
   }),
 })
 export class CallScheduleModel extends TimeStamps {
-  @prop({ required: true, ref: () => CallScheduleModel })
+  @prop({ _id: false, required: true })
   schedule: CallScheduleItemModel[]
 
   @prop({ required: true, unique: true })
@@ -20,15 +32,4 @@ export class CallScheduleModel extends TimeStamps {
 
   @prop({ default: new Date() })
   scheduleUpdatedAt: Date
-}
-
-export class CallScheduleItemModel {
-  @prop()
-  lessonNumber: number
-
-  @prop()
-  start: Date
-
-  @prop()
-  end: Date
 }

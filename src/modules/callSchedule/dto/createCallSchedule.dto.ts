@@ -1,6 +1,7 @@
-import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator'
+import { IsArray, IsNotEmpty, IsNumber, IsString, Matches, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CallScheduleItemModel } from '../callSchedule.model'
+import { timeRegExp } from '../../../global/regex'
 
 export class CreateCallScheduleDto {
   @IsArray()
@@ -17,9 +18,9 @@ export class CallScheduleItem implements CallScheduleItemModel {
   @IsNumber()
   lessonNumber: number
 
-  @IsDateString()
-  start: Date
+  @Matches(timeRegExp)
+  start: string
 
-  @IsDateString()
-  end: Date
+  @Matches(timeRegExp)
+  end: string
 }
