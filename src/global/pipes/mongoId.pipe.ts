@@ -1,6 +1,11 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
+import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common'
 import { Types } from 'mongoose'
-import { INVALID_MONGO_ID, UNNECESSARY_SYMBOLS_IN_QUERY_PARAMETER } from '../constants/errors.constants'
+import {
+  INVALID_MONGO_ID,
+  QUERY_PARAMETER_HAVE_MULTIPLE_VALUES,
+  QUERY_PARAMETER_IS_EMPTY,
+  QUERY_PARAMETER_IS_REQUIRED,
+} from '../constants/errors.constants'
 import { isMongoId } from 'class-validator'
 
 export interface ParseMongoIdPipeOptions {
@@ -25,26 +30,17 @@ export class ParseMongoIdPipe implements PipeTransform<any, Types.ObjectId | Typ
 
   transform(value: string | undefined): Types.ObjectId | Types.ObjectId[] | undefined {
     if (!this.options.required && value === undefined) return value
-    if (this.options.multiple && value) {
-      const unnecessarySymbols = value.replace(/([a-zA-Z0-9,_])+/g, '')
+    if (this.options.required && value === undefined) throw new BadRequestException(QUERY_PARAMETER_IS_REQUIRED(this.options.parameter))
+    if (this.options.required && value === '') throw new BadRequestException(QUERY_PARAMETER_IS_EMPTY(this.options.parameter))
 
-      if (unnecessarySymbols) {
-        throw new BadRequestException(UNNECESSARY_SYMBOLS_IN_QUERY_PARAMETER(this.options.parameter, unnecessarySymbols))
-      }
-
-      for (const id of value.split(',')) {
-        if (!isMongoId(id)) {
-          throw new HttpException(INVALID_MONGO_ID, HttpStatus.BAD_REQUEST)
-        }
-      }
-
-      return value.split(',').map(id => new Types.ObjectId(id))
+    const ids = (value as string).split(',')
+    if (!this.options.multiple && ids.length > 1)
+      throw new BadRequestException(QUERY_PARAMETER_HAVE_MULTIPLE_VALUES(this.options.parameter))
+    for (const id of ids) {
+      if (!isMongoId(id)) throw new BadRequestException(INVALID_MONGO_ID(id))
     }
 
-    if (!isMongoId(value)) {
-      throw new HttpException(INVALID_MONGO_ID, HttpStatus.BAD_REQUEST)
-    }
-
-    return new Types.ObjectId(value as string)
+    if (this.options.multiple) return ids.map(Types.ObjectId)
+    else return Types.ObjectId(ids[0])
   }
 }
