@@ -9,6 +9,8 @@ import { CheckExistenceService } from '../../global/classes/CheckExistenceServic
 import { DocumentType } from '@typegoose/typegoose'
 import { GroupService } from '../group/group.service'
 import { NoteService } from '../note/note.service'
+import { scheduleServiceMethodDefaultOptions } from './schedule.constants'
+import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
 
 @Injectable()
 export class ScheduleService extends CheckExistenceService<LessonModel> {
@@ -20,51 +22,59 @@ export class ScheduleService extends CheckExistenceService<LessonModel> {
     super(lessonModel, undefined, lesson => LESSON_WITH_ID_NOT_FOUND(lesson._id))
   }
 
-  async create(dto: CreateScheduleDto) {
+  async create(dto: CreateScheduleDto, options = scheduleServiceMethodDefaultOptions.create) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.create)
     const lessons = dto.schedule.map(lesson => ({ ...lesson, group: dto.group }))
     return this.lessonModel.create(lessons)
   }
 
-  getByGroup(groupId: Types.ObjectId, queryOptions?: QueryOptions) {
+  async getByGroupId(groupId: Types.ObjectId, queryOptions?: QueryOptions, options = scheduleServiceMethodDefaultOptions.getByGroupId) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.getByGroupId)
+    if (options.checkExistence.group) await this.groupService.throwIfNotExists({ _id: groupId })
     return this.lessonModel.find({ group: groupId }, undefined, queryOptions)
   }
 
-  getByGroupIds(groupIds: Types.ObjectId[], queryOptions?: QueryOptions) {
+  async getByGroupIds(
+    groupIds: Types.ObjectId[],
+    queryOptions?: QueryOptions,
+    options = scheduleServiceMethodDefaultOptions.getByGroupIds
+  ) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.getByGroupIds)
+    if (options.checkExistence.group) await this.groupService.throwIfNotExists(groupIds.map(id => ({ _id: id })))
     return this.lessonModel.find({ group: { $in: groupIds } }, undefined, queryOptions)
   }
 
-  async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
-    await this.throwIfNotExists({ _id: id })
+  async getById(id: Types.ObjectId, queryOptions?: QueryOptions, options = scheduleServiceMethodDefaultOptions.getById) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.getById)
+    if (options.checkExistence.schedule) await this.throwIfNotExists({ _id: id })
     return (await this.lessonModel.findById(id, undefined, queryOptions).exec()) as unknown as DocumentType<LessonModel>
   }
 
-  async updateById(id: Types.ObjectId, lesson: Lesson) {
-    await this.throwIfNotExists({ _id: id })
+  async updateById(id: Types.ObjectId, lesson: Lesson, options = scheduleServiceMethodDefaultOptions.updateById) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.updateById)
+    if (options.checkExistence.schedule) await this.throwIfNotExists({ _id: id })
     return this.lessonModel.updateOne({ _id: id }, { $set: { ...lesson } }).exec()
   }
 
-  async deleteByGroupId(groupId: Types.ObjectId) {
-    await this.groupService.throwIfNotExists({ _id: groupId })
-    const lessons = await this.getByGroup(groupId, { projection: { _id: 1 } })
+  async deleteByGroupId(groupId: Types.ObjectId, options = scheduleServiceMethodDefaultOptions.deleteByGroupId) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.deleteByGroupId)
+    if (options.checkExistence.group) await this.groupService.throwIfNotExists({ _id: groupId })
+    const lessons = await this.getByGroupId(groupId, { projection: { _id: 1 } })
     await this.noteService.deleteAllByLessonIds(lessons.map(lesson => lesson._id))
     return this.lessonModel.deleteMany({ group: groupId })
   }
 
-  async deleteAllByGroupIds(groupIds: Types.ObjectId[]) {
-    await this.groupService.throwIfNotExists(groupIds.map(id => ({ _id: id })))
+  async deleteAllByGroupIds(groupIds: Types.ObjectId[], options = scheduleServiceMethodDefaultOptions.deleteAllByGroupIds) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.deleteAllByGroupIds)
+    if (options.checkExistence.group) await this.groupService.throwIfNotExists(groupIds.map(id => ({ _id: id })))
     const lessons = await this.getByGroupIds(groupIds, { projection: { _id: 1 } })
     await this.noteService.deleteAllByLessonIds(lessons.map(lesson => lesson._id))
     return this.lessonModel.deleteMany({ group: { $in: groupIds } })
   }
 
-  async deleteById(id: Types.ObjectId) {
-    await this.throwIfNotExists({ _id: id })
-    await this.noteService.deleteByLessonId(id)
-    return this.lessonModel.deleteOne({ _id: id })
-  }
-
-  async deleteMany(ids: Types.ObjectId[]) {
-    await this.throwIfNotExists(ids.map(id => ({ _id: id })))
+  async deleteMany(ids: Types.ObjectId[], options = scheduleServiceMethodDefaultOptions.deleteMany) {
+    options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.deleteMany)
+    if (options.checkExistence.schedule) await this.throwIfNotExists(ids.map(id => ({ _id: id })))
     await this.noteService.deleteAllByLessonIds(ids)
     return this.lessonModel.deleteMany({ _id: { $in: ids } })
   }

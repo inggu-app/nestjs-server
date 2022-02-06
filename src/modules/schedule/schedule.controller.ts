@@ -29,7 +29,7 @@ export class ScheduleController {
     }
 
     // Удаляем ненужные занятия и прикреплённые к ним заметки
-    const groupSchedule = await this.scheduleService.getByGroup(new Types.ObjectId(dto.group), { projection: { _id: 1 } })
+    const groupSchedule = await this.scheduleService.getByGroupId(new Types.ObjectId(dto.group), { projection: { _id: 1 } })
     const extraLessonIds = groupSchedule.filter(lesson => !existLessons.find(l => l.id === lesson.id)).map(l => l.id as Types.ObjectId)
     await this.noteService.deleteAllByLessonIds(extraLessonIds)
     await this.scheduleService.deleteMany(extraLessonIds)
@@ -49,7 +49,7 @@ export class ScheduleController {
   @Get('/by-group-id')
   async getByGroupId(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     const group = await this.groupService.getById(groupId, { projection: { lastScheduleUpdate: 1 } })
-    const lessonsSchedule = await this.scheduleService.getByGroup(groupId, queryOptions)
+    const lessonsSchedule = await this.scheduleService.getByGroupId(groupId, queryOptions)
 
     return {
       schedule: lessonsSchedule,

@@ -9,6 +9,8 @@ import { FACULTY_WITH_ID_NOT_FOUND, FACULTY_WITH_TITLE_EXISTS } from '../../glob
 import { DocumentType } from '@typegoose/typegoose'
 import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
 import { GroupService } from '../group/group.service'
+import { facultyServiceMethodDefaultOptions } from './faculty.constants'
+import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
 
 @Injectable()
 export class FacultyService extends CheckExistenceService<FacultyModel> {
@@ -19,22 +21,25 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
     super(facultyModel, undefined, arg => FACULTY_WITH_ID_NOT_FOUND(arg._id))
   }
 
-  async create(dto: CreateFacultyDto) {
-    await this.throwIfExists({ title: dto.title }, { error: FACULTY_WITH_TITLE_EXISTS(dto.title) })
+  async create(dto: CreateFacultyDto, options = facultyServiceMethodDefaultOptions.create) {
+    options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.create)
+    if (options.checkExistence.faculty) await this.throwIfExists({ title: dto.title }, { error: FACULTY_WITH_TITLE_EXISTS(dto.title) })
     return this.facultyModel.create(dto)
   }
 
-  async getById(facultyId: Types.ObjectId, queryOptions?: QueryOptions) {
-    await this.throwIfNotExists({ _id: facultyId })
+  async getById(facultyId: Types.ObjectId, queryOptions?: QueryOptions, options = facultyServiceMethodDefaultOptions.getById) {
+    options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.getById)
+    if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: facultyId })
     return (await this.facultyModel.findById(facultyId, undefined, queryOptions).exec()) as unknown as DocumentType<FacultyModel>
   }
 
-  async getByIds(facultyIds: Types.ObjectId[], queryOptions?: QueryOptions) {
-    await this.throwIfNotExists(facultyIds.map(id => ({ _id: id })))
+  async getByIds(facultyIds: Types.ObjectId[], queryOptions?: QueryOptions, options = facultyServiceMethodDefaultOptions.getByIds) {
+    options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.getByIds)
+    if (options.checkExistence.faculty) await this.throwIfNotExists(facultyIds.map(id => ({ _id: id })))
     return this.facultyModel.find({ _id: { $in: facultyIds } }, undefined, queryOptions)
   }
 
-  getAll(page: number, count: number, title?: string, queryOptions?: QueryOptions) {
+  getAll(page: number, count: number, title?: string, queryOptions?: QueryOptions, options = facultyServiceMethodDefaultOptions.getAll) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
 
@@ -44,20 +49,22 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
       .limit(count)
   }
 
-  countAll(title?: string) {
+  countAll(title?: string, options = facultyServiceMethodDefaultOptions.countAll) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
     return this.facultyModel.countDocuments(filter)
   }
 
-  async update(dto: UpdateFacultyDto) {
+  async update(dto: UpdateFacultyDto, options = facultyServiceMethodDefaultOptions.update) {
+    options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.update)
     const { id, ...fields } = dto
-    await this.throwIfNotExists({ _id: Types.ObjectId(id) })
+    if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: Types.ObjectId(id) })
     await this.facultyModel.updateOne({ _id: id }, { $set: fields })
   }
 
-  async delete(id: Types.ObjectId) {
-    await this.throwIfNotExists({ _id: id })
+  async delete(id: Types.ObjectId, options = facultyServiceMethodDefaultOptions.delete) {
+    options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.delete)
+    if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: id })
     await this.groupService.deleteAllByFacultyId(id)
     return this.facultyModel.deleteOne({ _id: id })
   }
