@@ -46,13 +46,13 @@ export class NoteService extends CheckExistenceService<NoteModel> {
 
   async deleteAllByLessonIds(lessonIds: Types.ObjectId[], options = noteServiceMethodDefaultOptions.deleteAllByLessonIds) {
     options = mergeOptionsWithDefaultOptions(options, noteServiceMethodDefaultOptions.deleteAllByLessonIds)
-    if (options.checkExistence.note) await this.scheduleService.throwIfNotExists(lessonIds.map(id => ({ _id: id })))
+    if (options.checkExistence.lessons) await this.scheduleService.throwIfNotExists(lessonIds.map(id => ({ _id: id })))
     return this.noteModel.deleteMany({ lesson: { $in: lessonIds } })
   }
 
-  async deleteByLessonId(lessonId: Types.ObjectId, options = noteServiceMethodDefaultOptions.deleteAllByLessonIds) {
-    options = mergeOptionsWithDefaultOptions(options, noteServiceMethodDefaultOptions.deleteByLessonId)
-    if (options.checkExistence.note) await this.scheduleService.throwIfNotExists({ _id: lessonId })
+  async deleteAllByLessonId(lessonId: Types.ObjectId, options = noteServiceMethodDefaultOptions.deleteAllByLessonId) {
+    options = mergeOptionsWithDefaultOptions(options, noteServiceMethodDefaultOptions.deleteAllByLessonId)
+    if (options.checkExistence.lesson) await this.scheduleService.throwIfNotExists({ _id: lessonId })
     return this.noteModel.deleteOne({ _id: lessonId })
   }
 }

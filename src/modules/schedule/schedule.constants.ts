@@ -10,7 +10,9 @@ export enum WeeksTypeEnum {
 
 export const scheduleServiceMethodDefaultOptions = {
   create: {
-    checkExistence: {},
+    checkExistence: {
+      group: true,
+    },
   },
   getByGroupId: {
     checkExistence: {
@@ -19,7 +21,7 @@ export const scheduleServiceMethodDefaultOptions = {
   },
   getByGroupIds: {
     checkExistence: {
-      group: true,
+      groups: true,
     },
   },
   getById: {
@@ -39,7 +41,7 @@ export const scheduleServiceMethodDefaultOptions = {
   },
   deleteAllByGroupIds: {
     checkExistence: {
-      group: true,
+      groups: true,
     },
   },
   deleteById: {

@@ -24,12 +24,12 @@ export const noteServiceMethodDefaultOptions = {
   },
   deleteAllByLessonIds: {
     checkExistence: {
-      note: true,
+      lessons: true,
     },
   },
-  deleteByLessonId: {
+  deleteAllByLessonId: {
     checkExistence: {
-      note: true,
+      lesson: true,
     },
   },
 }
