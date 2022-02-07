@@ -94,7 +94,7 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
   ) {
     options = mergeOptionsWithDefaultOptions(options, adminUserServiceMethodDefaultOptions.updateAvailability)
     if (options.checkExistence.adminUser) await this.throwIfNotExists({ _id: id })
-    const adminUser = await this.getById(id, { projection: { _id: 0, availability: 1 } })
+    const adminUser = await this.getById(id, { projection: { _id: 0, availability: 1 } }, { checkExistence: { adminUser: false } })
     return this.adminUserModel.updateOne(
       { _id: id },
       { $set: { availability: { ...(adminUser.toObject() as DocumentType<AdminUserModel>).availability, ...availabilityDto } } }

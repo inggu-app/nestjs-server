@@ -69,7 +69,9 @@ export class AdminUserController {
       }
       const generatedToken = this.jwtService.sign(tokenPayload)
       const tokenExpiresDate = addDays(new Date(), 30)
-      await this.adminUserService.addToken(adminUser.id, new TokenDataModel(generatedToken, tokenExpiresDate))
+      await this.adminUserService.addToken(adminUser.id, new TokenDataModel(generatedToken, tokenExpiresDate), {
+        checkExistence: { adminUser: false },
+      })
       response.cookie('access_token', generatedToken, { httpOnly: true, expires: tokenExpiresDate }).json({
         authorized: true,
       })
@@ -109,7 +111,7 @@ export class AdminUserController {
   @Patch('/')
   async update(@Body() dto: UpdateAdminUserDto) {
     await this.adminUserService.update(dto)
-    return this.adminUserService.getById(Types.ObjectId(dto.id))
+    return this.adminUserService.getById(Types.ObjectId(dto.id), undefined, { checkExistence: { adminUser: false } })
   }
 
   @WhitelistedValidationPipe()
@@ -125,14 +127,16 @@ export class AdminUserController {
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
     await this.adminUserService.updateAvailability(Types.ObjectId(dto.id), dto.availability)
-
-    return this.adminUserService.getById(Types.ObjectId(dto.id), { projection: { availability: 1 } })
+    return this.adminUserService.getById(
+      Types.ObjectId(dto.id),
+      { projection: { availability: 1 } },
+      { checkExistence: { adminUser: false } }
+    )
   }
 
   @Delete('/')
   async deleteById(@MongoId('adminUserId') adminUserId: Types.ObjectId) {
     await this.adminUserService.deleteById(adminUserId)
-
     return
   }
 }
