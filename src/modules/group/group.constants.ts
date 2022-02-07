@@ -21,7 +21,7 @@ export const groupServiceMethodDefaultOptions = {
   },
   getByFacultyId: {
     checkExistence: {
-      group: true,
+      faculty: true,
     },
   },
   update: {
@@ -44,7 +44,7 @@ export const groupServiceMethodDefaultOptions = {
   },
   deleteAllByFacultyId: {
     checkExistence: {
-      group: true,
+      faculty: true,
     },
   },
   countMany: {

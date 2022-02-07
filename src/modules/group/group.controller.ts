@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/commo
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { QueryOptions, Types } from 'mongoose'
-import { FacultyService } from '../faculty/faculty.service'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
@@ -12,7 +11,7 @@ import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedVa
 
 @Controller()
 export class GroupController {
-  constructor(private readonly groupService: GroupService, private readonly facultyService: FacultyService) {}
+  constructor(private readonly groupService: GroupService) {}
 
   @AdminUserAuth({
     availability: 'canCreateGroup',
@@ -20,7 +19,6 @@ export class GroupController {
   @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateGroupDto) {
-    await this.facultyService.throwIfNotExists({ _id: Types.ObjectId(dto.faculty) })
     return this.groupService.create(dto)
   }
 
@@ -63,7 +61,7 @@ export class GroupController {
   @Patch('/')
   async update(@Body() dto: UpdateGroupDto) {
     await this.groupService.update(dto)
-    return this.groupService.getById(Types.ObjectId(dto.id))
+    return this.groupService.getById(Types.ObjectId(dto.id), undefined, { checkExistence: { group: false } })
   }
 
   @AdminUserAuth({

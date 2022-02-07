@@ -45,14 +45,12 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.getByGroupIds)
     if (options.checkExistence.group) await this.throwIfNotExists(groupIds.map(id => ({ _id: id })))
     const filter: FilterQuery<DocumentType<GroupModel>> = { _id: { $in: groupIds } }
-
     return this.groupModel.find(filter, undefined, queryOptions)
   }
 
   getMany(page: number, count: number, title?: string, queryOptions?: QueryOptions) {
     const filter: FilterQuery<DocumentType<GroupModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
-
     return this.groupModel
       .find(filter, undefined, queryOptions)
       .skip((page - 1) * count)
@@ -68,14 +66,14 @@ export class GroupService extends CheckExistenceService<GroupModel> {
 
   async getByFacultyId(facultyId: Types.ObjectId, queryOptions?: QueryOptions, options = groupServiceMethodDefaultOptions.getByFacultyId) {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.getByFacultyId)
-    if (options.checkExistence.group) await this.facultyService.throwIfNotExists({ _id: facultyId })
+    if (options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: facultyId })
     return this.groupModel.find({ faculty: facultyId }, undefined, queryOptions).exec()
   }
 
   async update(dto: UpdateGroupDto, options = groupServiceMethodDefaultOptions.update) {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.update)
     if (options.checkExistence.groupById) await this.throwIfNotExists({ _id: Types.ObjectId(dto.id) })
-    const group = await this.getById(Types.ObjectId(dto.id), { projection: { faculty: 1 } })
+    const group = await this.getById(Types.ObjectId(dto.id), { projection: { faculty: 1 } }, { checkExistence: { group: false } })
     if (options.checkExistence.groupByTitleAndFaculty)
       await this.throwIfExists(
         { title: dto.title, faculty: dto.faculty ? Types.ObjectId(dto.faculty) : group.faculty },
@@ -97,15 +95,18 @@ export class GroupService extends CheckExistenceService<GroupModel> {
   async delete(id: Types.ObjectId, options = groupServiceMethodDefaultOptions.delete) {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.delete)
     if (options.checkExistence.group) await this.throwIfNotExists({ _id: id })
-    await this.scheduleService.deleteByGroupId(id)
+    await this.scheduleService.deleteByGroupId(id, { checkExistence: { group: false } })
     return this.groupModel.deleteOne({ _id: id })
   }
 
   async deleteAllByFacultyId(facultyId: Types.ObjectId, options = groupServiceMethodDefaultOptions.deleteAllByFacultyId) {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.deleteAllByFacultyId)
-    if (options.checkExistence.group) await this.facultyService.throwIfNotExists({ _id: facultyId })
-    const groups = await this.getByFacultyId(facultyId, { projection: { _id: 1 } })
-    await this.scheduleService.deleteAllByGroupIds(groups.map(g => g._id))
+    if (options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: facultyId })
+    const groups = await this.getByFacultyId(facultyId, { projection: { _id: 1 } }, { checkExistence: { faculty: false } })
+    await this.scheduleService.deleteAllByGroupIds(
+      groups.map(g => g._id),
+      { checkExistence: { groups: false } }
+    )
     return this.groupModel.deleteMany({ faculty: facultyId })
   }
 }
