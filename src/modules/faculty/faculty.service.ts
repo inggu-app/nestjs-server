@@ -65,7 +65,7 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
   async delete(id: Types.ObjectId, options = facultyServiceMethodDefaultOptions.delete) {
     options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.delete)
     if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: id })
-    await this.groupService.deleteAllByFacultyId(id)
+    await this.groupService.deleteAllByFacultyId(id, { checkExistence: { faculty: false } })
     return this.facultyModel.deleteOne({ _id: id })
   }
 }
