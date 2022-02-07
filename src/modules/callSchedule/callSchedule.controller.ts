@@ -20,7 +20,7 @@ export class CallScheduleController {
   @Post('/')
   async create(@Body() dto: CreateCallScheduleDto) {
     await this.callScheduleService.create(dto)
-    return this.callScheduleService.getByName(dto.name)
+    return this.callScheduleService.getByName(dto.name, undefined, { checkExistence: { callSchedule: false } })
   }
 
   @Get('/by-id')
@@ -42,13 +42,13 @@ export class CallScheduleController {
   @Patch('/')
   async update(@Body() dto: UpdateCallScheduleDto) {
     await this.callScheduleService.update(dto)
-    return this.callScheduleService.getById(Types.ObjectId(dto.id))
+    return this.callScheduleService.getById(Types.ObjectId(dto.id), undefined, { checkExistence: { callSchedule: false } })
   }
 
   @Patch('/default')
   async updateDefaultSchedule(@MongoId('callScheduleId') id: Types.ObjectId) {
     await this.callScheduleService.updateDefaultSchedule(id)
-    return this.callScheduleService.getDefaultSchedule()
+    return this.callScheduleService.getDefaultSchedule(undefined, { checkExistence: { callSchedule: false } })
   }
 
   @Delete('/by-id')
