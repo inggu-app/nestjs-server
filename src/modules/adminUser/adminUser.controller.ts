@@ -1,10 +1,9 @@
-import { BadRequestException, Body, Controller, Delete, Get, Patch, Post, Query, Req, Res, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, Patch, Post, Req, Res, UnauthorizedException } from '@nestjs/common'
 import { CreateAdminUserDto } from './dto/createAdminUser.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserService } from './adminUser.service'
-import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { UpdateAdminUserDto } from './dto/updateAdminUser.dto'
 import { UpdatePasswordDto } from './dto/updatePassword.dto'
 import { LoginDto } from './dto/login.dto'
@@ -19,6 +18,8 @@ import { UpdateAvailabilityDto } from './dto/updateAvailability.dto'
 import { removeFields } from '../../global/utils/removeFields'
 import { DocumentType } from '@typegoose/typegoose'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
+import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
+import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 
 @Controller()
 export class AdminUserController {
@@ -47,9 +48,9 @@ export class AdminUserController {
 
   @Get('/many')
   async getMany(
-    @Query('page', new CustomParseIntPipe({ intType: 'positive' })) page: number,
-    @Query('count', new CustomParseIntPipe({ intType: 'positive' })) count: number,
-    @Query('name') name?: string,
+    @IntQueryParam('page', { intType: 'positive' }) page: number,
+    @IntQueryParam('page', { intType: 'positive' }) count: number,
+    @StringQueryParam('name', { required: false }) name?: string,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {

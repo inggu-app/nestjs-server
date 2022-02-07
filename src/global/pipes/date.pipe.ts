@@ -1,6 +1,6 @@
-import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
+import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common'
 import { matches } from 'class-validator'
-import { INVALID_DATE } from '../constants/errors.constants'
+import { QUERY_PARAMETER_DATE_INCORRECT, QUERY_PARAMETER_IS_EMPTY, QUERY_PARAMETER_IS_REQUIRED } from '../constants/errors.constants'
 import { dateTimeRegExp } from '../regex'
 
 interface Options {
@@ -15,17 +15,16 @@ const defaultOptions: Options = {
 export class ParseDatePipe implements PipeTransform<any, Date | undefined> {
   private readonly options = defaultOptions
 
-  constructor(options?: Options) {
+  constructor(private readonly parameter: string, options?: Options) {
     this.options = { ...defaultOptions, ...options }
   }
 
   transform(value: any): Date | undefined {
-    if (!this.options?.required && value === undefined) return value
+    if (!this.options.required && value === undefined) return value
 
-    if (typeof value === 'string') value = value.replace(/"/g, '')
-    if (!matches(value, dateTimeRegExp) && value !== undefined) {
-      throw new HttpException(INVALID_DATE, HttpStatus.BAD_REQUEST)
-    }
+    if (this.options.required && value === undefined) throw new BadRequestException(QUERY_PARAMETER_IS_REQUIRED(this.parameter))
+    if (this.options.required && value === '') throw new BadRequestException(QUERY_PARAMETER_IS_EMPTY(this.parameter))
+    if (!matches(value, dateTimeRegExp)) throw new BadRequestException(QUERY_PARAMETER_DATE_INCORRECT(this.parameter, dateTimeRegExp))
 
     return new Date(value)
   }

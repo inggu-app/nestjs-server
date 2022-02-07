@@ -1,13 +1,14 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common'
 import { FacultyService } from './faculty.service'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { QueryOptions, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
-import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
+import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
+import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 
 @Controller()
 export class FacultyController {
@@ -39,9 +40,9 @@ export class FacultyController {
 
   @Get('/many')
   async getMany(
-    @Query('page', new CustomParseIntPipe({ intType: 'positive' })) page: number,
-    @Query('count', new CustomParseIntPipe({ intType: 'positive' })) count: number,
-    @Query('title') title?: string,
+    @IntQueryParam('page', { intType: 'positive' }) page: number,
+    @IntQueryParam('count', { intType: 'positive' }) count: number,
+    @StringQueryParam('title', { required: false }) title?: string,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {

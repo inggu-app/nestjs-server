@@ -1,13 +1,13 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
-import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
 import { UpdateCallScheduleDto } from './dto/updateCallSchedule.dto'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
+import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 
 @Controller()
 export class CallScheduleController {
@@ -29,10 +29,7 @@ export class CallScheduleController {
   }
 
   @Get('/by-name')
-  getByName(
-    @Query('callScheduleName', new CustomParseStringPipe('callScheduleName')) name: string,
-    @MongoQueryOptions() queryOptions?: QueryOptions
-  ) {
+  getByName(@StringQueryParam('callScheduleName') name: string, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.callScheduleService.getByName(name, queryOptions)
   }
 
@@ -60,7 +57,7 @@ export class CallScheduleController {
   }
 
   @Delete('/by-name')
-  async deleteByName(@Query('callScheduleName', new CustomParseStringPipe('callScheduleName')) name: string) {
+  async deleteByName(@StringQueryParam('callScheduleName') name: string) {
     await this.callScheduleService.deleteByName(name)
   }
 }

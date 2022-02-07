@@ -5,6 +5,6 @@ interface Options {
   required?: boolean
 }
 
-export const RegExp = (parameter: string, regExp: RegExp, options?: Options) => {
+export const RegExpQueryParam = (parameter: string, regExp: RegExp, options?: Options) => {
   return Query(parameter, new CustomParseStringPipe(parameter, { regExp, ...options }))
 }

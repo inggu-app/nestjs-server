@@ -8,11 +8,14 @@ export const QUERY_PARAMETER_IS_EMPTY = (parameter: string) => `Значение
 export const QUERY_PARAMETER_HAVE_MULTIPLE_VALUES = (parameter: string) => `В параметр ${parameter} нельзя передать несколько значений`
 export const QUERY_PARAMETER_REGEXP_INCORRECT = (parameter: string, regExp: RegExp) =>
   `Значение параметра ${parameter} должно соответствовать регулярному выражению ${regExp}`
-export const QUERY_PARAMETER_ENUM_INCORRECT = (parameter: string) => `Параметр ${parameter} должен соответствовать enum`
-export const INVALID_DATE = 'Дата должна быть в формате yyyy-MM-ddThh:mm:ss.SSSZ'
-export const INVALID_OS = 'Некорректная операционная система'
-export const INVALID_APP_VERSION = 'Некорректный формат версии. Необходимый формат: d.d.d'
-export const INCORRECT_INT = 'Некорректное значение целого числа'
+export const QUERY_PARAMETER_ENUM_INCORRECT = (parameter: string) => `Значение параметра ${parameter} должно соответствовать enum`
+export const QUERY_PARAMETER_INT_INCORRECT = (parameter: string) => `Значение параметра ${parameter} должно быть целым числом`
+export const QUERY_PARAMETER_POSITIVE_INT_INCORRECT = (parameter: string) =>
+  `Значение параметра ${parameter} должно быть положительным целым числом`
+export const QUERY_PARAMETER_NEGATIVE_INT_INCORRECT = (parameter: string) =>
+  `Значение параметра ${parameter} должно быть отрицательным целым числом`
+export const QUERY_PARAMETER_DATE_INCORRECT = (parameter: string, regExp: RegExp) =>
+  `Значение параметра ${parameter} должно быть датой и должно соответствовать регулярному выражению ${regExp}`
 export const INCORRECT_CREDENTIALS = 'Неправильные логин или пароль'
 
 export const FACULTY_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Факультета с id "${id}" не существует`

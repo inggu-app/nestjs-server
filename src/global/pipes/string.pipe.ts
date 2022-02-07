@@ -16,17 +16,14 @@ export class CustomParseStringPipe implements PipeTransform<any, string | undefi
   private readonly options = defaultOptions
 
   constructor(private readonly parameter: string, options?: Options) {
-    console.log(options)
     this.options = { ...defaultOptions, ...options }
   }
 
   transform(value: any): string | undefined {
-    console.log(this.options, value)
     if (!this.options.required && value === undefined) return value
 
     if (this.options.required && value === undefined) throw new BadRequestException(QUERY_PARAMETER_IS_REQUIRED(this.parameter))
     if (this.options.required && value === '') throw new BadRequestException(QUERY_PARAMETER_IS_EMPTY(this.parameter))
-    console.log(this.options.regExp)
     if (this.options.regExp && !this.options.regExp.test(value))
       throw new BadRequestException(QUERY_PARAMETER_REGEXP_INCORRECT(this.parameter, this.options.regExp))
 

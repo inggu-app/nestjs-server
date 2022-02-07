@@ -1,13 +1,14 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { QueryOptions, Types } from 'mongoose'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
-import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
+import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
+import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 
 @Controller()
 export class GroupController {
@@ -43,9 +44,9 @@ export class GroupController {
 
   @Get('/many')
   private async getMany(
-    @Query('page', new CustomParseIntPipe()) page: number,
-    @Query('count', new CustomParseIntPipe()) count: number,
-    @Query('title') title?: string,
+    @IntQueryParam('page', { intType: 'positive' }) page: number,
+    @IntQueryParam('page', { intType: 'positive' }) count: number,
+    @StringQueryParam('title', { required: false }) title?: string,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {

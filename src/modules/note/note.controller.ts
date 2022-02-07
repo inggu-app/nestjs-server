@@ -1,14 +1,14 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post } from '@nestjs/common'
 import { NoteService } from './note.service'
 import { CreateNoteDto } from './dto/createNoteDto'
-import { CustomParseIntPipe } from '../../global/pipes/int.pipe'
 import { QueryOptions, Types } from 'mongoose'
 import { DeviceId } from '../../global/types'
 import { INVALID_NOTE_DEVICE_ID } from '../../global/constants/errors.constants'
-import { CustomParseStringPipe } from '../../global/pipes/string.pipe'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
+import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
+import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 
 @Controller()
 export class NoteController {
@@ -28,7 +28,7 @@ export class NoteController {
   @Get('/by-lesson-id')
   async getByLessonId(
     @MongoId('lessonId') lessonId: Types.ObjectId,
-    @Query('week', new CustomParseIntPipe()) week: number,
+    @IntQueryParam('week', { intType: 'positive' }) week: number,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
@@ -37,7 +37,7 @@ export class NoteController {
   }
 
   @Delete('/')
-  async delete(@MongoId('noteId') noteId: Types.ObjectId, @Query('deviceId', new CustomParseStringPipe('deviceId')) deviceId: DeviceId) {
+  async delete(@MongoId('noteId') noteId: Types.ObjectId, @StringQueryParam('deviceId', { required: false }) deviceId: DeviceId) {
     const candidate = await this.noteService.getById(noteId)
 
     if (deviceId !== candidate.deviceId) {

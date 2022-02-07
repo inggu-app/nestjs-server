@@ -1,13 +1,13 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, Post } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { QueryOptions, Types } from 'mongoose'
 import { GroupService } from '../group/group.service'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
-import { ParseDatePipe } from '../../global/pipes/date.pipe'
 import { NoteService } from '../note/note.service'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
+import { DateQueryParam } from '../../global/decorators/DateQueryParam.decorator'
 
 @Controller()
 export class ScheduleController {
@@ -56,7 +56,7 @@ export class ScheduleController {
   }
 
   @Get('/check')
-  async checkScheduleUpdate(@MongoId('groupId') groupId: Types.ObjectId, @Query('updatedAt', new ParseDatePipe()) updatedAt: Date) {
+  async checkScheduleUpdate(@MongoId('groupId') groupId: Types.ObjectId, @DateQueryParam('updatedAt') updatedAt: Date) {
     const group = await this.groupService.getById(groupId, { projection: { lastScheduleUpdate: 1 } })
     return {
       updated: group.lastScheduleUpdate > updatedAt,
