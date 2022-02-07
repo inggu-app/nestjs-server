@@ -29,7 +29,10 @@ export class CallScheduleController {
   }
 
   @Get('/by-name')
-  getByName(@Query('callScheduleName', new CustomParseStringPipe()) name: string, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  getByName(
+    @Query('callScheduleName', new CustomParseStringPipe('callScheduleName')) name: string,
+    @MongoQueryOptions() queryOptions?: QueryOptions
+  ) {
     return this.callScheduleService.getByName(name, queryOptions)
   }
 
@@ -57,7 +60,7 @@ export class CallScheduleController {
   }
 
   @Delete('/by-name')
-  async deleteByName(@Query('callScheduleName', new CustomParseStringPipe()) name: string) {
+  async deleteByName(@Query('callScheduleName', new CustomParseStringPipe('callScheduleName')) name: string) {
     await this.callScheduleService.deleteByName(name)
   }
 }

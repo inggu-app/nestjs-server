@@ -6,10 +6,10 @@ import { SettingsModule } from '../modules/settings/settings.module'
 import { CallScheduleModule } from '../modules/callSchedule/callSchedule.module'
 import { SecretLabelModule } from '../modules/settings/secretLabel/secretLabel.module'
 import { SemesterRangeModule } from '../modules/settings/semesterRange/semesterRange.module'
-import { AppVersionModule } from '../modules/settings/appVersion/appVersion.module'
 import { NoteModule } from '../modules/note/note.module'
 import { ModuleRoutesEnum } from '../global/enums/moduleRoutes.enum'
 import { AdminUserModule } from '../modules/adminUser/adminUser.module'
+import { AppVersionModule } from '../modules/appVersion/appVersion.module'
 
 export const routesConfig: Routes = [
   {
@@ -37,6 +37,10 @@ export const routesConfig: Routes = [
     module: CallScheduleModule,
   },
   {
+    path: ModuleRoutesEnum.APP_VERSION_MODULE,
+    module: AppVersionModule,
+  },
+  {
     path: ModuleRoutesEnum.SETTINGS_MODULE,
     module: SettingsModule,
     children: [
@@ -47,10 +51,6 @@ export const routesConfig: Routes = [
       {
         path: ModuleRoutesEnum.SEMESTER_RANGE_MODULE,
         module: SemesterRangeModule,
-      },
-      {
-        path: ModuleRoutesEnum.APP_VERSION_MODULE,
-        module: AppVersionModule,
       },
     ],
   },

@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common'
 import { AppVersionController } from './appVersion.controller'
-import { TypegooseModule } from 'nestjs-typegoose'
 import { AppVersionService } from './appVersion.service'
-import { AndroidAppVersionModel } from './models/androidAppVersion.model'
-import { IosAppVersionModel } from './models/iosAppVersion.model'
+import { TypegooseModule } from 'nestjs-typegoose'
+import { AppVersionModel } from './appVersion.model'
 
 @Module({
   controllers: [AppVersionController],
@@ -11,10 +10,7 @@ import { IosAppVersionModel } from './models/iosAppVersion.model'
   imports: [
     TypegooseModule.forFeature([
       {
-        typegooseClass: AndroidAppVersionModel,
-      },
-      {
-        typegooseClass: IosAppVersionModel,
+        typegooseClass: AppVersionModel,
       },
     ]),
   ],

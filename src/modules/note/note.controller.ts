@@ -37,7 +37,7 @@ export class NoteController {
   }
 
   @Delete('/')
-  async delete(@MongoId('noteId') noteId: Types.ObjectId, @Query('deviceId', new CustomParseStringPipe()) deviceId: DeviceId) {
+  async delete(@MongoId('noteId') noteId: Types.ObjectId, @Query('deviceId', new CustomParseStringPipe('deviceId')) deviceId: DeviceId) {
     const candidate = await this.noteService.getById(noteId)
 
     if (deviceId !== candidate.deviceId) {

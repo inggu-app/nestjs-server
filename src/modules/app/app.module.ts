@@ -15,6 +15,7 @@ import { FacultyModule } from '../faculty/faculty.module'
 import { GroupModule } from '../group/group.module'
 import { AdminUserModule } from '../adminUser/adminUser.module'
 import { CallScheduleModule } from '../callSchedule/callSchedule.module'
+import { AppVersionModule } from '../appVersion/appVersion.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CallScheduleModule } from '../callSchedule/callSchedule.module'
     RouterModule.forRoutes(routesConfig),
     AdminUserModule,
     CallScheduleModule,
+    AppVersionModule,
     ConfigModule.forRoot({ isGlobal: true }),
     {
       ...JwtModule.registerAsync({

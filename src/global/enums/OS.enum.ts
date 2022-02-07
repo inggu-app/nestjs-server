@@ -1,4 +1,4 @@
-export enum OperationSystems {
+export enum OperationSystem {
   ANDROID = 'android',
   IOS = 'ios',
 }

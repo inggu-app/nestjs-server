@@ -1,28 +1,34 @@
-import { HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
-import { INCORRECT_STRING } from '../constants/errors.constants'
+import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common'
+import { QUERY_PARAMETER_IS_EMPTY, QUERY_PARAMETER_IS_REQUIRED, QUERY_PARAMETER_REGEXP_INCORRECT } from '../constants/errors.constants'
 
 interface Options {
   required?: boolean
+  regExp?: RegExp
 }
 
 const defaultOptions: Options = {
   required: true,
+  regExp: undefined,
 }
 
 @Injectable()
 export class CustomParseStringPipe implements PipeTransform<any, string | undefined> {
   private readonly options = defaultOptions
 
-  constructor(options?: Options) {
+  constructor(private readonly parameter: string, options?: Options) {
+    console.log(options)
     this.options = { ...defaultOptions, ...options }
   }
 
   transform(value: any): string | undefined {
+    console.log(this.options, value)
     if (!this.options.required && value === undefined) return value
 
-    if (!value) {
-      throw new HttpException(INCORRECT_STRING, HttpStatus.BAD_REQUEST)
-    }
+    if (this.options.required && value === undefined) throw new BadRequestException(QUERY_PARAMETER_IS_REQUIRED(this.parameter))
+    if (this.options.required && value === '') throw new BadRequestException(QUERY_PARAMETER_IS_EMPTY(this.parameter))
+    console.log(this.options.regExp)
+    if (this.options.regExp && !this.options.regExp.test(value))
+      throw new BadRequestException(QUERY_PARAMETER_REGEXP_INCORRECT(this.parameter, this.options.regExp))
 
     return value
   }

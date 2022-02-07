@@ -21,7 +21,7 @@ export interface CallScheduleModel extends Base {}
   }),
 })
 export class CallScheduleModel extends TimeStamps {
-  @prop({ _id: false, required: true })
+  @prop({ _id: false, required: true, type: () => CallScheduleItemModel })
   schedule: CallScheduleItemModel[]
 
   @prop({ required: true, unique: true })
