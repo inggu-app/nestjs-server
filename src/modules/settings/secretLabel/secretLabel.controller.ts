@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CreateSecretLabelDto } from './dto/createSecretLabel.dto'
 import { SecretLabelService } from './secretLabel.service'
-import { ParseDatePipe } from '../../../global/pipes/date.pipe'
 import { ApiTags } from '@nestjs/swagger'
+import { DateQueryParam } from '../../../global/decorators/DateQueryParam.decorator'
 
 @ApiTags('Секретная надпись')
 @Controller()
@@ -18,7 +18,7 @@ export class SecretLabelController {
   }
 
   @Get('/')
-  async getSecretLabel(@Query('updatedAt', new ParseDatePipe({ required: false })) updatedAt?: Date) {
+  async getSecretLabel(@DateQueryParam('updatedAt', { required: false }) updatedAt?: Date) {
     const secretLabel = await this.secretLabelService.getActiveSecretLabel()
 
     if ((secretLabel && secretLabel?.updatedAt && updatedAt && updatedAt < secretLabel?.updatedAt) || !updatedAt) {
