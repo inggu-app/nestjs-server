@@ -16,6 +16,7 @@ import { GroupModule } from '../group/group.module'
 import { AdminUserModule } from '../adminUser/adminUser.module'
 import { CallScheduleModule } from '../callSchedule/callSchedule.module'
 import { AppVersionModule } from '../appVersion/appVersion.module'
+import { LearningStageModule } from '../learningStage/learningStage.module'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AppVersionModule } from '../appVersion/appVersion.module'
     AdminUserModule,
     CallScheduleModule,
     AppVersionModule,
+    LearningStageModule,
     ConfigModule.forRoot({ isGlobal: true }),
     {
       ...JwtModule.registerAsync({
