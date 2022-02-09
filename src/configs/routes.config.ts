@@ -5,7 +5,6 @@ import { FacultyModule } from '../modules/faculty/faculty.module'
 import { SettingsModule } from '../modules/settings/settings.module'
 import { CallScheduleModule } from '../modules/callSchedule/callSchedule.module'
 import { SecretLabelModule } from '../modules/settings/secretLabel/secretLabel.module'
-import { SemesterRangeModule } from '../modules/settings/semesterRange/semesterRange.module'
 import { NoteModule } from '../modules/note/note.module'
 import { ModuleRoutesEnum } from '../global/enums/moduleRoutes.enum'
 import { AdminUserModule } from '../modules/adminUser/adminUser.module'
@@ -52,10 +51,6 @@ export const routesConfig: Routes = [
       {
         path: ModuleRoutesEnum.SECRET_LABEL_MODULE,
         module: SecretLabelModule,
-      },
-      {
-        path: ModuleRoutesEnum.SEMESTER_RANGE_MODULE,
-        module: SemesterRangeModule,
       },
     ],
   },
