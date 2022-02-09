@@ -24,7 +24,7 @@ export class ScheduleService extends CheckExistenceService<LessonModel> {
 
   async create(dto: CreateScheduleDto, options = scheduleServiceMethodDefaultOptions.create) {
     options = mergeOptionsWithDefaultOptions(options, scheduleServiceMethodDefaultOptions.create)
-    if (options.checkExistence.group) await this.groupService.throwIfNotExists({ _id: Types.ObjectId(dto.group) })
+    if (options.checkExistence.group) await this.groupService.throwIfNotExists({ _id: dto.group })
     const lessons = dto.schedule.map(lesson => ({ ...lesson, group: dto.group }))
     return this.lessonModel.create(lessons)
   }

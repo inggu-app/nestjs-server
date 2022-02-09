@@ -112,7 +112,7 @@ export class AdminUserController {
   @Patch('/')
   async update(@Body() dto: UpdateAdminUserDto) {
     await this.adminUserService.update(dto)
-    return this.adminUserService.getById(Types.ObjectId(dto.id), undefined, { checkExistence: { adminUser: false } })
+    return this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } })
   }
 
   @WhitelistedValidationPipe()
@@ -127,12 +127,8 @@ export class AdminUserController {
   @WhitelistedValidationPipe()
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
-    await this.adminUserService.updateAvailability(Types.ObjectId(dto.id), dto.availability)
-    return this.adminUserService.getById(
-      Types.ObjectId(dto.id),
-      { projection: { availability: 1 } },
-      { checkExistence: { adminUser: false } }
-    )
+    await this.adminUserService.updateAvailability(dto.id, dto.availability)
+    return this.adminUserService.getById(dto.id, { projection: { availability: 1 } }, { checkExistence: { adminUser: false } })
   }
 
   @Delete('/')

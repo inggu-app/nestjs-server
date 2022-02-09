@@ -2,38 +2,38 @@ import { IsBoolean, IsObject, IsOptional, IsString, MaxLength } from 'class-vali
 import { Availability } from '../adminUser.model'
 import { Type } from 'class-transformer'
 
-export class AvailabilityDto implements Availability {
+export class AvailabilityDto implements Partial<Availability> {
   @IsOptional()
   @IsBoolean()
-  canUpdateCallSchedule: boolean
+  canUpdateCallSchedule?: boolean
 
   @IsOptional()
   @IsBoolean()
-  canCreateFaculty: boolean
+  canCreateFaculty?: boolean
 
   @IsOptional()
   @IsBoolean()
-  canCreateGroup: boolean
+  canCreateGroup?: boolean
 
   @IsOptional()
   @IsBoolean()
-  canDeleteFaculty: boolean
+  canDeleteFaculty?: boolean
 
   @IsOptional()
   @IsBoolean()
-  canDeleteGroup: boolean
+  canDeleteGroup?: boolean
 
   @IsOptional()
   @IsBoolean()
-  canUpdateFaculty: boolean
+  canUpdateFaculty?: boolean
 
   @IsOptional()
   @IsBoolean()
-  canUpdateGroup: boolean
+  canUpdateGroup?: boolean
 
   @IsOptional()
   @IsBoolean()
-  canUpdateSemesterRange: boolean
+  canUpdateSemesterRange?: boolean
 }
 
 export class CreateAdminUserDto {

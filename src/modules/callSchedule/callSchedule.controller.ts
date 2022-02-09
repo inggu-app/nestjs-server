@@ -42,7 +42,7 @@ export class CallScheduleController {
   @Patch('/')
   async update(@Body() dto: UpdateCallScheduleDto) {
     await this.callScheduleService.update(dto)
-    return this.callScheduleService.getById(Types.ObjectId(dto.id), undefined, { checkExistence: { callSchedule: false } })
+    return this.callScheduleService.getById(dto.id, undefined, { checkExistence: { callSchedule: false } })
   }
 
   @Patch('/default')

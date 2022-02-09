@@ -22,7 +22,7 @@ export class NoteService extends CheckExistenceService<NoteModel> {
 
   async create(dto: CreateNoteDto, options = noteServiceMethodDefaultOptions.create) {
     options = mergeOptionsWithDefaultOptions(options, noteServiceMethodDefaultOptions.create)
-    if (options.checkExistence.note) await this.scheduleService.throwIfNotExists({ _id: Types.ObjectId(dto.lesson) })
+    if (options.checkExistence.note) await this.scheduleService.throwIfNotExists({ _id: dto.lesson })
     return this.noteModel.create(dto)
   }
 

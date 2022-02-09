@@ -1,12 +1,13 @@
-import { IsArray, IsEnum, IsMongoId, IsNumber, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator'
+import { IsArray, IsEnum, IsNumber, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { WeekDaysEnum } from '../../../global/enums/WeekDays.enum'
 import { WeeksTypeEnum } from '../schedule.constants'
-import { MongoIdString } from '../../../global/types'
+import { Types } from 'mongoose'
+import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
 
 export class CreateScheduleDto {
-  @IsMongoId()
-  group: MongoIdString
+  @IsMongoIdWithTransform()
+  group: Types.ObjectId
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -16,8 +17,8 @@ export class CreateScheduleDto {
 
 export class Lesson {
   @IsOptional()
-  @IsMongoId()
-  id: MongoIdString | undefined | null
+  @IsMongoIdWithTransform()
+  id: Types.ObjectId | undefined | null
 
   @IsString()
   title: string

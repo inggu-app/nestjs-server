@@ -75,7 +75,7 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
 
   async update(dto: UpdateAdminUserDto, options = adminUserServiceMethodDefaultOptions.update) {
     options = mergeOptionsWithDefaultOptions(options, adminUserServiceMethodDefaultOptions.update)
-    if (options.checkExistence.adminUser) await this.throwIfNotExists({ _id: Types.ObjectId(dto.id) })
+    if (options.checkExistence.adminUser) await this.throwIfNotExists({ _id: dto.id })
     const { id, ...fields } = dto
     return this.adminUserModel.updateOne({ _id: id }, { $set: fields })
   }

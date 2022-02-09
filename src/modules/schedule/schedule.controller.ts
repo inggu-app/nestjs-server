@@ -20,16 +20,16 @@ export class ScheduleController {
   @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
-    await this.groupService.throwIfNotExists({ _id: Types.ObjectId(dto.group) })
+    await this.groupService.throwIfNotExists({ _id: dto.group })
 
     // Обновляем уже существующие занятия
     const existLessons = dto.schedule.filter(lesson => lesson.id)
     for await (const lesson of existLessons) {
-      await this.scheduleService.updateById(Types.ObjectId(lesson.id as string), lesson)
+      await this.scheduleService.updateById(lesson.id as Types.ObjectId, lesson)
     }
 
     // Удаляем ненужные занятия и прикреплённые к ним заметки
-    const groupSchedule = await this.scheduleService.getByGroupId(new Types.ObjectId(dto.group), { projection: { _id: 1 } })
+    const groupSchedule = await this.scheduleService.getByGroupId(dto.group, { projection: { _id: 1 } })
     const extraLessonIds = groupSchedule.filter(lesson => !existLessons.find(l => l.id === lesson.id)).map(l => l.id as Types.ObjectId)
     await this.noteService.deleteAllByLessonIds(extraLessonIds, { checkExistence: { lessons: false } })
     await this.scheduleService.deleteMany(extraLessonIds, { checkExistence: { schedule: false } })
@@ -41,7 +41,7 @@ export class ScheduleController {
     }
 
     // Обновляем поле lastScheduleUpdate для группы
-    await this.groupService.updateLastScheduleUpdate(Types.ObjectId(dto.group), new Date(), { checkExistence: { group: false } })
+    await this.groupService.updateLastScheduleUpdate(dto.group, new Date(), { checkExistence: { group: false } })
   }
 
   @Get('/by-group-id')

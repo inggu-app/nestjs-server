@@ -1,12 +1,11 @@
-import { IsDate, IsDefined, IsEnum, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator'
 import { LearningStage } from '../learningStage.constants'
-import { Transform, Type } from 'class-transformer'
+import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
-import { transformMongoIdWithParams } from '../../../global/utils/mongoId'
+import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
 
 export class UpdateLearningStageDto {
-  @IsDefined()
-  @Transform(transformMongoIdWithParams)
+  @IsMongoIdWithTransform()
   id: Types.ObjectId
 
   @IsOptional()

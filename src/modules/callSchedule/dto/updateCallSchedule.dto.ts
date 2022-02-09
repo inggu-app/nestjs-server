@@ -1,11 +1,12 @@
-import { IsArray, IsMongoId, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator'
-import { MongoIdString } from '../../../global/types'
+import { IsArray, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CallScheduleItem } from './createCallSchedule.dto'
+import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
+import { Types } from 'mongoose'
 
 export class UpdateCallScheduleDto {
-  @IsMongoId()
-  id: MongoIdString
+  @IsMongoIdWithTransform()
+  id: Types.ObjectId
 
   @IsOptional()
   @IsArray()

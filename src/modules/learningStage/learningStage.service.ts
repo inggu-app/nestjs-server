@@ -32,7 +32,6 @@ export class LearningStageService extends CheckExistenceService<LearningStageMod
   }
 
   async getByDate(date: Date, queryOptions?: QueryOptions) {
-    console.log(date)
     await this.throwIfNotExists({ start: { $lte: date }, end: { $gte: date } }, { error: LEARNING_STAGE_BY_DATE_NOT_FOUND(date) })
 
     return this.learningStageModel.findOne({ start: { $lte: date }, end: { $gte: date } }, undefined, queryOptions)

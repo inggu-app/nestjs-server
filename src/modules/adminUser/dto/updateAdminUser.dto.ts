@@ -1,17 +1,18 @@
-import { IsMongoId, IsOptional, IsString, MaxLength } from 'class-validator'
-import { MongoIdString } from '../../../global/types'
+import { IsOptional, IsString, MaxLength } from 'class-validator'
+import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
+import { Types } from 'mongoose'
 
 export class UpdateAdminUserDto {
-  @IsMongoId()
-  id: MongoIdString
+  @IsMongoIdWithTransform()
+  id: Types.ObjectId
 
   @IsOptional()
   @IsString()
   @MaxLength(60)
-  name: string
+  name?: string
 
   @IsOptional()
   @IsString()
   @MaxLength(60)
-  login: string
+  login?: string
 }

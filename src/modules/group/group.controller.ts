@@ -62,7 +62,7 @@ export class GroupController {
   @Patch('/')
   async update(@Body() dto: UpdateGroupDto) {
     await this.groupService.update(dto)
-    return this.groupService.getById(Types.ObjectId(dto.id), undefined, { checkExistence: { group: false } })
+    return this.groupService.getById(dto.id, undefined, { checkExistence: { group: false } })
   }
 
   @AdminUserAuth({

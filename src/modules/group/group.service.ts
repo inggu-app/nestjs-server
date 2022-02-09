@@ -28,10 +28,9 @@ export class GroupService extends CheckExistenceService<GroupModel> {
   async create(dto: CreateGroupDto, options = groupServiceMethodDefaultOptions.create) {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.create)
     if (options.checkExistence.group)
-      await this.throwIfExists({ title: dto.title, faculty: Types.ObjectId(dto.faculty) }, { error: GROUP_WITH_TITLE_EXISTS(dto.title) })
-    if (options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: Types.ObjectId(dto.faculty) })
-    if (dto.callSchedule && options.checkExistence.callSchedule)
-      await this.callScheduleService.throwIfNotExists({ _id: Types.ObjectId(dto.callSchedule) })
+      await this.throwIfExists({ title: dto.title, faculty: dto.faculty }, { error: GROUP_WITH_TITLE_EXISTS(dto.title) })
+    if (options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: dto.faculty })
+    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
     return this.groupModel.create(dto)
   }
 
@@ -72,16 +71,15 @@ export class GroupService extends CheckExistenceService<GroupModel> {
 
   async update(dto: UpdateGroupDto, options = groupServiceMethodDefaultOptions.update) {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.update)
-    if (options.checkExistence.groupById) await this.throwIfNotExists({ _id: Types.ObjectId(dto.id) })
-    const group = await this.getById(Types.ObjectId(dto.id), { projection: { faculty: 1 } }, { checkExistence: { group: false } })
+    if (options.checkExistence.groupById) await this.throwIfNotExists({ _id: dto.id })
+    const group = await this.getById(dto.id, { projection: { faculty: 1, title: 1 } }, { checkExistence: { group: false } })
     if (options.checkExistence.groupByTitleAndFaculty)
       await this.throwIfExists(
-        { title: dto.title, faculty: dto.faculty ? Types.ObjectId(dto.faculty) : group.faculty },
-        { error: GROUP_WITH_TITLE_EXISTS(dto.title) }
+        { title: dto.title ?? group.title, faculty: dto.faculty ?? group.faculty },
+        { error: GROUP_WITH_TITLE_EXISTS(dto.title ?? group.title) }
       )
-    if (dto.faculty && options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: Types.ObjectId(dto.faculty) })
-    if (dto.callSchedule && options.checkExistence.callSchedule)
-      await this.callScheduleService.throwIfNotExists({ _id: Types.ObjectId(dto.callSchedule) })
+    if (dto.faculty && options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: dto.faculty })
+    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
     const { id, ...fields } = dto
     return this.groupModel.updateOne({ _id: id }, { $set: fields }).exec()
   }

@@ -1,5 +1,7 @@
-import { IsInt, IsMongoId, IsNotEmpty, IsString, Min } from 'class-validator'
+import { IsInt, IsNotEmpty, IsString, Min } from 'class-validator'
 import { DeviceId } from '../../../global/types'
+import { Types } from 'mongoose'
+import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
 
 export class CreateNoteDto {
   @IsString()
@@ -14,6 +16,6 @@ export class CreateNoteDto {
   @Min(1)
   week: number
 
-  @IsMongoId()
-  lesson: string
+  @IsMongoIdWithTransform()
+  lesson: Types.ObjectId
 }

@@ -52,7 +52,7 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
   async update(dto: UpdateCallScheduleDto, options = callScheduleServiceMethodDefaultOptions.update) {
     options = mergeOptionsWithDefaultOptions(options, callScheduleServiceMethodDefaultOptions.update)
     const { id, ...fields } = dto
-    if (options.checkExistence.callSchedule) await this.throwIfNotExists({ _id: Types.ObjectId(id) })
+    if (options.checkExistence.callSchedule) await this.throwIfNotExists({ _id: dto.id })
     if (fields.schedule) return this.callScheduleModel.updateOne({ _id: id }, { $set: { ...fields, scheduleUpdatedAt: new Date() } })
     return this.callScheduleModel.updateOne({ _id: dto.id }, { $set: fields })
   }

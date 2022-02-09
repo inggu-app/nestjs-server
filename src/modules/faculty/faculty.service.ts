@@ -58,7 +58,7 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
   async update(dto: UpdateFacultyDto, options = facultyServiceMethodDefaultOptions.update) {
     options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.update)
     const { id, ...fields } = dto
-    if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: Types.ObjectId(id) })
+    if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: dto.id })
     await this.facultyModel.updateOne({ _id: id }, { $set: fields })
   }
 
