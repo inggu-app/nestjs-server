@@ -5,3 +5,7 @@ export type MongoIdString = string
 export type ServiceMethodOptions<CheckExistence extends string = string> = {
   checkExistence?: Record<CheckExistence, boolean>
 }
+
+export interface ITokenData {
+  id: MongoIdString
+}

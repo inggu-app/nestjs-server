@@ -1,23 +1,17 @@
-import { Availability } from '../../modules/adminUser/adminUser.model'
-import { applyDecorators, ExecutionContext, Injectable, SetMetadata, UseGuards } from '@nestjs/common'
+import { ExecutionContext, UseGuards } from '@nestjs/common'
+import { Types } from 'mongoose'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { AdminUserService } from '../../modules/adminUser/adminUser.service'
 import { ITokenData } from '../types'
-import { Types } from 'mongoose'
 import { AccessTokenAuthGuard, IAccessTokenAuth } from '../guards/AccessTokenAuth.guard'
 
-interface AdminUserAuthOptions {
-  availability: keyof Availability
+export const UltraSuperAdminUserAuth = () => {
+  return UseGuards(UltraSuperAdminUserAuthGuard)
 }
 
-export const AdminUserAuth = (options: AdminUserAuthOptions) => {
-  return applyDecorators(SetMetadata('availability', options.availability), UseGuards(AdminUserAuthGuard))
-}
-
-@Injectable()
-export class AdminUserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenAuth {
+class UltraSuperAdminUserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenAuth {
   constructor(
     protected readonly reflector: Reflector,
     protected readonly jwtService: JwtService,
@@ -29,11 +23,9 @@ export class AdminUserAuthGuard extends AccessTokenAuthGuard implements IAccessT
 
   async accessAllowed(tokenData: ITokenData, context: ExecutionContext) {
     const adminUser = await this.adminUserService.getById(new Types.ObjectId(tokenData.id), {
-      projection: { _id: 0, availability: 1 },
+      projection: { isUltraSuper: 1 },
     })
     context.switchToHttp().getRequest().userId = adminUser.id
-
-    const availability: keyof Availability = this.reflector.get('availability', context.getHandler())
-    return (adminUser.availability as Availability)[availability]
+    return adminUser.isUltraSuper
   }
 }

@@ -8,7 +8,6 @@ import { UpdateAdminUserDto } from './dto/updateAdminUser.dto'
 import { UpdatePasswordDto } from './dto/updatePassword.dto'
 import { LoginDto } from './dto/login.dto'
 import { JwtService } from '@nestjs/jwt'
-import { ITokenData } from '../../global/guards/adminUserAuth.guard'
 import * as bcrypt from 'bcrypt'
 import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { Request, Response } from 'express'
@@ -20,6 +19,11 @@ import { DocumentType } from '@typegoose/typegoose'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
+import { UpdateUserSuperDto } from './dto/updateUserSuper.dto'
+import { UpdateUserUltraSuperDto } from './dto/updateUserUltraSuper.dto'
+import { ITokenData } from '../../global/types'
+import { SuperAdminUserAuth } from '../../global/decorators/SuperAdminUserAuth.decorator'
+import { UltraSuperAdminUserAuth } from '../../global/decorators/UltraSuperAdminUserAuth.decorator'
 
 @Controller()
 export class AdminUserController {
@@ -116,6 +120,22 @@ export class AdminUserController {
   }
 
   @WhitelistedValidationPipe()
+  @UltraSuperAdminUserAuth()
+  @Patch('/super')
+  async updateUserSuper(@Body() dto: UpdateUserSuperDto) {
+    await this.adminUserService.updateUserSuper(dto.id, dto.isSuper)
+    return this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } })
+  }
+
+  @WhitelistedValidationPipe()
+  @UltraSuperAdminUserAuth()
+  @Patch('/ultra-super')
+  async updateUserUltraSuper(@Body() dto: UpdateUserUltraSuperDto) {
+    await this.adminUserService.updateUserUltraSuper(dto.id, dto.isUltraSuper)
+    return this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } })
+  }
+
+  @WhitelistedValidationPipe()
   @Patch('/update-password')
   async updatePassword(@Body() dto: UpdatePasswordDto) {
     await this.adminUserService.updatePassword(dto.login, dto.password)
@@ -125,6 +145,7 @@ export class AdminUserController {
   }
 
   @WhitelistedValidationPipe()
+  @SuperAdminUserAuth()
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
     await this.adminUserService.updateAvailability(dto.id, dto.availability)

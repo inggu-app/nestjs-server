@@ -80,6 +80,20 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
     return this.adminUserModel.updateOne({ _id: id }, { $set: fields })
   }
 
+  async updateUserSuper(id: Types.ObjectId, isSuper: boolean, options = adminUserServiceMethodDefaultOptions.updateUserSuper) {
+    if (options.checkExistence.adminUser) await this.throwIfNotExists({ _id: id })
+    return this.adminUserModel.updateOne({ _id: id }, { $set: { isSuper } })
+  }
+
+  async updateUserUltraSuper(
+    id: Types.ObjectId,
+    isUltraSuper: boolean,
+    options = adminUserServiceMethodDefaultOptions.updateUserUltraSuper
+  ) {
+    if (options.checkExistence.adminUser) await this.throwIfNotExists({ _id: id })
+    return this.adminUserModel.updateOne({ _id: id }, { $set: { isUltraSuper } })
+  }
+
   async updatePassword(login: string, password: string, options = adminUserServiceMethodDefaultOptions.updatePassword) {
     options = mergeOptionsWithDefaultOptions(options, adminUserServiceMethodDefaultOptions.updatePassword)
     if (options.checkExistence.adminUser) await this.throwIfNotExists({ login })

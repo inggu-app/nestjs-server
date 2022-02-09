@@ -33,6 +33,16 @@ export const adminUserServiceMethodDefaultOptions = {
       adminUser: true,
     },
   },
+  updateUserSuper: {
+    checkExistence: {
+      adminUser: true,
+    },
+  },
+  updateUserUltraSuper: {
+    checkExistence: {
+      adminUser: true,
+    },
+  },
   updatePassword: {
     checkExistence: {
       adminUser: true,

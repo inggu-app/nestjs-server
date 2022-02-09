@@ -63,4 +63,10 @@ export class AdminUserModel extends TimeStamps {
 
   @prop({ _id: false, required: true, default: [], type: () => TokenDataModel })
   tokens: Ref<TokenDataModel, undefined>[]
+
+  @prop()
+  isSuper: boolean
+
+  @prop()
+  isUltraSuper: boolean
 }
