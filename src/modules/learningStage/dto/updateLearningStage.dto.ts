@@ -1,11 +1,13 @@
-import { IsEnum, IsMongoId, IsOptional, IsString, Matches } from 'class-validator'
-import { MongoIdString } from '../../../global/types'
+import { IsDate, IsDefined, IsEnum, IsOptional, IsString } from 'class-validator'
 import { LearningStage } from '../learningStage.constants'
-import { dateTimeRegExp } from '../../../global/regex'
+import { Transform, Type } from 'class-transformer'
+import { Types } from 'mongoose'
+import { transformMongoIdWithParams } from '../../../global/utils/mongoId'
 
 export class UpdateLearningStageDto {
-  @IsMongoId()
-  id: MongoIdString
+  @IsDefined()
+  @Transform(transformMongoIdWithParams)
+  id: Types.ObjectId
 
   @IsOptional()
   @IsEnum(LearningStage)
@@ -20,10 +22,12 @@ export class UpdateLearningStageDto {
   description?: string
 
   @IsOptional()
-  @Matches(dateTimeRegExp)
+  @Type(() => Date)
+  @IsDate()
   start?: Date
 
   @IsOptional()
-  @Matches(dateTimeRegExp)
+  @Type(() => Date)
+  @IsDate()
   end?: Date
 }

@@ -40,6 +40,7 @@ export class LearningStageController {
   @Patch('/')
   async update(@Body() dto: UpdateLearningStageDto) {
     await this.learningStageService.update(dto)
+    return this.learningStageService.getById(dto.id)
   }
 
   @Delete('/')

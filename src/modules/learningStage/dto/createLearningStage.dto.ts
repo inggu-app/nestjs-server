@@ -1,6 +1,6 @@
-import { IsEnum, IsString, Matches } from 'class-validator'
+import { IsDate, IsEnum, IsString } from 'class-validator'
 import { LearningStage } from '../learningStage.constants'
-import { dateTimeRegExp } from '../../../global/regex'
+import { Type } from 'class-transformer'
 
 export class CreateLearningStageDto {
   @IsEnum(LearningStage)
@@ -12,9 +12,11 @@ export class CreateLearningStageDto {
   @IsString()
   description: string
 
-  @Matches(dateTimeRegExp)
+  @Type(() => Date)
+  @IsDate()
   start: Date
 
-  @Matches(dateTimeRegExp)
+  @Type(() => Date)
+  @IsDate()
   end: Date
 }

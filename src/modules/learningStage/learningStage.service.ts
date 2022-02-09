@@ -7,7 +7,7 @@ import { CreateLearningStageDto } from './dto/createLearningStage.dto'
 import { QueryOptions, Types } from 'mongoose'
 import { UpdateLearningStageDto } from './dto/updateLearningStage.dto'
 import {
-  LEARNING_STAGE_CURRENT_STAGE_NOT_FOUND,
+  LEARNING_STAGE_BY_DATE_NOT_FOUND,
   LEARNING_STAGE_INTERVALS_COLLISION,
   LEARNING_STAGE_WITH_ID_NOT_FOUND,
 } from '../../global/constants/errors.constants'
@@ -26,15 +26,21 @@ export class LearningStageService extends CheckExistenceService<LearningStageMod
     return this.learningStageModel.create(dto)
   }
 
+  async getById(id: Types.ObjectId, queryOptions?: QueryOptions) {
+    await this.throwIfNotExists({ _id: id })
+    return this.learningStageModel.findOne({ _id: id }, undefined, queryOptions)
+  }
+
   async getByDate(date: Date, queryOptions?: QueryOptions) {
-    await this.throwIfNotExists({ start: { $lte: date }, end: { $gte: date } }, { error: LEARNING_STAGE_CURRENT_STAGE_NOT_FOUND })
+    console.log(date)
+    await this.throwIfNotExists({ start: { $lte: date }, end: { $gte: date } }, { error: LEARNING_STAGE_BY_DATE_NOT_FOUND(date) })
 
     return this.learningStageModel.findOne({ start: { $lte: date }, end: { $gte: date } }, undefined, queryOptions)
   }
 
   getCurrentAndFuture(queryOptions?: QueryOptions) {
     const currentDate = new Date()
-    return this.learningStageModel.findOne({ end: { $gte: currentDate } }, undefined, queryOptions)
+    return this.learningStageModel.find({ end: { $gte: currentDate } }, undefined, queryOptions)
   }
 
   async update(dto: UpdateLearningStageDto) {
