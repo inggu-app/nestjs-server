@@ -29,8 +29,8 @@ export class AdminUserController {
 
   @WhitelistedValidationPipe()
   @Post('/')
-  create(@Body() dto: CreateAdminUserDto) {
-    return this.adminUserService.create(dto)
+  async create(@Body() dto: CreateAdminUserDto) {
+    return removeAdminUserFields(await this.adminUserService.create(dto), ['tokens', 'hashedPassword'])
   }
 
   @Get('/by-id')

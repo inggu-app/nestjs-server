@@ -19,8 +19,7 @@ export class CallScheduleController {
   @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateCallScheduleDto) {
-    await this.callScheduleService.create(dto)
-    return this.callScheduleService.getByName(dto.name, undefined, { checkExistence: { callSchedule: false } })
+    return this.callScheduleService.create(dto)
   }
 
   @Get('/by-id')

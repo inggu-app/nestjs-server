@@ -6,5 +6,5 @@ export function removeFields<T>(data: Record<string, any> | Record<string, any>[
     fieldsToRemove.forEach(field => delete object[field as string])
   }
 
-  return clonedData
+  return Array.isArray(data) ? clonedData : (clonedData as Record<string, any>)[0]
 }

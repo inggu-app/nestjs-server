@@ -15,8 +15,7 @@ export class LearningStageController {
   @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateLearningStageDto) {
-    await this.learningStageService.create(dto)
-    return this.learningStageService.getByDate(dto.start)
+    return this.learningStageService.create(dto)
   }
 
   @Get('/current')
