@@ -11,12 +11,14 @@ import { CheckExistenceService } from '../../global/classes/CheckExistenceServic
 import { GroupService } from '../group/group.service'
 import { facultyServiceMethodDefaultOptions } from './faculty.constants'
 import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
+import { CallScheduleService } from '../callSchedule/callSchedule.service'
 
 @Injectable()
 export class FacultyService extends CheckExistenceService<FacultyModel> {
   constructor(
     @InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>,
-    @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService
+    @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService,
+    private readonly callScheduleService: CallScheduleService
   ) {
     super(facultyModel, undefined, arg => FACULTY_WITH_ID_NOT_FOUND(arg._id))
   }
@@ -24,6 +26,7 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
   async create(dto: CreateFacultyDto, options = facultyServiceMethodDefaultOptions.create) {
     options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.create)
     if (options.checkExistence.faculty) await this.throwIfExists({ title: dto.title }, { error: FACULTY_WITH_TITLE_EXISTS(dto.title) })
+    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
     return this.facultyModel.create(dto)
   }
 
@@ -59,7 +62,8 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
     options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.update)
     const { id, ...fields } = dto
     if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: dto.id })
-    await this.facultyModel.updateOne({ _id: id }, { $set: fields })
+    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
+    return this.facultyModel.updateOne({ _id: id }, { $set: fields })
   }
 
   async delete(id: Types.ObjectId, options = facultyServiceMethodDefaultOptions.delete) {

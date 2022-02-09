@@ -5,6 +5,7 @@ export const facultyServiceMethodDefaultOptions = {
   create: {
     checkExistence: {
       faculty: true,
+      callSchedule: true,
     },
   },
   getById: {
@@ -26,6 +27,7 @@ export const facultyServiceMethodDefaultOptions = {
   update: {
     checkExistence: {
       faculty: true,
+      callSchedule: true,
     },
   },
   delete: {

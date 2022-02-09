@@ -56,8 +56,9 @@ export class FacultyController {
   })
   @WhitelistedValidationPipe()
   @Patch('/')
-  update(@Body() dto: UpdateFacultyDto) {
-    return this.facultyService.update(dto)
+  async update(@Body() dto: UpdateFacultyDto) {
+    await this.facultyService.update(dto)
+    return this.facultyService.getById(dto.id)
   }
 
   @AdminUserAuth({

@@ -10,4 +10,8 @@ export class UpdateFacultyDto {
   @IsString()
   @IsNotEmpty()
   title?: string
+
+  @IsOptional()
+  @IsMongoIdWithTransform()
+  callSchedule?: Types.ObjectId
 }
