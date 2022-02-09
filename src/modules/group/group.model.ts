@@ -16,7 +16,7 @@ export class GroupModel extends TimeStamps {
   title: string
 
   @prop({ ref: () => FacultyModel, type: Types.ObjectId })
-  faculty: Types.ObjectId
+  faculty: Ref<FacultyModel, Types.ObjectId>
 
   @prop({ default: new Date() })
   lastScheduleUpdate: Date

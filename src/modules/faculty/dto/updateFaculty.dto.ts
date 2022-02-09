@@ -11,7 +11,6 @@ export class UpdateFacultyDto {
   @IsNotEmpty()
   title?: string
 
-  @IsOptional()
-  @IsMongoIdWithTransform()
+  @IsMongoIdWithTransform(true)
   callSchedule?: Types.ObjectId
 }

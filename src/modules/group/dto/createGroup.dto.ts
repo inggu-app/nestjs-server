@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
 import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { Types } from 'mongoose'
 
@@ -10,7 +10,6 @@ export class CreateGroupDto {
   @IsMongoIdWithTransform()
   faculty: Types.ObjectId
 
-  @IsOptional()
-  @IsMongoIdWithTransform()
+  @IsMongoIdWithTransform(true)
   callSchedule?: Types.ObjectId
 }

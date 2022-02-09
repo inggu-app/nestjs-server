@@ -11,11 +11,9 @@ export class UpdateGroupDto {
   @IsNotEmpty()
   title?: string
 
-  @IsOptional()
-  @IsMongoIdWithTransform()
+  @IsMongoIdWithTransform(true)
   faculty?: Types.ObjectId
 
-  @IsOptional()
-  @IsMongoIdWithTransform()
+  @IsMongoIdWithTransform(true)
   callSchedule?: Types.ObjectId
 }

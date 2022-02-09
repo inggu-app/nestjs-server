@@ -73,9 +73,9 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.update)
     if (options.checkExistence.groupById) await this.throwIfNotExists({ _id: dto.id })
     const group = await this.getById(dto.id, { projection: { faculty: 1, title: 1 } }, { checkExistence: { group: false } })
-    if (options.checkExistence.groupByTitleAndFaculty)
+    if (options.checkExistence.groupByTitleAndFaculty && (dto.title || dto.faculty))
       await this.throwIfExists(
-        { title: dto.title ?? group.title, faculty: dto.faculty ?? group.faculty },
+        { _id: { $ne: dto.id }, title: dto.title ?? group.title, faculty: dto.faculty ?? group.faculty },
         { error: GROUP_WITH_TITLE_EXISTS(dto.title ?? group.title) }
       )
     if (dto.faculty && options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: dto.faculty })

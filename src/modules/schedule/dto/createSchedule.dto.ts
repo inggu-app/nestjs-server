@@ -16,9 +16,8 @@ export class CreateScheduleDto {
 }
 
 export class Lesson {
-  @IsOptional()
-  @IsMongoIdWithTransform()
-  id: Types.ObjectId | undefined | null
+  @IsMongoIdWithTransform(true)
+  id?: Types.ObjectId
 
   @IsString()
   title: string
