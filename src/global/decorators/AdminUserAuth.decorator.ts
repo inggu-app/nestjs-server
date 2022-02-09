@@ -1,4 +1,4 @@
-import { Availability } from '../../modules/adminUser/adminUser.model'
+import { Availability, TokenDataModel } from '../../modules/adminUser/adminUser.model'
 import { applyDecorators, ExecutionContext, Injectable, SetMetadata, UseGuards } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
@@ -27,13 +27,18 @@ export class AdminUserAuthGuard extends AccessTokenAuthGuard implements IAccessT
     super(jwtService, configService, adminUserService)
   }
 
-  async accessAllowed(tokenData: ITokenData, context: ExecutionContext) {
-    const adminUser = await this.adminUserService.getById(new Types.ObjectId(tokenData.id), {
-      projection: { _id: 0, availability: 1 },
-    })
-    context.switchToHttp().getRequest().userId = adminUser.id
+  async accessAllowed(tokenData: ITokenData, requestToken: string, context: ExecutionContext) {
+    try {
+      const adminUser = await this.adminUserService.getById(new Types.ObjectId(tokenData.id), {
+        projection: { availability: 1, tokens: 1 },
+      })
+      context.switchToHttp().getRequest().userId = adminUser.id
 
-    const availability: keyof Availability = this.reflector.get('availability', context.getHandler())
-    return (adminUser.availability as Availability)[availability]
+      const availability: keyof Availability = this.reflector.get('availability', context.getHandler())
+      return (
+        (adminUser.availability as Availability)[availability] &&
+        !!adminUser.tokens.find(tokenData => (tokenData as TokenDataModel).token === requestToken)
+      )
+    } catch (e) {}
   }
 }

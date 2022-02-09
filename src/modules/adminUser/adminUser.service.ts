@@ -28,7 +28,8 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
 
     const { password, ...fields } = dto
     const hashedPassword = await bcrypt.hash(password, 8)
-    return this.adminUserModel.create({ ...fields, hashedPassword })
+    const adminUsersCount = await this.countMany()
+    return this.adminUserModel.create({ ...fields, hashedPassword, isSuper: adminUsersCount === 0, isUltraSuper: adminUsersCount === 0 })
   }
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions, options = adminUserServiceMethodDefaultOptions.getById) {
@@ -81,7 +82,7 @@ export class AdminUserService extends CheckExistenceService<AdminUserModel> {
   }
 
   async updateUserSuper(id: Types.ObjectId, isSuper: boolean, options = adminUserServiceMethodDefaultOptions.updateUserSuper) {
-    if (options.checkExistence.adminUser) await this.throwIfNotExists({ _id: id })
+    if (options.checkExistence.adminUser) await this.throwIfNotExists({ _id: id, isSuper: true })
     return this.adminUserModel.updateOne({ _id: id }, { $set: { isSuper } })
   }
 

@@ -32,6 +32,7 @@ export class AdminUserController {
   }
 
   @WhitelistedValidationPipe()
+  @UltraSuperAdminUserAuth()
   @Post('/')
   async create(@Body() dto: CreateAdminUserDto) {
     return removeAdminUserFields(await this.adminUserService.create(dto), ['tokens', 'hashedPassword'])
@@ -116,7 +117,10 @@ export class AdminUserController {
   @Patch('/')
   async update(@Body() dto: UpdateAdminUserDto) {
     await this.adminUserService.update(dto)
-    return this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } })
+    return removeAdminUserFields(await this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } }), [
+      'tokens',
+      'hashedPassword',
+    ])
   }
 
   @WhitelistedValidationPipe()
@@ -124,7 +128,10 @@ export class AdminUserController {
   @Patch('/super')
   async updateUserSuper(@Body() dto: UpdateUserSuperDto) {
     await this.adminUserService.updateUserSuper(dto.id, dto.isSuper)
-    return this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } })
+    return removeAdminUserFields(await this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } }), [
+      'tokens',
+      'hashedPassword',
+    ])
   }
 
   @WhitelistedValidationPipe()
@@ -132,7 +139,10 @@ export class AdminUserController {
   @Patch('/ultra-super')
   async updateUserUltraSuper(@Body() dto: UpdateUserUltraSuperDto) {
     await this.adminUserService.updateUserUltraSuper(dto.id, dto.isUltraSuper)
-    return this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } })
+    return removeAdminUserFields(await this.adminUserService.getById(dto.id, undefined, { checkExistence: { adminUser: false } }), [
+      'tokens',
+      'hashedPassword',
+    ])
   }
 
   @WhitelistedValidationPipe()
@@ -149,13 +159,15 @@ export class AdminUserController {
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
     await this.adminUserService.updateAvailability(dto.id, dto.availability)
-    return this.adminUserService.getById(dto.id, { projection: { availability: 1 } }, { checkExistence: { adminUser: false } })
+    return removeAdminUserFields(
+      await this.adminUserService.getById(dto.id, { projection: { availability: 1 } }, { checkExistence: { adminUser: false } }),
+      ['tokens', 'hashedPassword']
+    )
   }
 
   @Delete('/')
   async deleteById(@MongoId('adminUserId') adminUserId: Types.ObjectId) {
     await this.adminUserService.deleteById(adminUserId)
-    return
   }
 }
 

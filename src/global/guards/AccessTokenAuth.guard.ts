@@ -1,15 +1,15 @@
 import { ITokenData } from '../types'
-import { CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common'
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common'
 import { envVariables } from '../constants/envVariables.constants'
-import { Types } from 'mongoose'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { AdminUserService } from '../../modules/adminUser/adminUser.service'
 
 export interface IAccessTokenAuth {
-  accessAllowed(tokenData: ITokenData, context: ExecutionContext): boolean | Promise<boolean>
+  accessAllowed(tokenData: ITokenData, token: string, context: ExecutionContext): boolean | Promise<boolean | undefined> | undefined
 }
 
+@Injectable()
 export class AccessTokenAuthGuard implements CanActivate, IAccessTokenAuth {
   constructor(
     protected readonly jwtService: JwtService,
@@ -17,23 +17,21 @@ export class AccessTokenAuthGuard implements CanActivate, IAccessTokenAuth {
     protected readonly adminUserService: AdminUserService
   ) {}
 
-  accessAllowed(tokenData: ITokenData, context: ExecutionContext): boolean | Promise<boolean> {
+  accessAllowed(tokenData: ITokenData, token: string, context: ExecutionContext): boolean | Promise<boolean | undefined> | undefined {
     return true
   }
 
   async canActivate(context: ExecutionContext) {
+    if ((await this.adminUserService.countMany()) === 0) return true
     const token = context.switchToHttp().getRequest().cookies['access_token']
 
     if (token) {
       try {
         if (await this.jwtService.verifyAsync(token, { secret: this.configService.get(envVariables.tokenJwtSecretKey) })) {
           const tokenData = this.jwtService.decode(token) as ITokenData
-          if (await this.adminUserService.checkTokenExists(Types.ObjectId(tokenData.id), token)) {
-            return this.accessAllowed(tokenData, context)
-          }
+          return !!(await this.accessAllowed(tokenData, token, context))
         }
-      } finally {
-      }
+      } catch (e) {}
     }
 
     throw new ForbiddenException()
