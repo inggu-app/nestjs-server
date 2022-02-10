@@ -11,5 +11,5 @@ export class CreateGroupDto {
   faculty: Types.ObjectId
 
   @IsMongoIdWithTransform(true)
-  callSchedule?: Types.ObjectId
+  callSchedule?: Types.ObjectId | null
 }

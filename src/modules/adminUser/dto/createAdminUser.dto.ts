@@ -1,37 +1,38 @@
-import { IsBoolean, IsObject, IsOptional, IsString, MaxLength } from 'class-validator'
+import { IsBoolean, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
 import { Availability } from '../adminUser.model'
 import { Type } from 'class-transformer'
+import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 
 export class AvailabilityDto implements Partial<Availability> {
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canUpdateCallSchedule?: boolean
 
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canCreateFaculty?: boolean
 
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canCreateGroup?: boolean
 
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canDeleteFaculty?: boolean
 
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canDeleteGroup?: boolean
 
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canUpdateFaculty?: boolean
 
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canUpdateGroup?: boolean
 
-  @IsOptional()
+  @IsUndefinable()
   @IsBoolean()
   canUpdateSemesterRange?: boolean
 }
@@ -50,6 +51,7 @@ export class CreateAdminUserDto {
   password: string
 
   @IsObject()
+  @ValidateNested()
   @Type(() => AvailabilityDto)
   availability: AvailabilityDto
 }

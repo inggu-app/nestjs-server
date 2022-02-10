@@ -1,31 +1,32 @@
-import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsEnum, IsString } from 'class-validator'
 import { LearningStage } from '../learningStage.constants'
 import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
 import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
+import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 
 export class UpdateLearningStageDto {
   @IsMongoIdWithTransform()
   id: Types.ObjectId
 
-  @IsOptional()
+  @IsUndefinable()
   @IsEnum(LearningStage)
   stage?: LearningStage
 
-  @IsOptional()
+  @IsUndefinable()
   @IsString()
   title?: string
 
-  @IsOptional()
+  @IsUndefinable()
   @IsString()
   description?: string
 
-  @IsOptional()
+  @IsUndefinable()
   @Type(() => Date)
   @IsDate()
   start?: Date
 
-  @IsOptional()
+  @IsUndefinable()
   @Type(() => Date)
   @IsDate()
   end?: Date

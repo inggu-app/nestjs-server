@@ -1,9 +1,10 @@
-import { IsArray, IsEnum, IsNumber, IsOptional, IsPositive, IsString, Min, ValidateNested } from 'class-validator'
+import { IsArray, IsEnum, IsNumber, IsPositive, IsString, Min, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { WeekDaysEnum } from '../../../global/enums/WeekDays.enum'
 import { WeeksTypeEnum } from '../schedule.constants'
 import { Types } from 'mongoose'
 import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
+import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 
 export class CreateScheduleDto {
   @IsMongoIdWithTransform()
@@ -44,7 +45,7 @@ export class Lesson {
   @IsString()
   type: string
 
-  @IsOptional()
+  @IsUndefinable()
   @IsPositive()
   subgroup: number
 }
