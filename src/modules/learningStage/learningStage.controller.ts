@@ -7,7 +7,9 @@ import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { DateQueryParam } from '../../global/decorators/DateQueryParam.decorator'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Стадии обучения')
 @Controller()
 export class LearningStageController {
   constructor(private readonly learningStageService: LearningStageService) {}

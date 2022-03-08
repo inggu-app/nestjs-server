@@ -9,7 +9,9 @@ import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Факультеты')
 @Controller()
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}

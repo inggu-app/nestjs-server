@@ -28,10 +28,10 @@ export class LessonModel extends TimeStamps {
   @prop({
     enum: WeekDaysEnum,
   })
-  weekDay: number
+  weekDay: WeekDaysEnum
 
   @prop({ enum: WeeksTypeEnum })
-  weeksType: number
+  weeksType: WeeksTypeEnum
 
   @prop({ type: () => [Number] })
   weeks: number[]

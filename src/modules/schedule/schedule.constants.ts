@@ -1,12 +1,15 @@
 import { checkOptionsForServiceMethodExistence } from '../../global/utils/serviceMethodOptions'
 import { ScheduleService } from './schedule.service'
+import { enumKeyValuesMatch } from '../../global/utils/enumKeysValues'
 
 export enum WeeksTypeEnum {
-  WEEKS,
-  FIRST,
-  SECOND,
-  ALL,
+  WEEKS = 'WEEKS',
+  FIRST = 'FIRST',
+  SECOND = 'SECOND',
+  ALL = 'ALL',
 }
+
+enumKeyValuesMatch(WeeksTypeEnum)
 
 export const scheduleServiceMethodDefaultOptions = {
   create: {

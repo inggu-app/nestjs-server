@@ -10,7 +10,9 @@ import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedVa
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 import { FacultyService } from '../faculty/faculty.service'
 import { GroupService } from '../group/group.service'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Расписание звонков')
 @Controller()
 export class CallScheduleController {
   constructor(

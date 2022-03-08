@@ -9,7 +9,9 @@ import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.dec
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Заметки')
 @Controller()
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}

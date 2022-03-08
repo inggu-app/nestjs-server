@@ -1,10 +1,9 @@
-import { IsDefined, isMongoId, IsOptional } from 'class-validator'
+import { IsDefined, isMongoId } from 'class-validator'
 import { Transform, TransformFnParams } from 'class-transformer'
 import { Types } from 'mongoose'
 import { BadRequestException } from '@nestjs/common'
 
-function transformMongoIdWithParams(params: TransformFnParams, isOptional: boolean): Types.ObjectId | undefined | null {
-  if (isOptional && (params.value === undefined || params.value === null)) return params.value
+function transformMongoIdWithParams(params: TransformFnParams): Types.ObjectId | undefined {
   if (isMongoId(params.value)) {
     return Types.ObjectId(params.value)
   } else {
@@ -12,11 +11,10 @@ function transformMongoIdWithParams(params: TransformFnParams, isOptional: boole
   }
 }
 
-export const IsMongoIdWithTransform = (isOptional = false): PropertyDecorator => {
+export const IsMongoIdWithTransform = (): PropertyDecorator => {
   return (target: any, key: string | symbol): void => {
-    if (isOptional) IsOptional()(target, key)
-    else IsDefined()(target, key)
+    IsDefined()(target, key)
 
-    Transform(params => transformMongoIdWithParams(params, isOptional))(target, key)
+    Transform(params => transformMongoIdWithParams(params))(target, key)
   }
 }

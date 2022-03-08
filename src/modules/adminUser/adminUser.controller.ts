@@ -24,7 +24,9 @@ import { UpdateUserUltraSuperDto } from './dto/updateUserUltraSuper.dto'
 import { ITokenData } from '../../global/types'
 import { SuperAdminUserAuth } from '../../global/decorators/SuperAdminUserAuth.decorator'
 import { UltraSuperAdminUserAuth } from '../../global/decorators/UltraSuperAdminUserAuth.decorator'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Администраторы')
 @Controller()
 export class AdminUserController {
   constructor(private readonly adminUserService: AdminUserService, private readonly jwtService: JwtService) {

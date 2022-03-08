@@ -8,7 +8,9 @@ import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.dec
 import { NoteService } from '../note/note.service'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { DateQueryParam } from '../../global/decorators/DateQueryParam.decorator'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Расписание занятий')
 @Controller()
 export class ScheduleController {
   constructor(

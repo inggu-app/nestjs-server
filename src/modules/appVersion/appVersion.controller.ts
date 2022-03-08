@@ -8,7 +8,9 @@ import { OperationSystem } from '../../global/enums/OS.enum'
 import { EnumQueryParam } from '../../global/decorators/Enum.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { QueryOptions } from 'mongoose'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Версия приложения')
 @Controller()
 export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}

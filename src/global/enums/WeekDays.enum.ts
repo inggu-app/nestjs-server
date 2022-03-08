@@ -1,9 +1,13 @@
+import { enumKeyValuesMatch } from '../utils/enumKeysValues'
+
 export enum WeekDaysEnum {
-  MONDAY = 1,
-  TUESDAY,
-  WEDNESDAY,
-  THURSDAY,
-  FRIDAY,
-  SATURDAY,
-  SUNDAY,
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY',
 }
+
+enumKeyValuesMatch(WeekDaysEnum)
