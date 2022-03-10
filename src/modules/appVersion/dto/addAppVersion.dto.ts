@@ -40,7 +40,7 @@ export class AddAppVersionDto {
 
   @ApiProperty({
     title: 'Фичи, добавленные в обновлении',
-    type: [String],
+    type: [FeaturesDto],
   })
   @IsArray()
   @ValidateNested({ each: true })

@@ -10,7 +10,8 @@ import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedVa
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 import { FacultyService } from '../faculty/faculty.service'
 import { GroupService } from '../group/group.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
 
 @ApiTags('Расписание звонков')
 @Controller()
@@ -24,23 +25,57 @@ export class CallScheduleController {
   @AdminUserAuth({
     availability: 'canUpdateCallSchedule',
   })
+  @ApiOperation({
+    description:
+      'Эндпоинт позволяет создать расписание звонков. В последствии расписание звонков можно будет назначить глобальным или назначить локально факультету или группе.',
+  })
   @WhitelistedValidationPipe()
   @Post('/')
   async create(@Body() dto: CreateCallScheduleDto) {
     return this.callScheduleService.create(dto)
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет получить расписание звонков по id.',
+  })
+  @ApiQuery({
+    name: 'callScheduleId',
+    type: 'MongoId',
+    example: '6203ce8cff1a854919f38314',
+    description: 'id расписания звонков, которое нужно получить.',
+  })
+  @ApiMongoQueryOptions()
   @Get('/by-id')
   getById(@MongoId('callScheduleId') id: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.callScheduleService.getById(id, queryOptions)
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет получить расписание звонков по названию.',
+  })
+  @ApiQuery({
+    name: 'callScheduleName',
+    example: 'Общее расписание звонков',
+    description: 'Название расписания звонков, которое нужно получить.',
+  })
+  @ApiMongoQueryOptions()
   @Get('/by-name')
   getByName(@StringQueryParam('callScheduleName') name: string, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.callScheduleService.getByName(name, queryOptions)
   }
 
-  @Get('/by-group')
+  @ApiOperation({
+    description:
+      'Эндпоинт позволяет получить расписание звонков для группы. Если у группы нет специального расписания звонков, то будет возвращено расписание факультета(если оно есть) или глобальное расписание звонков.',
+  })
+  @ApiQuery({
+    name: 'groupId',
+    example: '6203ce8cff1a854919f38314',
+    description: 'id группы, для которой нужно получить расписание звонков.',
+    type: 'MongoId',
+  })
+  @ApiMongoQueryOptions()
+  @Get('/by-group-id')
   async getByGroupId(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     const group = await this.groupService.getById(groupId, { projection: { callSchedule: 1, faculty: 1 } })
     if (group.callSchedule) return this.callScheduleService.getById(group.callSchedule as Types.ObjectId, queryOptions)
@@ -53,36 +88,81 @@ export class CallScheduleController {
     return this.callScheduleService.getDefaultSchedule(queryOptions)
   }
 
-  @Get('/by-faculty')
+  @ApiOperation({
+    description:
+      'Эндпоинт позволяет получить расписание звонков для факультета. Если у факультета нет специального расписания звонков, то будет возвращено глобальное расписание.',
+  })
+  @ApiQuery({
+    name: 'facultyId',
+    type: 'MongoId',
+    example: '6203ce8cff1a854919f38314',
+    description: 'id факультета, расписание звонков для которого нужно получить.',
+  })
+  @ApiMongoQueryOptions()
+  @Get('/by-faculty-id')
   async getByFacultyId(@MongoId('facultyId') facultyId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     const faculty = await this.facultyService.getById(facultyId, { projection: { callSchedule: 1 } })
     if (faculty.callSchedule) return this.callScheduleService.getById(faculty.callSchedule as Types.ObjectId, queryOptions)
     return this.callScheduleService.getDefaultSchedule(queryOptions)
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет получить глобальное расписание звонков.',
+  })
+  @ApiMongoQueryOptions()
   @Get('/default')
   getDefaultSchedule(@MongoQueryOptions() queryOptions?: QueryOptions) {
     return this.callScheduleService.getDefaultSchedule(queryOptions)
   }
 
   @WhitelistedValidationPipe()
+  @ApiOperation({
+    description: 'Эндпоинт позволяет обновить расписание звонков.',
+  })
   @Patch('/')
   async update(@Body() dto: UpdateCallScheduleDto) {
     await this.callScheduleService.update(dto)
     return this.callScheduleService.getById(dto.id, undefined, { checkExistence: { callSchedule: false } })
   }
 
+  @ApiOperation({
+    description:
+      'Эндпоинт позволяет установить новое глобальное расписание звонков. Расписание звонков с переданным id станет глобальным, а прошлое перестанет быть глобальным.',
+  })
+  @ApiQuery({
+    name: 'callScheduleId',
+    type: 'MongoId',
+    example: '6203ce8cff1a854919f38314',
+    description: 'id расписания звонков, которое необходимо сделать глобальным.',
+  })
   @Patch('/default')
   async updateDefaultSchedule(@MongoId('callScheduleId') id: Types.ObjectId) {
     await this.callScheduleService.updateDefaultSchedule(id)
     return this.callScheduleService.getDefaultSchedule(undefined, { checkExistence: { callSchedule: false } })
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет удалить расписание звонков по id.',
+  })
+  @ApiQuery({
+    name: 'callScheduleId',
+    type: 'MongoId',
+    example: '6203ce8cff1a854919f38314',
+    description: 'id расписания звонков, которое необходимо удалить.',
+  })
   @Delete('/by-id')
   async deleteById(@MongoId('callScheduleId') id: Types.ObjectId) {
     await this.callScheduleService.deleteById(id)
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет удалить расписание звонков по названию.',
+  })
+  @ApiQuery({
+    name: 'callScheduleName',
+    example: 'Общее расписание звонков',
+    description: 'Название расписания звонков, которое нужно удалить.',
+  })
   @Delete('/by-name')
   async deleteByName(@StringQueryParam('callScheduleName') name: string) {
     await this.callScheduleService.deleteByName(name)

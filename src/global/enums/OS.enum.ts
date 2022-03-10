@@ -1,4 +1,8 @@
+import { enumKeyValuesMatch } from '../utils/enumKeysValues'
+
 export enum OperationSystem {
-  ANDROID = 'android',
-  IOS = 'ios',
+  ANDROID = 'ANDROID',
+  IOS = 'IOS',
 }
+
+enumKeyValuesMatch(OperationSystem)

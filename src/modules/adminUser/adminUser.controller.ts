@@ -24,7 +24,8 @@ import { UpdateUserUltraSuperDto } from './dto/updateUserUltraSuper.dto'
 import { ITokenData } from '../../global/types'
 import { SuperAdminUserAuth } from '../../global/decorators/SuperAdminUserAuth.decorator'
 import { UltraSuperAdminUserAuth } from '../../global/decorators/UltraSuperAdminUserAuth.decorator'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
 
 @ApiTags('Администраторы')
 @Controller()
@@ -35,16 +36,34 @@ export class AdminUserController {
 
   @WhitelistedValidationPipe()
   @UltraSuperAdminUserAuth()
+  @ApiOperation({ description: 'Эндпоинт позволяет создать администратора' })
   @Post('/')
   async create(@Body() dto: CreateAdminUserDto) {
     return removeAdminUserFields(await this.adminUserService.create(dto), ['tokens', 'hashedPassword'])
   }
 
+  @ApiOperation({ description: 'Эндпоинт позволяет получить администратора по его id' })
+  @ApiMongoQueryOptions()
+  @ApiQuery({
+    name: 'adminUserId',
+    description: 'id нужного администратора',
+    type: 'MongoId',
+    example: '6203ce8cff1a854919f38314',
+  })
   @Get('/by-id')
-  async getById(@MongoId('adminUserId') adminUserId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getById(@MongoId('adminUserIds') adminUserId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return removeAdminUserFields(await this.adminUserService.getById(adminUserId, queryOptions), ['tokens', 'hashedPassword'])
   }
 
+  @ApiOperation({ description: 'Эндпоинт позволяет получить список администраторов по списку из id' })
+  @ApiQuery({
+    name: 'adminUserIds',
+    description: 'Список id администраторов, которых нужно получить. id нужно перечислять через запятую',
+    type: 'MongoId',
+    isArray: true,
+    example: '6203ce8cff1a854919f38314,6203ce8cff1a854919f38314',
+  })
+  @ApiMongoQueryOptions()
   @Get('/by-ids')
   async getByIds(
     @MongoId('adminUserIds', { multiple: true }) adminUserIds: Types.ObjectId[],
@@ -53,10 +72,29 @@ export class AdminUserController {
     return removeAdminUserFields(await this.adminUserService.getByIds(adminUserIds, queryOptions), ['tokens', 'hashedPassword'])
   }
 
+  @ApiOperation({ description: 'Эндпоинт позволяет получить список всех администраторов, основываясь на переданных параметрах.' })
+  @ApiQuery({
+    name: 'page',
+    description: 'Страница. Значением параметра может быть только положительное число.',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'count',
+    description: 'Количество получаемых пользователей. Значением параметра может быть только положительное число.',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    description:
+      'Строка, которая содержится в ФИО администраторов. Если параметр передан, то возвращается список только тех администраторов, у которых в ФИО содержится переданная строка. Параметр не чувствителен к регистру(Исл = исл).',
+    example: 'Исл',
+  })
+  @ApiMongoQueryOptions()
   @Get('/many')
   async getMany(
     @IntQueryParam('page', { intType: 'positive' }) page: number,
-    @IntQueryParam('page', { intType: 'positive' }) count: number,
+    @IntQueryParam('count', { intType: 'positive' }) count: number,
     @StringQueryParam('name', { required: false }) name?: string,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
@@ -66,6 +104,10 @@ export class AdminUserController {
     }
   }
 
+  @ApiOperation({
+    description:
+      'Эндпоинт позволяет пройти авторизацию. Если аутентификация прошла успешно, то в cookie с именем access_token ложится токен доступа. После этого можно выполнять запросы на сервер.',
+  })
   @WhitelistedValidationPipe()
   @Get('/login')
   async login(@Body() dto: LoginDto, @Res() response: Response) {
@@ -86,6 +128,9 @@ export class AdminUserController {
     } else throw new BadRequestException(INCORRECT_CREDENTIALS)
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет проверить авторизован ли пользователь.',
+  })
   @Get('/check-authorized')
   async checkAuthorized(@Req() request: Request) {
     const token = request.cookies['access_token']
@@ -103,6 +148,9 @@ export class AdminUserController {
     }
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет деавторизоваться. cookie исчезает, с БД удаляется токен.',
+  })
   @Get('/logout')
   async logout(@Req() request: Request, @Res() response: Response) {
     const token = request.cookies['access_token'] as string | undefined
@@ -115,6 +163,9 @@ export class AdminUserController {
     } else throw new UnauthorizedException()
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет обновить информацию об администраторе. Доступен только если есть соответствующее разрешение.',
+  })
   @WhitelistedValidationPipe()
   @Patch('/')
   async update(@Body() dto: UpdateAdminUserDto) {
@@ -147,6 +198,9 @@ export class AdminUserController {
     ])
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет обновить пароль администратора. Доступен только если есть соответствующее разрешение.',
+  })
   @WhitelistedValidationPipe()
   @Patch('/update-password')
   async updatePassword(@Body() dto: UpdatePasswordDto) {
@@ -156,6 +210,9 @@ export class AdminUserController {
     }
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет обновить разрешения администратора.',
+  })
   @WhitelistedValidationPipe()
   @SuperAdminUserAuth()
   @Patch('/update-availability')
