@@ -9,7 +9,7 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto'
 import { LoginDto } from './dto/login.dto'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
-import { INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
+import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
 import { Request, Response } from 'express'
 import { AdminUserModel, TokenDataModel } from './adminUser.model'
 import { addDays } from './date'
@@ -111,8 +111,9 @@ export class AdminUserController {
   @WhitelistedValidationPipe()
   @Get('/login')
   async login(@Body() dto: LoginDto, @Res() response: Response) {
-    const adminUser = await this.adminUserService.getByLogin(dto.login, { projection: { _id: 1, hashedPassword: 1 } })
+    const adminUser = await this.adminUserService.getByLogin(dto.login, { projection: { _id: 1, hashedPassword: 1, interfaces: 1 } })
 
+    if (!adminUser.interfaces.includes(dto.interface)) throw new BadRequestException(FORBIDDEN_CLIENT_INTERFACE)
     if (await bcrypt.compare(dto.password, adminUser.hashedPassword)) {
       const tokenPayload: ITokenData = {
         id: adminUser.id,
