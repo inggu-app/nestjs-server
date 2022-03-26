@@ -15,5 +15,5 @@ export class FacultyModel extends TimeStamps {
   title: string
 
   @prop({ ref: () => CallScheduleModel, default: null })
-  callSchedule: Ref<CallScheduleModel, Types.ObjectId>
+  callSchedule: Ref<CallScheduleModel, Types.ObjectId> | null
 }
