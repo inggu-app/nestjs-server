@@ -3,12 +3,12 @@ import { ApiProperty } from '@nestjs/swagger'
 import { WeekDaysEnum } from '../../../../global/enums/WeekDays.enum'
 import { WeeksTypeEnum } from '../../schedule.constants'
 import { Types } from 'mongoose'
-import { MongoId, MongoIdExample } from '../../../../global/constants/constants'
+import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
 export class ResponseLesson implements Partial<LessonModel> {
   @ApiProperty({
     title: 'id занятия',
-    type: MongoId,
+    type: MongoIdType,
     example: MongoIdExample,
     required: false,
   })
@@ -88,7 +88,7 @@ export class ResponseLesson implements Partial<LessonModel> {
 
   @ApiProperty({
     title: 'id группы',
-    type: MongoId,
+    type: MongoIdType,
     example: MongoIdExample,
     description: 'id группы, к которой привязано занятие',
     required: false,

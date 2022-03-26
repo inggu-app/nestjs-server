@@ -33,6 +33,7 @@ export class UpdateGroupDto {
     example: '6203ce8cff1a854919f38314',
     type: 'MongoId',
   })
+  @IsUndefinable()
   @IsMongoIdWithTransform()
   faculty?: Types.ObjectId
 
@@ -42,6 +43,7 @@ export class UpdateGroupDto {
     example: '6203ce8cff1a854919f38314',
     type: 'MongoId',
   })
+  @IsUndefinable()
   @IsMongoIdWithTransform()
   callSchedule?: Types.ObjectId
 }
