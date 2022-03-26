@@ -7,5 +7,5 @@ interface Options {
 }
 
 export const IntQueryParam = (parameter: string, options?: Options) => {
-  return Query('page', new CustomParseIntPipe(parameter, { ...options }))
+  return Query(parameter, new CustomParseIntPipe(parameter, { ...options }))
 }
