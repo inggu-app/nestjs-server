@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { QueryOptions, Types } from 'mongoose'
@@ -8,7 +8,13 @@ import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.dec
 import { NoteService } from '../note/note.service'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { DateQueryParam } from '../../global/decorators/DateQueryParam.decorator'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
+import { MongoIdExample } from '../../global/constants/constants'
+import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
+import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
+import { GetByGroupIdResponseDto } from './dto/responses/GetByGroupIdResponse.dto'
+import { CheckScheduleUpdateResponseDto } from './dto/responses/CheckScheduleUpdateResponse.dto'
 
 @ApiTags('Расписание занятий')
 @Controller()
@@ -20,6 +26,16 @@ export class ScheduleController {
   ) {}
 
   @WhitelistedValidationPipe()
+  @ApiOperation({
+    description: 'Эндпоинт позволяет установить расписание занятий для группы.',
+  })
+  @AdminUserAuth({
+    availability: 'canCreateSchedule',
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+  })
   @Post('/')
   async create(@Body() dto: CreateScheduleDto) {
     await this.groupService.throwIfNotExists({ _id: dto.group })
@@ -46,6 +62,22 @@ export class ScheduleController {
     await this.groupService.updateLastScheduleUpdate(dto.group, new Date(), { checkExistence: { group: false } })
   }
 
+  @ApiOperation({
+    description:
+      'Эндпоинт позволяет получить расписание занятий по id группы. Поля занятий, которые будут возвращаться в поле ответа schedule, зависят от параметра projection, который передаётся в query-параметре queryOptions - будут возвращаться те поля, у которых в параметре будет значение 1',
+  })
+  @ApiQuery({
+    type: MongoId,
+    description: 'id группы, расписание которой нужно получить',
+    name: 'groupId',
+    example: MongoIdExample,
+  })
+  @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: GetByGroupIdResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/by-group-id')
   async getByGroupId(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     const group = await this.groupService.getById(groupId, { projection: { lastScheduleUpdate: 1 } })
@@ -57,6 +89,26 @@ export class ScheduleController {
     }
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет проверить обновилось ли расписание группы.',
+  })
+  @ApiQuery({
+    name: 'groupId',
+    type: MongoId,
+    description: 'id группы',
+    example: MongoIdExample,
+  })
+  @ApiQuery({
+    name: 'updatedAt',
+    type: Date,
+    description: 'Дата последнего обновления расписания, которая имеется у клиента.',
+    example: new Date(),
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    type: CheckScheduleUpdateResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/check')
   async checkScheduleUpdate(@MongoId('groupId') groupId: Types.ObjectId, @DateQueryParam('updatedAt') updatedAt: Date) {
     const group = await this.groupService.getById(groupId, { projection: { lastScheduleUpdate: 1 } })

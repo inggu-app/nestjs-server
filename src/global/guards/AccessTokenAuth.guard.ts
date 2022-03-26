@@ -34,6 +34,6 @@ export class AccessTokenAuthGuard implements CanActivate, IAccessTokenAuth {
       } catch (e) {}
     }
 
-    throw new ForbiddenException()
+    throw new ForbiddenException('Доступ запрещён')
   }
 }

@@ -70,6 +70,14 @@ export class AvailabilityDto implements Partial<Availability> {
   @IsUndefinable()
   @IsBoolean()
   canUpdateSemesterRange?: boolean
+
+  @ApiProperty({
+    required: false,
+    title: 'Может ли администратор создать расписание занятий',
+  })
+  @IsUndefinable()
+  @IsBoolean()
+  canCreateSchedule?: boolean
 }
 
 export class CreateAdminUserDto {

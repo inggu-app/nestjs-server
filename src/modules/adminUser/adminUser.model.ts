@@ -28,6 +28,9 @@ export class Availability {
 
   @prop({ default: false })
   canUpdateSemesterRange: boolean // можно ли обновить длительность семестра
+
+  @prop({ default: false })
+  canCreateSchedule: boolean // можно ли создать расписание занятий
 }
 
 export class TokenDataModel {
