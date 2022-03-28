@@ -1,13 +1,13 @@
-import { ResponseGroup } from './CreateResponse.dto'
+import { GroupModuleResponseGroup } from './GroupModuleCreateResponseDto'
 import { ApiProperty } from '@nestjs/swagger'
 
-export class GetManyResponseDto {
+export class GroupModuleGetManyResponseDto {
   @ApiProperty({
     title: 'Список групп',
-    type: ResponseGroup,
+    type: GroupModuleResponseGroup,
     isArray: true,
   })
-  groups: ResponseGroup[]
+  groups: GroupModuleResponseGroup[]
 
   @ApiProperty({
     title: 'Количество всех групп',

@@ -11,12 +11,12 @@ import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
-import { CreateResponseDto } from './dto/responses/CreateResponse.dto'
+import { FacultyModuleCreateResponseDto } from './dto/responses/FacultyModuleCreateResponseDto'
 import { MongoIdExample, MongoIdType } from '../../global/constants/constants'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
-import { GetByIdResponseDto } from './dto/responses/GetByIdResponse.dto'
-import { GetByIdsResponseDto } from './dto/responses/GetByIdsResponse.dto'
-import { GetManyResponseDto } from './dto/responses/GetManyResponse.dto'
+import { FacultyModuleGetByIdResponseDto } from './dto/responses/FacultyModuleGetByIdResponseDto'
+import { FacultyModuleGetByIdsResponseDto } from './dto/responses/FacultyModuleGetByIdsResponseDto'
+import { FacultyModuleGetManyResponseDto } from './dto/responses/FacultyModuleGetManyResponseDto'
 
 @ApiTags('Факультеты')
 @Controller()
@@ -32,7 +32,7 @@ export class FacultyController {
   })
   @ApiResponseException()
   @ApiResponse({
-    type: CreateResponseDto,
+    type: FacultyModuleCreateResponseDto,
     status: HttpStatus.CREATED,
   })
   @Post('/')
@@ -54,7 +54,7 @@ export class FacultyController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByIdResponseDto,
+    type: FacultyModuleGetByIdResponseDto,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
     status: HttpStatus.OK,
@@ -79,7 +79,7 @@ export class FacultyController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByIdsResponseDto,
+    type: FacultyModuleGetByIdsResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
@@ -120,7 +120,7 @@ export class FacultyController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetManyResponseDto,
+    type: FacultyModuleGetManyResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',

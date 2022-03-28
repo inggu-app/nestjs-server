@@ -25,7 +25,7 @@ class ResponseCallScheduleItem {
   end: string
 }
 
-export class ResponseCallSchedule {
+export class CallScheduleModuleResponseCallSchedule {
   @ApiProperty({
     title: 'id расписания звонков',
     type: MongoIdType,
@@ -74,9 +74,9 @@ export class ResponseCallSchedule {
   updatedAt: Date
 }
 
-export class CreateResponseDto {
+export class CallScheduleModuleCreateResponseDto {
   @ApiProperty({
-    type: ResponseCallSchedule,
+    type: CallScheduleModuleResponseCallSchedule,
   })
-  callSchedule: ResponseCallSchedule
+  callSchedule: CallScheduleModuleResponseCallSchedule
 }

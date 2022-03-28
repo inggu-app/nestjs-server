@@ -3,7 +3,7 @@ import { Types } from 'mongoose'
 import { GroupModel } from '../../group.model'
 import { MongoIdType, MongoIdExample } from '../../../../global/constants/constants'
 
-export class ResponseGroup implements Partial<GroupModel> {
+export class GroupModuleResponseGroup implements Partial<GroupModel> {
   @ApiProperty({
     title: 'id группы',
     type: MongoIdType,
@@ -65,10 +65,10 @@ export class ResponseGroup implements Partial<GroupModel> {
   updatedAt: Date
 }
 
-export class CreateResponseDto {
+export class GroupModuleCreateResponseDto {
   @ApiProperty({
-    type: ResponseGroup,
+    type: GroupModuleResponseGroup,
     required: false,
   })
-  group: ResponseGroup
+  group: GroupModuleResponseGroup
 }

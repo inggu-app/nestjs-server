@@ -13,8 +13,8 @@ import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 import { MongoIdExample } from '../../global/constants/constants'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
 import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
-import { GetByGroupIdResponseDto } from './dto/responses/GetByGroupIdResponse.dto'
-import { CheckScheduleUpdateResponseDto } from './dto/responses/CheckScheduleUpdateResponse.dto'
+import { ScheduleModuleGetByGroupIdResponseDto } from './dto/responses/ScheduleModuleGetByGroupIdResponseDto'
+import { ScheduleModuleCheckScheduleUpdateResponseDto } from './dto/responses/ScheduleModuleCheckScheduleUpdateResponseDto'
 
 @ApiTags('Расписание занятий')
 @Controller()
@@ -75,7 +75,7 @@ export class ScheduleController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByGroupIdResponseDto,
+    type: ScheduleModuleGetByGroupIdResponseDto,
     status: HttpStatus.OK,
   })
   @Get('/by-group-id')
@@ -106,7 +106,7 @@ export class ScheduleController {
   })
   @ApiResponseException()
   @ApiResponse({
-    type: CheckScheduleUpdateResponseDto,
+    type: ScheduleModuleCheckScheduleUpdateResponseDto,
     status: HttpStatus.OK,
   })
   @Get('/check')

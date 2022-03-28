@@ -11,13 +11,13 @@ import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
-import { CreateResponseDto } from './dto/responses/CreateResponse.dto'
+import { GroupModuleCreateResponseDto } from './dto/responses/GroupModuleCreateResponseDto'
 import { MongoIdExample, MongoIdType } from '../../global/constants/constants'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
-import { GetByIdResponseDto } from './dto/responses/GetByIdResponse.dto'
-import { GetByIdsResponseDto } from './dto/responses/GetByIdsResponse.dto'
-import { GetByFacultyIdResponseDto } from './dto/responses/GetByFacultyIdResponse.dto'
-import { GetManyResponseDto } from './dto/responses/GetManyResponse.dto'
+import { GroupModuleGetByIdResponseDto } from './dto/responses/GroupModuleGetByIdResponseDto'
+import { GroupModuleGetByIdsResponseDto } from './dto/responses/GroupModuleGetByIdsResponseDto'
+import { GroupModuleGetByFacultyIdResponseDto } from './dto/responses/GroupModuleGetByFacultyIdResponseDto'
+import { GroupModuleGetManyResponseDto } from './dto/responses/GroupModuleGetManyResponseDto'
 
 @ApiTags('Группы')
 @Controller()
@@ -33,7 +33,7 @@ export class GroupController {
   })
   @ApiResponseException()
   @ApiResponse({
-    type: CreateResponseDto,
+    type: GroupModuleCreateResponseDto,
     status: HttpStatus.CREATED,
   })
   @Post('/')
@@ -55,7 +55,7 @@ export class GroupController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByIdResponseDto,
+    type: GroupModuleGetByIdResponseDto,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
     status: HttpStatus.OK,
@@ -78,7 +78,7 @@ export class GroupController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByIdsResponseDto,
+    type: GroupModuleGetByIdsResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
@@ -102,7 +102,7 @@ export class GroupController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByFacultyIdResponseDto,
+    type: GroupModuleGetByFacultyIdResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
@@ -140,7 +140,7 @@ export class GroupController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetManyResponseDto,
+    type: GroupModuleGetManyResponseDto,
     status: HttpStatus.OK,
   })
   @Get('/many')

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class CheckScheduleUpdateResponseDto {
+export class ScheduleModuleCheckScheduleUpdateResponseDto {
   @ApiProperty({
     title: 'Обновилось ли расписание',
   })

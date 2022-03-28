@@ -5,7 +5,7 @@ import { WeeksTypeEnum } from '../../schedule.constants'
 import { Types } from 'mongoose'
 import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
-export class ResponseLesson implements Partial<LessonModel> {
+export class ScheduleModuleResponseLesson implements Partial<LessonModel> {
   @ApiProperty({
     title: 'id занятия',
     type: MongoIdType,
@@ -108,12 +108,12 @@ export class ResponseLesson implements Partial<LessonModel> {
   updatedAt: Date
 }
 
-export class GetByGroupIdResponseDto {
+export class ScheduleModuleGetByGroupIdResponseDto {
   @ApiProperty({
-    type: ResponseLesson,
+    type: ScheduleModuleResponseLesson,
     isArray: true,
   })
-  schedule: ResponseLesson[]
+  schedule: ScheduleModuleResponseLesson[]
 
   @ApiProperty({
     type: Date,

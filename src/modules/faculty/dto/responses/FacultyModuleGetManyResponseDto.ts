@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { ResponseFaculty } from './CreateResponse.dto'
+import { FacultyModuleResponseFaculty } from './FacultyModuleCreateResponseDto'
 
-export class GetManyResponseDto {
+export class FacultyModuleGetManyResponseDto {
   @ApiProperty({
-    type: ResponseFaculty,
+    type: FacultyModuleResponseFaculty,
     isArray: true,
   })
-  faculties: ResponseFaculty[]
+  faculties: FacultyModuleResponseFaculty[]
 
   @ApiProperty({
     title: 'Количество всех факультетов',

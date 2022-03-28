@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
-export class ResponseFaculty {
+export class FacultyModuleResponseFaculty {
   @ApiProperty({
     title: 'id факультета',
     type: MongoIdType,
@@ -41,9 +41,9 @@ export class ResponseFaculty {
   updatedAt: Date
 }
 
-export class CreateResponseDto {
+export class FacultyModuleCreateResponseDto {
   @ApiProperty({
-    type: ResponseFaculty,
+    type: FacultyModuleResponseFaculty,
   })
-  faculty: ResponseFaculty
+  faculty: FacultyModuleResponseFaculty
 }

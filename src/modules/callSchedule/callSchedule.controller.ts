@@ -12,13 +12,13 @@ import { FacultyService } from '../faculty/faculty.service'
 import { GroupService } from '../group/group.service'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
-import { CreateResponseDto } from './dto/responses/CreateResponse.dto'
+import { CallScheduleModuleCreateResponseDto } from './dto/responses/CallScheduleModuleCreateResponseDto'
 import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
-import { GetByIdResponseDto } from './dto/responses/GetByIdResponse.dto'
-import { GetByNameResponseDto } from './dto/responses/GetByNameResponse.dto'
-import { GetByGroupIdResponseDto } from './dto/responses/GetByGroupIdResponse.dto'
-import { GetByFacultyIdResponseDto } from './dto/responses/GetByFacultyIdResponse.dto'
-import { GetDefaultScheduleResponseDto } from './dto/responses/GetDefaultScheduleResponse.dto'
+import { CallScheduleModuleGetByIdResponseDto } from './dto/responses/CallScheduleModuleGetByIdResponseDto'
+import { CallScheduleModuleGetByNameResponseDto } from './dto/responses/CallScheduleModuleGetByNameResponseDto'
+import { CallScheduleModuleGetByGroupIdResponseDto } from './dto/responses/CallScheduleModuleGetByGroupIdResponseDto'
+import { CallScheduleModuleGetByFacultyIdResponseDto } from './dto/responses/CallScheduleModuleGetByFacultyIdResponseDto'
+import { CallScheduleModuleGetDefaultScheduleResponseDto } from './dto/responses/CallScheduleModuleGetDefaultScheduleResponseDto'
 
 @ApiTags('Расписание звонков')
 @Controller()
@@ -38,7 +38,7 @@ export class CallScheduleController {
       'Эндпоинт позволяет создать расписание звонков. В последствии расписание звонков можно будет назначить глобальным или назначить локально факультету или группе.',
   })
   @ApiResponse({
-    type: CreateResponseDto,
+    type: CallScheduleModuleCreateResponseDto,
     status: HttpStatus.CREATED,
   })
   @ApiResponseException()
@@ -61,7 +61,7 @@ export class CallScheduleController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByIdResponseDto,
+    type: CallScheduleModuleGetByIdResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
@@ -84,7 +84,7 @@ export class CallScheduleController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByNameResponseDto,
+    type: CallScheduleModuleGetByNameResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
@@ -109,7 +109,7 @@ export class CallScheduleController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByGroupIdResponseDto,
+    type: CallScheduleModuleGetByGroupIdResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
@@ -148,7 +148,7 @@ export class CallScheduleController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetByFacultyIdResponseDto,
+    type: CallScheduleModuleGetByFacultyIdResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
@@ -171,7 +171,7 @@ export class CallScheduleController {
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
-    type: GetDefaultScheduleResponseDto,
+    type: CallScheduleModuleGetDefaultScheduleResponseDto,
     status: HttpStatus.OK,
     description:
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
