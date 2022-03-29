@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Post } from '@nestjs/common'
 import { AddAppVersionDto } from './dto/addAppVersion.dto'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { RegExpQueryParam } from '../../global/decorators/RegExpQueryParam.decorator'
@@ -8,19 +8,24 @@ import { OperationSystem } from '../../global/enums/OS.enum'
 import { EnumQueryParam } from '../../global/decorators/Enum.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { QueryOptions } from 'mongoose'
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
+import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
+import { AppVersionModuleGetVersionResponseDto } from './dto/responses/AppVersionModuleGetVersionResponse.dto'
+import { AppVersionModuleGetFromVersionResponseDto } from './dto/responses/AppVersionModuleGetFromVersionResponse.dto'
+import { AppVersionModuleCheckResponseDto } from './dto/responses/AppVersionModuleCheckResponse.dto'
 
 @ApiTags('Версия приложения')
 @Controller()
 export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}
 
+  @WhitelistedValidationPipe()
   @ApiOperation({
     description:
       'Эндпоинт позволяет добавить новую версию приложения. Если клиент запросить конкретное обновление или запрос список обновлений с какой-то версии, то ему вернётся обновление(или список), которые соответствуют запросу.',
   })
-  @WhitelistedValidationPipe()
+  @ApiResponseException()
   @Post('/add')
   async addVersion(@Body() dto: AddAppVersionDto) {
     await this.appVersionService.create(dto)
@@ -41,13 +46,20 @@ export class AppVersionController {
     example: '2.0.1',
   })
   @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: AppVersionModuleGetVersionResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/')
-  getVersion(
+  async getVersion(
     @EnumQueryParam('os', OperationSystem) os: OperationSystem,
     @RegExpQueryParam('version', appVersionRegExp) version: string,
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
-    return this.appVersionService.getVersion(os, version, queryOptions)
+    return {
+      version: await this.appVersionService.getVersion(os, version, queryOptions),
+    }
   }
 
   @ApiOperation({
@@ -65,6 +77,11 @@ export class AppVersionController {
     example: '2.0.1',
   })
   @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: AppVersionModuleGetFromVersionResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/from')
   async getFromVersion(
     @EnumQueryParam('os', OperationSystem) os: OperationSystem,
@@ -90,6 +107,11 @@ export class AppVersionController {
     description: `Версия, для которой нужно получить информацию. Версия должна соответствовать регулярному выражению ${appVersionRegExp}`,
     example: '2.0.1',
   })
+  @ApiResponseException()
+  @ApiResponse({
+    type: AppVersionModuleCheckResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/check')
   async check(@EnumQueryParam('os', OperationSystem) os: OperationSystem, @RegExpQueryParam('version', appVersionRegExp) version: string) {
     return {
@@ -110,6 +132,10 @@ export class AppVersionController {
     name: 'version',
     description: `Версия, для которой нужно получить информацию. Версия должна соответствовать регулярному выражению ${appVersionRegExp}`,
     example: '2.0.1',
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
   })
   @Delete('/')
   async delete(@EnumQueryParam('os', OperationSystem) os: OperationSystem, @RegExpQueryParam('version', appVersionRegExp) version: string) {
