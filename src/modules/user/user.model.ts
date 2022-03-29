@@ -70,10 +70,4 @@ export class UserModel extends TimeStamps {
 
   @prop({ _id: false, required: true, default: [], type: () => TokenDataModel })
   tokens: Ref<TokenDataModel, undefined>[]
-
-  @prop({ default: false })
-  isSuper: boolean
-
-  @prop({ default: false })
-  isUltraSuper: boolean
 }

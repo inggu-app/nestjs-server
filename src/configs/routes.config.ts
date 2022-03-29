@@ -29,7 +29,7 @@ export const routesConfig: Routes = [
     module: NoteModule,
   },
   {
-    path: ModuleRoutesEnum.ADMIN_USER_MODULE,
+    path: ModuleRoutesEnum.USER_MODULE,
     module: UserModule,
   },
   {

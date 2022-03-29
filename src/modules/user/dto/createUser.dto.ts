@@ -125,6 +125,7 @@ export class CreateUserDto {
   @ApiProperty({
     title: 'Список доступных для авторизации интерфейсов',
     enum: ClientInterfacesEnum,
+    isArray: true,
   })
   @IsEnum(ClientInterfacesEnum, { each: true })
   interfaces: ClientInterfacesEnum[]

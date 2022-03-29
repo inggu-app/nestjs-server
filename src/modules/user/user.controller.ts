@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Delete, Get, Patch, Post, Req, Res, UnauthorizedException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { CreateUserDto } from './dto/createUser.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
@@ -9,7 +21,7 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto'
 import { LoginDto } from './dto/login.dto'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
-import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS } from '../../global/constants/errors.constants'
+import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS, NOT_AUTHORIZED } from '../../global/constants/errors.constants'
 import { Request, Response } from 'express'
 import { UserModel, TokenDataModel } from './user.model'
 import { addDays } from './date'
@@ -19,11 +31,16 @@ import { DocumentType } from '@typegoose/typegoose'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
-import { UpdateUserSuperDto } from './dto/updateUserSuper.dto'
-import { UpdateUserUltraSuperDto } from './dto/updateUserUltraSuper.dto'
 import { ITokenData } from '../../global/types'
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
+import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
+import { UserModuleCreateResponseDto } from './dto/responses/UserModuleCreateResponse.dto'
+import { UserModuleGetByIdResponseDto } from './dto/responses/UserModuleGetByIdResponse.dto'
+import { UserModuleGetByIdsResponseDto } from './dto/responses/UserModuleGetByIdsResponse.dto'
+import { UserModuleGetManyResponseDto } from './dto/responses/UserModuleGetManyResponse.dto'
+import { UserModuleCheckAuthorizedResponseDto } from './dto/responses/UserModuleCheckAuthorizedResponse.dto'
+import { MongoIdExample, MongoIdType } from '../../global/constants/constants'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -34,9 +51,16 @@ export class UserController {
 
   @WhitelistedValidationPipe()
   @ApiOperation({ description: 'Эндпоинт позволяет создать пользователя' })
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleCreateResponseDto,
+    status: HttpStatus.CREATED,
+  })
   @Post('/')
   async create(@Body() dto: CreateUserDto) {
-    return removeUserFields(await this.userService.create(dto), ['tokens', 'hashedPassword'])
+    return {
+      user: removeUserFields(await this.userService.create(dto), ['tokens', 'hashedPassword']),
+    }
   }
 
   @ApiOperation({ description: 'Эндпоинт позволяет получить пользователя по его id' })
@@ -47,12 +71,19 @@ export class UserController {
     type: 'MongoId',
     example: '6203ce8cff1a854919f38314',
   })
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleGetByIdResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/by-id')
   async getById(@MongoId('userId') userId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
-    return removeUserFields(await this.userService.getById(userId, queryOptions), ['tokens', 'hashedPassword'])
+    return {
+      user: removeUserFields(await this.userService.getById(userId, queryOptions), ['tokens', 'hashedPassword']),
+    }
   }
 
-  @ApiOperation({ description: 'Эндпоинт позволяет получить список пользователей по списку из id' })
+  @ApiOperation({ description: 'Эндпоинт позволяет получить список пользователей по списку их id' })
   @ApiQuery({
     name: 'userIds',
     description: 'Список id пользователей, которых нужно получить. id нужно перечислять через запятую',
@@ -61,9 +92,16 @@ export class UserController {
     example: '6203ce8cff1a854919f38314,6203ce8cff1a854919f38314',
   })
   @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleGetByIdsResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/by-ids')
   async getByIds(@MongoId('userIds', { multiple: true }) userIds: Types.ObjectId[], @MongoQueryOptions() queryOptions?: QueryOptions) {
-    return removeUserFields(await this.userService.getByIds(userIds, queryOptions), ['tokens', 'hashedPassword'])
+    return {
+      users: removeUserFields(await this.userService.getByIds(userIds, queryOptions), ['tokens', 'hashedPassword']),
+    }
   }
 
   @ApiOperation({ description: 'Эндпоинт позволяет получить список всех пользователей, основываясь на переданных параметрах.' })
@@ -85,6 +123,11 @@ export class UserController {
     example: 'Исл',
   })
   @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleGetManyResponseDto,
+    status: HttpStatus.OK,
+  })
   @Get('/many')
   async getMany(
     @IntQueryParam('page', { intType: 'positive' }) page: number,
@@ -98,11 +141,15 @@ export class UserController {
     }
   }
 
+  @WhitelistedValidationPipe()
   @ApiOperation({
     description:
       'Эндпоинт позволяет пройти авторизацию. Если аутентификация прошла успешно, то в cookie с именем access_token ложится токен доступа. После этого можно выполнять запросы на сервер.',
   })
-  @WhitelistedValidationPipe()
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   @Get('/login')
   async login(@Body() dto: LoginDto, @Res() response: Response) {
     const user = await this.userService.getByLogin(dto.login, { projection: { _id: 1, hashedPassword: 1, interfaces: 1 } })
@@ -117,14 +164,17 @@ export class UserController {
       await this.userService.addToken(user.id, new TokenDataModel(generatedToken, tokenExpiresDate), {
         checkExistence: { user: false },
       })
-      response.cookie('access_token', generatedToken, { httpOnly: true, expires: tokenExpiresDate }).json({
-        authorized: true,
-      })
+      response.cookie('access_token', generatedToken, { httpOnly: true, expires: tokenExpiresDate }).json()
     } else throw new BadRequestException(INCORRECT_CREDENTIALS)
   }
 
   @ApiOperation({
     description: 'Эндпоинт позволяет проверить авторизован ли пользователь.',
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleCheckAuthorizedResponseDto,
+    status: HttpStatus.OK,
   })
   @Get('/check-authorized')
   async checkAuthorized(@Req() request: Request) {
@@ -146,76 +196,77 @@ export class UserController {
   @ApiOperation({
     description: 'Эндпоинт позволяет деавторизоваться. cookie исчезает, с БД удаляется токен.',
   })
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   @Get('/logout')
   async logout(@Req() request: Request, @Res() response: Response) {
     const token = request.cookies['access_token'] as string | undefined
     if (token) {
       const tokenData = this.jwtService.decode(token) as ITokenData
       await this.userService.deleteToken(Types.ObjectId(tokenData.id), token)
-      response.clearCookie('access_token').json({
-        authorized: false,
-      })
-    } else throw new UnauthorizedException()
+      response.clearCookie('access_token').json()
+    } else throw new UnauthorizedException(NOT_AUTHORIZED)
   }
 
+  @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить информацию о пользователе. Доступен только если есть соответствующее разрешение.',
   })
-  @WhitelistedValidationPipe()
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   @Patch('/')
   async update(@Body() dto: UpdateUserDto) {
     await this.userService.update(dto)
-    return removeUserFields(await this.userService.getById(dto.id, undefined, { checkExistence: { user: false } }), [
-      'tokens',
-      'hashedPassword',
-    ])
   }
 
   @WhitelistedValidationPipe()
-  @Patch('/super')
-  async updateUserSuper(@Body() dto: UpdateUserSuperDto) {
-    await this.userService.updateUserSuper(dto.id, dto.isSuper)
-    return removeUserFields(await this.userService.getById(dto.id, undefined, { checkExistence: { user: false } }), [
-      'tokens',
-      'hashedPassword',
-    ])
-  }
-
-  @WhitelistedValidationPipe()
-  @Patch('/ultra-super')
-  async updateUserUltraSuper(@Body() dto: UpdateUserUltraSuperDto) {
-    await this.userService.updateUserUltraSuper(dto.id, dto.isUltraSuper)
-    return removeUserFields(await this.userService.getById(dto.id, undefined, { checkExistence: { user: false } }), [
-      'tokens',
-      'hashedPassword',
-    ])
-  }
-
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить пароль пользователя. Доступен только если есть соответствующее разрешение.',
   })
-  @WhitelistedValidationPipe()
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   @Patch('/update-password')
   async updatePassword(@Body() dto: UpdatePasswordDto) {
     await this.userService.updatePassword(dto.login, dto.password)
-    return {
-      newPassword: dto.password,
+
+    const user = await this.userService.getByLogin(dto.login, { projection: { tokens: 1 } }, { checkExistence: { user: false } })
+    for await (const token of user.tokens) {
+      await this.userService.deleteToken(user.id, (token as TokenDataModel).token, { checkExistence: { user: false } })
     }
   }
 
+  @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить разрешения пользователя.',
   })
-  @WhitelistedValidationPipe()
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
     await this.userService.updateAvailability(dto.id, dto.availability)
-    return removeUserFields(
-      await this.userService.getById(dto.id, { projection: { availability: 1 } }, { checkExistence: { user: false } }),
-      ['tokens', 'hashedPassword']
-    )
   }
 
+  @ApiOperation({
+    description: 'Эндпоинт позволяет удалить пользователя',
+  })
+  @ApiQuery({
+    name: 'userId',
+    description: 'id удаляемого пользователя',
+    type: MongoIdType,
+    example: MongoIdExample,
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   @Delete('/')
   async deleteById(@MongoId('userId') userId: Types.ObjectId) {
     await this.userService.deleteById(userId)

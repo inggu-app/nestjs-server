@@ -3,7 +3,7 @@ export enum ModuleRoutesEnum {
   GROUP_MODULE = '/groups',
   FACULTY_MODULE = '/faculties',
   NOTE_MODULE = '/notes',
-  ADMIN_USER_MODULE = '/admin-users',
+  USER_MODULE = '/users',
   SETTINGS_MODULE = '/settings',
   APP_VERSION_MODULE = '/app-version',
   CALL_SCHEDULE_MODULE = '/call-schedule',

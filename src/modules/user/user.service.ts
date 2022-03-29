@@ -77,16 +77,6 @@ export class UserService extends CheckExistenceService<UserModel> {
     return this.userModel.updateOne({ _id: id }, { $set: fields })
   }
 
-  async updateUserSuper(id: Types.ObjectId, isSuper: boolean, options = userServiceMethodDefaultOptions.updateUserSuper) {
-    if (options.checkExistence.user) await this.throwIfNotExists({ _id: id, isSuper: true })
-    return this.userModel.updateOne({ _id: id }, { $set: { isSuper } })
-  }
-
-  async updateUserUltraSuper(id: Types.ObjectId, isUltraSuper: boolean, options = userServiceMethodDefaultOptions.updateUserUltraSuper) {
-    if (options.checkExistence.user) await this.throwIfNotExists({ _id: id })
-    return this.userModel.updateOne({ _id: id }, { $set: { isUltraSuper } })
-  }
-
   async updatePassword(login: string, password: string, options = userServiceMethodDefaultOptions.updatePassword) {
     options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.updatePassword)
     if (options.checkExistence.user) await this.throwIfNotExists({ login })

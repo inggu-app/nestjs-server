@@ -18,6 +18,7 @@ export const QUERY_PARAMETER_DATE_INCORRECT = (parameter: string, regExp: RegExp
   `Значение параметра ${parameter} должно быть датой и должно соответствовать регулярному выражению ${regExp}`
 export const INCORRECT_CREDENTIALS = 'Неправильные логин или пароль'
 export const FORBIDDEN_CLIENT_INTERFACE = 'Доступ через это клиентское приложение запрещён'
+export const NOT_AUTHORIZED = 'Вы не авторизованы'
 
 export const FACULTY_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Факультета с id "${id}" не существует`
 export const FACULTY_WITH_TITLE_EXISTS = (title: string) => `Факультет с названием "${title}" уже существует`
