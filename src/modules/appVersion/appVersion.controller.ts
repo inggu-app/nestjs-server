@@ -26,6 +26,9 @@ export class AppVersionController {
       'Эндпоинт позволяет добавить новую версию приложения. Если клиент запросить конкретное обновление или запрос список обновлений с какой-то версии, то ему вернётся обновление(или список), которые соответствуют запросу.',
   })
   @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+  })
   @Post('/add')
   async addVersion(@Body() dto: AddAppVersionDto) {
     await this.appVersionService.create(dto)
