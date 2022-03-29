@@ -1,9 +1,9 @@
 import { ArrayMaxSize, IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator'
-import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
+import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { Types } from 'mongoose'
-import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
+import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
-import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enum'
+import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
 
 export class UpdateUserDto {
   @ApiProperty({

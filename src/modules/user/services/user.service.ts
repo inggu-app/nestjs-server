@@ -1,31 +1,32 @@
 import { Injectable } from '@nestjs/common'
 import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
-import { UserModel, TokenDataModel } from './user.model'
+import { UserModel, TokenDataModel } from '../models/user.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
-import { USER_WITH_ID_NOT_FOUND, USER_WITH_LOGIN_EXISTS, USER_WITH_LOGIN_NOT_FOUND } from '../../global/constants/errors.constants'
-import { AvailabilityDto, CreateUserDto } from './dto/createUser.dto'
+import { USER_WITH_ID_NOT_FOUND, USER_WITH_LOGIN_EXISTS, USER_WITH_LOGIN_NOT_FOUND } from '../../../global/constants/errors.constants'
+import { AvailabilityDto, CreateUserDto } from '../dto/user/createUser.dto'
 import { DocumentType } from '@typegoose/typegoose'
-import { UpdateUserDto } from './dto/updateUser.dto'
+import { UpdateUserDto } from '../dto/user/updateUser.dto'
 import * as bcrypt from 'bcrypt'
-import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
-import { userServiceMethodDefaultOptions } from './user.constants'
-import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
+import { CheckExistenceService } from '../../../global/classes/CheckExistenceService'
+import { userServiceMethodDefaultOptions } from '../constants/user.constants'
+import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMethodOptions'
+import { UpdateRolesDto } from '../dto/user/updateRoles.dto'
+import { RoleService } from './role.service'
 
 @Injectable()
 export class UserService extends CheckExistenceService<UserModel> {
-  constructor(@InjectModel(UserModel) private readonly userModel: ModelType<UserModel>) {
+  constructor(@InjectModel(UserModel) private readonly userModel: ModelType<UserModel>, private readonly roleService: RoleService) {
     super(userModel, undefined, user => USER_WITH_ID_NOT_FOUND(user._id))
   }
 
   async create(dto: CreateUserDto, options = userServiceMethodDefaultOptions.create) {
     options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.create)
-    if (options.checkExistence.user) await this.throwIfExists({ login: dto.login }, { error: USER_WITH_LOGIN_EXISTS(dto.login) })
+    await this.throwIfExists({ login: dto.login }, { error: USER_WITH_LOGIN_EXISTS(dto.login) })
 
     const { password, ...fields } = dto
     const hashedPassword = await bcrypt.hash(password, 8)
-    const usersCount = await this.countMany()
-    return this.userModel.create({ ...fields, hashedPassword, isSuper: usersCount === 0, isUltraSuper: usersCount === 0 })
+    return this.userModel.create({ ...fields, hashedPassword })
   }
 
   async getById(id: Types.ObjectId, queryOptions?: QueryOptions, options = userServiceMethodDefaultOptions.getById) {
@@ -96,6 +97,13 @@ export class UserService extends CheckExistenceService<UserModel> {
       { _id: id },
       { $set: { availability: { ...(user.toObject() as DocumentType<UserModel>).availability, ...availabilityDto } } }
     )
+  }
+
+  async updateRoles(rolesDto: UpdateRolesDto, options = userServiceMethodDefaultOptions.updateRoles) {
+    options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.updateRoles)
+    if (options.checkExistence.user) await this.throwIfNotExists({ _id: rolesDto.id })
+    await this.roleService.throwIfNotExists(rolesDto.roles)
+    return this.userModel.updateOne({ _id: rolesDto.id }, { $set: { roles: rolesDto.roles } })
   }
 
   async addToken(id: Types.ObjectId, tokenData: TokenDataModel, options = userServiceMethodDefaultOptions.addToken) {

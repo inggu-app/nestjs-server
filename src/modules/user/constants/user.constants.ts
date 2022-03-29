@@ -1,11 +1,9 @@
-import { checkOptionsForServiceMethodExistence } from '../../global/utils/serviceMethodOptions'
-import { UserService } from './user.service'
+import { checkOptionsForServiceMethodExistence } from '../../../global/utils/serviceMethodOptions'
+import { UserService } from '../services/user.service'
 
 export const userServiceMethodDefaultOptions = {
   create: {
-    checkExistence: {
-      user: true,
-    },
+    checkExistence: {},
   },
   getById: {
     checkExistence: {
@@ -51,6 +49,12 @@ export const userServiceMethodDefaultOptions = {
   updateAvailability: {
     checkExistence: {
       user: true,
+    },
+  },
+  updateRoles: {
+    checkExistence: {
+      user: true,
+      roles: true,
     },
   },
   addToken: {

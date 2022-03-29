@@ -35,6 +35,8 @@ export const INVALID_NOTE_DEVICE_ID = (id: Types.ObjectId, deviceId: DeviceId) =
 export const USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Пользователь с id ${id} не существует`
 export const USER_WITH_LOGIN_EXISTS = (login: string) => `Пользователь с логином ${login} уже существует`
 export const USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Пользователь с логином ${login} не существует`
+export const ROLE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Роль с id ${id} не существует`
+export const ROLE_WITH_LABEL_EXISTS = (label: string) => `Роль с названием ${label} уже существует`
 
 export const CALL_SCHEDULE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Расписание звонков с id ${id} не существует`
 export const CALL_SCHEDULE_WITH_NAME_EXISTS = (name: string) => `Расписание звонков с названием ${name} уже существует`

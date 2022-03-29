@@ -1,6 +1,6 @@
 import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enum'
+import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
 
 export class LoginDto {
   @ApiProperty({

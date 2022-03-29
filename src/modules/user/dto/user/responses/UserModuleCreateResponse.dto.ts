@@ -1,32 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
+import { MongoIdExample, MongoIdType } from '../../../../../global/constants/constants'
 import { Types } from 'mongoose'
-import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
+import { ClientInterfacesEnum } from '../../../../../global/enums/ClientInterfaces.enum'
 import { AvailabilityDto } from '../createUser.dto'
-
-// {
-//   "user": {
-//   "interfaces": [
-//     "ADMIN_WEB_APP"
-//   ],
-//     "name": "Пользователь",
-//     "login": "user",
-//     "availability": {
-//     "canCreateFaculty": false,
-//       "canUpdateFaculty": false,
-//       "canDeleteFaculty": false,
-//       "canCreateGroup": false,
-//       "canUpdateGroup": false,
-//       "canDeleteGroup": false,
-//       "canUpdateCallSchedule": false,
-//       "canUpdateSemesterRange": false,
-//       "canCreateSchedule": false
-//   },
-//   "createdAt": "2022-03-29T13:18:58.328Z",
-//     "updatedAt": "2022-03-29T13:18:58.328Z",
-//     "id": "6243074290b014c007f8eae8"
-// }
-// }
 
 export class UserModuleResponseUser {
   @ApiProperty({
@@ -44,6 +20,15 @@ export class UserModuleResponseUser {
     required: false,
   })
   interfaces: ClientInterfacesEnum[]
+
+  @ApiProperty({
+    description: 'Роли пользователя',
+    type: MongoIdType,
+    example: [MongoIdExample],
+    isArray: true,
+    required: false,
+  })
+  roles: Types.ObjectId[]
 
   @ApiProperty({
     description: 'Имя пользователя',

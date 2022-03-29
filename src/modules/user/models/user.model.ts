@@ -1,8 +1,9 @@
 import { ModelOptions, prop, Ref } from '@typegoose/typegoose'
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
-import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
-import { FacultyModel } from '../faculty/faculty.model'
-import { ClientInterfacesEnum } from '../../global/enums/ClientInterfaces.enum'
+import { getModelDefaultOptions } from '../../../configs/modelDefaultOptions.config'
+import { FacultyModel } from '../../faculty/faculty.model'
+import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enum'
+import { RoleModel } from './role.model'
 
 export class Availability {
   @prop({ default: false })
@@ -70,4 +71,7 @@ export class UserModel extends TimeStamps {
 
   @prop({ _id: false, required: true, default: [], type: () => TokenDataModel })
   tokens: Ref<TokenDataModel, undefined>[]
+
+  @prop({ ref: RoleModel, default: [] })
+  roles: Ref<RoleModel, undefined>[]
 }

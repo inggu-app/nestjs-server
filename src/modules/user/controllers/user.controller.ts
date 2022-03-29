@@ -11,36 +11,37 @@ import {
   Res,
   UnauthorizedException,
 } from '@nestjs/common'
-import { CreateUserDto } from './dto/createUser.dto'
-import { MongoId } from '../../global/decorators/MongoId.decorator'
+import { CreateUserDto } from '../dto/user/createUser.dto'
+import { MongoId } from '../../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
-import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
-import { UserService } from './user.service'
-import { UpdateUserDto } from './dto/updateUser.dto'
-import { UpdatePasswordDto } from './dto/updatePassword.dto'
-import { LoginDto } from './dto/login.dto'
+import { MongoQueryOptions } from '../../../global/decorators/MongoQueryOptions.decorator'
+import { UserService } from '../services/user.service'
+import { UpdateUserDto } from '../dto/user/updateUser.dto'
+import { UpdatePasswordDto } from '../dto/user/updatePassword.dto'
+import { LoginDto } from '../dto/user/login.dto'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
-import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS, NOT_AUTHORIZED } from '../../global/constants/errors.constants'
+import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS, NOT_AUTHORIZED } from '../../../global/constants/errors.constants'
 import { Request, Response } from 'express'
-import { UserModel, TokenDataModel } from './user.model'
-import { addDays } from './date'
-import { UpdateAvailabilityDto } from './dto/updateAvailability.dto'
-import { removeFields } from '../../global/utils/removeFields'
+import { UserModel, TokenDataModel } from '../models/user.model'
+import { addDays } from '../date'
+import { UpdateAvailabilityDto } from '../dto/user/updateAvailability.dto'
+import { removeFields } from '../../../global/utils/removeFields'
 import { DocumentType } from '@typegoose/typegoose'
-import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
-import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
-import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
-import { ITokenData } from '../../global/types'
+import { WhitelistedValidationPipe } from '../../../global/decorators/WhitelistedValidationPipe.decorator'
+import { IntQueryParam } from '../../../global/decorators/IntQueryParam.decorator'
+import { StringQueryParam } from '../../../global/decorators/StringQueryParam.decorator'
+import { ITokenData } from '../../../global/types'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
-import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
-import { UserModuleCreateResponseDto } from './dto/responses/UserModuleCreateResponse.dto'
-import { UserModuleGetByIdResponseDto } from './dto/responses/UserModuleGetByIdResponse.dto'
-import { UserModuleGetByIdsResponseDto } from './dto/responses/UserModuleGetByIdsResponse.dto'
-import { UserModuleGetManyResponseDto } from './dto/responses/UserModuleGetManyResponse.dto'
-import { UserModuleCheckAuthorizedResponseDto } from './dto/responses/UserModuleCheckAuthorizedResponse.dto'
-import { MongoIdExample, MongoIdType } from '../../global/constants/constants'
+import { ApiMongoQueryOptions } from '../../../global/decorators/ApiMongoQueryOptions.decorator'
+import { ApiResponseException } from '../../../global/decorators/ApiResponseException.decorator'
+import { UserModuleCreateResponseDto } from '../dto/user/responses/UserModuleCreateResponse.dto'
+import { UserModuleGetByIdResponseDto } from '../dto/user/responses/UserModuleGetByIdResponse.dto'
+import { UserModuleGetByIdsResponseDto } from '../dto/user/responses/UserModuleGetByIdsResponse.dto'
+import { UserModuleGetManyResponseDto } from '../dto/user/responses/UserModuleGetManyResponse.dto'
+import { UserModuleCheckAuthorizedResponseDto } from '../dto/user/responses/UserModuleCheckAuthorizedResponse.dto'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
+import { UpdateRolesDto } from '../dto/user/updateRoles.dto'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -252,6 +253,19 @@ export class UserController {
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
     await this.userService.updateAvailability(dto.id, dto.availability)
+  }
+
+  @WhitelistedValidationPipe()
+  @ApiOperation({
+    description: 'Эндпоинт позволяет обновить роли пользователя.',
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
+  @Patch('/update-roles')
+  async updateRoles(@Body() dto: UpdateRolesDto) {
+    await this.userService.updateRoles(dto)
   }
 
   @ApiOperation({

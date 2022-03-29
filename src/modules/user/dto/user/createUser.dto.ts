@@ -1,9 +1,9 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
-import { Availability } from '../user.model'
+import { Availability } from '../../models/user.model'
 import { Type } from 'class-transformer'
-import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
+import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
-import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enum'
+import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
 
 export class AvailabilityDto implements Partial<Availability> {
   @ApiProperty({

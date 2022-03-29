@@ -3,7 +3,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@
 import { envVariables } from '../constants/envVariables.constants'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { UserService } from '../../modules/user/user.service'
+import { UserService } from '../../modules/user/services/user.service'
 
 export interface IAccessTokenAuth {
   accessAllowed(tokenData: ITokenData, token: string, context: ExecutionContext): boolean | Promise<boolean | undefined> | undefined
