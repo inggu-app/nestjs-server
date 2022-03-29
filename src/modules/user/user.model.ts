@@ -46,13 +46,13 @@ export class TokenDataModel {
   expiresIn: Date
 }
 
-export interface AdminUserModel extends Base {}
+export interface UserModel extends Base {}
 @ModelOptions({
   schemaOptions: getModelDefaultOptions<FacultyModel>({
-    collection: 'AdminUser',
+    collection: 'User',
   }),
 })
-export class AdminUserModel extends TimeStamps {
+export class UserModel extends TimeStamps {
   @prop({ required: true })
   name: string
 

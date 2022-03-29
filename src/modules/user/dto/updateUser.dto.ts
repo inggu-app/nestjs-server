@@ -5,9 +5,9 @@ import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorato
 import { ApiProperty } from '@nestjs/swagger'
 import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enum'
 
-export class UpdateAdminUserDto {
+export class UpdateUserDto {
   @ApiProperty({
-    title: 'Id администратора, которого необходимо обновить',
+    title: 'id пользователя, которого необходимо обновить',
     type: 'MongoId',
     example: '6203ce8cff1a854919f38314',
   })
@@ -16,8 +16,8 @@ export class UpdateAdminUserDto {
 
   @ApiProperty({
     required: false,
-    title: 'Имя администратора, на которое нужно заменить текущее имя.',
-    example: 'Администратор',
+    title: 'Имя пользователя, на которое нужно заменить текущее имя.',
+    example: 'Пользователь',
     maxLength: 60,
     minLength: 1,
   })
@@ -29,7 +29,7 @@ export class UpdateAdminUserDto {
 
   @ApiProperty({
     required: false,
-    title: 'Логин администратора, на который нужно заменить текущее имя.',
+    title: 'Логин пользователя, на который нужно заменить текущее имя.',
     example: 'admin',
     maxLength: 60,
     minLength: 1,

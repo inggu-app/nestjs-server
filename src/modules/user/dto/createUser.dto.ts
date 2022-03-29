@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
-import { Availability } from '../adminUser.model'
+import { Availability } from '../user.model'
 import { Type } from 'class-transformer'
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
@@ -8,7 +8,7 @@ import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enu
 export class AvailabilityDto implements Partial<Availability> {
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор обновить любое расписание звонков.',
+    title: 'Может ли пользователь обновить любое расписание звонков.',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -16,7 +16,7 @@ export class AvailabilityDto implements Partial<Availability> {
 
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор создать факультет.',
+    title: 'Может ли пользователь создать факультет.',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -24,7 +24,7 @@ export class AvailabilityDto implements Partial<Availability> {
 
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор создать группу.',
+    title: 'Может ли пользователь создать группу.',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -32,7 +32,7 @@ export class AvailabilityDto implements Partial<Availability> {
 
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор удалить факультет.',
+    title: 'Может ли пользователь удалить факультет.',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -40,7 +40,7 @@ export class AvailabilityDto implements Partial<Availability> {
 
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор удалить группу.',
+    title: 'Может ли пользователь удалить группу.',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -48,7 +48,7 @@ export class AvailabilityDto implements Partial<Availability> {
 
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор обновить факультет.',
+    title: 'Может ли пользователь обновить факультет.',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -56,7 +56,7 @@ export class AvailabilityDto implements Partial<Availability> {
 
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор обновить группу.',
+    title: 'Может ли пользователь обновить группу.',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -65,7 +65,7 @@ export class AvailabilityDto implements Partial<Availability> {
   // TODO: посмотреть
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор обновить ',
+    title: 'Может ли пользователь обновить ',
   })
   @IsUndefinable()
   @IsBoolean()
@@ -73,19 +73,19 @@ export class AvailabilityDto implements Partial<Availability> {
 
   @ApiProperty({
     required: false,
-    title: 'Может ли администратор создать расписание занятий',
+    title: 'Может ли пользователь создать расписание занятий',
   })
   @IsUndefinable()
   @IsBoolean()
   canCreateSchedule?: boolean
 }
 
-export class CreateAdminUserDto {
+export class CreateUserDto {
   @ApiProperty({
-    title: 'Имя администратора',
+    title: 'Имя пользователя',
     maxLength: 60,
     minLength: 1,
-    example: 'Администратор',
+    example: 'Пользователь',
   })
   @IsString()
   @IsNotEmpty()
@@ -93,10 +93,10 @@ export class CreateAdminUserDto {
   name: string
 
   @ApiProperty({
-    title: 'Логин администратора',
+    title: 'Логин пользователь',
     maxLength: 60,
     minLength: 1,
-    example: 'Admin',
+    example: 'User',
   })
   @IsString()
   @IsNotEmpty()
@@ -104,7 +104,7 @@ export class CreateAdminUserDto {
   login: string
 
   @ApiProperty({
-    title: 'Пароль администратора',
+    title: 'Пароль пользователь',
     maxLength: 30,
     minLength: 1,
     example: '123456',
@@ -115,7 +115,7 @@ export class CreateAdminUserDto {
   password: string
 
   @ApiProperty({
-    title: 'Список разрешений администратора',
+    title: 'Список разрешений пользователя',
   })
   @IsObject()
   @ValidateNested()

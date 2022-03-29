@@ -1,9 +1,9 @@
-import { Availability, TokenDataModel } from '../../modules/adminUser/adminUser.model'
+import { Availability, TokenDataModel } from '../../modules/user/user.model'
 import { applyDecorators, ExecutionContext, Injectable, SetMetadata, UseGuards } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { AdminUserService } from '../../modules/adminUser/adminUser.service'
+import { UserService } from '../../modules/user/user.service'
 import { ITokenData } from '../types'
 import { Types } from 'mongoose'
 import { AccessTokenAuthGuard, IAccessTokenAuth } from '../guards/AccessTokenAuth.guard'
@@ -22,7 +22,7 @@ export class AdminUserAuthGuard extends AccessTokenAuthGuard implements IAccessT
     protected readonly reflector: Reflector,
     protected readonly jwtService: JwtService,
     protected readonly configService: ConfigService,
-    protected readonly adminUserService: AdminUserService
+    protected readonly adminUserService: UserService
   ) {
     super(jwtService, configService, adminUserService)
   }

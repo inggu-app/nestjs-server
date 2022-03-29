@@ -7,7 +7,7 @@ import { CallScheduleModule } from '../modules/callSchedule/callSchedule.module'
 import { SecretLabelModule } from '../modules/settings/secretLabel/secretLabel.module'
 import { NoteModule } from '../modules/note/note.module'
 import { ModuleRoutesEnum } from '../global/enums/moduleRoutes.enum'
-import { AdminUserModule } from '../modules/adminUser/adminUser.module'
+import { UserModule } from '../modules/user/user.module'
 import { AppVersionModule } from '../modules/appVersion/appVersion.module'
 import { LearningStageModule } from '../modules/learningStage/learningStage.module'
 
@@ -30,7 +30,7 @@ export const routesConfig: Routes = [
   },
   {
     path: ModuleRoutesEnum.ADMIN_USER_MODULE,
-    module: AdminUserModule,
+    module: UserModule,
   },
   {
     path: ModuleRoutesEnum.CALL_SCHEDULE_MODULE,

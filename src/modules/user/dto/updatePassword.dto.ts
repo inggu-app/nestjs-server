@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 
 export class UpdatePasswordDto {
   @ApiProperty({
-    title: 'Логин администратора, пароль которого нужно обновить.',
+    title: 'Логин пользователя, пароль которого нужно обновить.',
     example: 'admin',
   })
   @IsString()

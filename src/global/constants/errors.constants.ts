@@ -31,9 +31,9 @@ export const NOTE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Заметки с
 export const INVALID_NOTE_DEVICE_ID = (id: Types.ObjectId, deviceId: DeviceId) =>
   `Заметка c id ${id} создана не устройством с deviceId ${deviceId}`
 
-export const ADMIN_USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Админ с id ${id} не существует`
-export const ADMIN_USER_WITH_LOGIN_EXISTS = (login: string) => `Админ с логином ${login} уже существует`
-export const ADMIN_USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Админ с логином ${login} не существует`
+export const USER_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Пользователь с id ${id} не существует`
+export const USER_WITH_LOGIN_EXISTS = (login: string) => `Пользователь с логином ${login} уже существует`
+export const USER_WITH_LOGIN_NOT_FOUND = (login: string) => `Пользователь с логином ${login} не существует`
 
 export const CALL_SCHEDULE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Расписание звонков с id ${id} не существует`
 export const CALL_SCHEDULE_WITH_NAME_EXISTS = (name: string) => `Расписание звонков с названием ${name} уже существует`

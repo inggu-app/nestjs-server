@@ -3,10 +3,10 @@ import { Types } from 'mongoose'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { AdminUserService } from '../../modules/adminUser/adminUser.service'
+import { UserService } from '../../modules/user/user.service'
 import { ITokenData } from '../types'
 import { AccessTokenAuthGuard, IAccessTokenAuth } from '../guards/AccessTokenAuth.guard'
-import { TokenDataModel } from '../../modules/adminUser/adminUser.model'
+import { TokenDataModel } from '../../modules/user/user.model'
 
 export const UltraSuperAdminUserAuth = () => {
   return UseGuards(UltraSuperAdminUserAuthGuard)
@@ -18,7 +18,7 @@ class UltraSuperAdminUserAuthGuard extends AccessTokenAuthGuard implements IAcce
     protected readonly reflector: Reflector,
     protected readonly jwtService: JwtService,
     protected readonly configService: ConfigService,
-    protected readonly adminUserService: AdminUserService
+    protected readonly adminUserService: UserService
   ) {
     super(jwtService, configService, adminUserService)
   }

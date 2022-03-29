@@ -12,7 +12,7 @@ import { JwtModule } from '@nestjs/jwt'
 import getJWTConfig from '../../configs/jwt.config'
 import { FacultyModule } from '../faculty/faculty.module'
 import { GroupModule } from '../group/group.module'
-import { AdminUserModule } from '../adminUser/adminUser.module'
+import { UserModule } from '../user/user.module'
 import { CallScheduleModule } from '../callSchedule/callSchedule.module'
 import { AppVersionModule } from '../appVersion/appVersion.module'
 import { LearningStageModule } from '../learningStage/learningStage.module'
@@ -25,7 +25,7 @@ import { LearningStageModule } from '../learningStage/learningStage.module'
     FacultyModule,
     GroupModule,
     RouterModule.forRoutes(routesConfig),
-    AdminUserModule,
+    UserModule,
     CallScheduleModule,
     AppVersionModule,
     LearningStageModule,

@@ -4,7 +4,7 @@ import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enu
 
 export class LoginDto {
   @ApiProperty({
-    title: 'Логин администратора',
+    title: 'Логин пользователя',
     example: 'admin',
     maxLength: 60,
     minLength: 1,
@@ -15,7 +15,7 @@ export class LoginDto {
   login: string
 
   @ApiProperty({
-    title: 'Пароль администратора',
+    title: 'Пароль пользователя',
     example: '123456',
     maxLength: 30,
     minLength: 1,

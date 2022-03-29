@@ -1,25 +1,25 @@
 import { checkOptionsForServiceMethodExistence } from '../../global/utils/serviceMethodOptions'
-import { AdminUserService } from './adminUser.service'
+import { UserService } from './user.service'
 
-export const adminUserServiceMethodDefaultOptions = {
+export const userServiceMethodDefaultOptions = {
   create: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   getById: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   getByLogin: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   getByIds: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   getMany: {
@@ -30,54 +30,54 @@ export const adminUserServiceMethodDefaultOptions = {
   },
   update: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   updateUserSuper: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   updateUserUltraSuper: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   updatePassword: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   updateAvailability: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   addToken: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   deleteToken: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   checkTokenExists: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   deleteExpiredTokens: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
   deleteById: {
     checkExistence: {
-      adminUser: true,
+      user: true,
     },
   },
 }
 
-checkOptionsForServiceMethodExistence<AdminUserService>(adminUserServiceMethodDefaultOptions)
+checkOptionsForServiceMethodExistence<UserService>(userServiceMethodDefaultOptions)
