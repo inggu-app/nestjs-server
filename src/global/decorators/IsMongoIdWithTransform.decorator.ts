@@ -1,4 +1,13 @@
-import { buildMessage, IsDefined, isMongoId, registerDecorator, ValidationOptions } from 'class-validator'
+import {
+  buildMessage,
+  IsDefined,
+  isMongoId,
+  registerDecorator,
+  ValidationArguments,
+  ValidationOptions,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator'
 import { Transform, TransformFnParams } from 'class-transformer'
 import { Types } from 'mongoose'
 
@@ -27,14 +36,21 @@ function CustomIsMongoId(validationOptions?: ValidationOptions) {
       name: 'CustomIsMongoId',
       target: object.constructor,
       propertyName: propertyName.toString(),
+      constraints: [validationOptions],
       options: validationOptions,
-      validator: {
-        validate(value: any): Promise<boolean> | boolean {
-          if (value instanceof Types.ObjectId) return isMongoId(value.toHexString())
-          else return isMongoId(value)
-        },
-        defaultMessage: buildMessage(eachPrefix => `${eachPrefix}$property must be a mongo id`, validationOptions),
-      },
+      validator: CustomIsMongoIdValidator,
     })
+  }
+}
+
+@ValidatorConstraint({ async: true, name: 'CustomIsMongoId' })
+export class CustomIsMongoIdValidator implements ValidatorConstraintInterface {
+  validate(value: any) {
+    if (value instanceof Types.ObjectId) return isMongoId(value.toHexString())
+    else return isMongoId(value)
+  }
+
+  defaultMessage(validationArguments?: ValidationArguments): string {
+    return buildMessage(eachPrefix => `${eachPrefix}$property must be a mongo id`, validationArguments?.constraints[0])(validationArguments)
   }
 }
