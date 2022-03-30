@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
-import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
+import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
@@ -29,9 +29,6 @@ export class CallScheduleController {
     private readonly groupService: GroupService
   ) {}
 
-  @AdminUserAuth({
-    availability: 'canUpdateCallSchedule',
-  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description:

@@ -4,34 +4,61 @@ import { getModelDefaultOptions } from '../../../configs/modelDefaultOptions.con
 import { FacultyModel } from '../../faculty/faculty.model'
 import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enum'
 import { RoleModel } from './role.model'
+import { GroupModel } from '../../group/group.model'
+import { Types } from 'mongoose'
 
-export class Availability {
+// работа с созданием расписания занятий для группы
+export class CreateScheduleAvailabilityModel {
   @prop({ default: false })
-  canCreateFaculty: boolean // можно ли создать факультет
+  available: boolean
 
-  @prop({ default: false })
-  canUpdateFaculty: boolean // можно ли обновить факультет
+  @prop({ default: true })
+  all: boolean
 
-  @prop({ default: false })
-  canDeleteFaculty: boolean // можно ли удалить факультет
+  @prop({ ref: FacultyModel, default: [] })
+  availableFaculties: (Types.ObjectId | FacultyModel)[]
 
-  @prop({ default: false })
-  canCreateGroup: boolean // можно ли создать группу
+  @prop({ ref: GroupModel, default: [] })
+  availableGroups: (Types.ObjectId | GroupModel)[]
 
-  @prop({ default: false })
-  canUpdateGroup: boolean // можно ли обновить группу
+  @prop({ ref: GroupModel, default: [] })
+  forbiddenGroups: (Types.ObjectId | GroupModel)[]
+}
 
-  @prop({ default: false })
-  canDeleteGroup: boolean // можно ли удалить группу
-
-  @prop({ default: false })
-  canUpdateCallSchedule: boolean // можно ли обновить расписание звонков
-
-  @prop({ default: false })
-  canUpdateSemesterRange: boolean // можно ли обновить длительность семестра
-
-  @prop({ default: false })
-  canCreateSchedule: boolean // можно ли создать расписание занятий
+export class AvailabilityModel {
+  @prop({
+    type: CreateScheduleAvailabilityModel,
+    default: <CreateScheduleAvailabilityModel>{
+      available: false,
+      all: true,
+      availableFaculties: [],
+      availableGroups: [],
+      forbiddenGroups: [],
+    },
+    _id: false,
+  })
+  createSchedule: CreateScheduleAvailabilityModel
+  //
+  // @prop({ default: false })
+  // canUpdateFaculty: boolean // можно ли обновить факультет
+  //
+  // @prop({ default: false })
+  // canDeleteFaculty: boolean // можно ли удалить факультет
+  //
+  // @prop({ default: false })
+  // canCreateGroup: boolean // можно ли создать группу
+  //
+  // @prop({ default: false })
+  // canUpdateGroup: boolean // можно ли обновить группу
+  //
+  // @prop({ default: false })
+  // canDeleteGroup: boolean // можно ли удалить группу
+  //
+  // @prop({ default: false })
+  // canUpdateCallSchedule: boolean // можно ли обновить расписание звонков
+  //
+  // @prop({ default: false })
+  // canUpdateSemesterRange: boolean // можно ли обновить длительность семестра
 }
 
 export class TokenDataModel {
@@ -66,8 +93,8 @@ export class UserModel extends TimeStamps {
   @prop({ required: true })
   hashedPassword: string
 
-  @prop({ _id: false, required: true, type: () => Availability })
-  availability: Ref<Availability, undefined>
+  @prop({ _id: false, required: true, type: () => AvailabilityModel })
+  availability: AvailabilityModel
 
   @prop({ _id: false, required: true, default: [], type: () => TokenDataModel })
   tokens: Ref<TokenDataModel, undefined>[]

@@ -1,83 +1,24 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
-import { Availability } from '../../models/user.model'
+import { IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
+import { AvailabilityModel, CreateScheduleAvailabilityModel } from '../../models/user.model'
 import { Type } from 'class-transformer'
-import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
 import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
+import { Types } from 'mongoose'
 
-export class AvailabilityDto implements Partial<Availability> {
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь обновить любое расписание звонков.',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canUpdateCallSchedule?: boolean
+export class CreateScheduleAvailabilityDto implements CreateScheduleAvailabilityModel {
+  available: boolean
 
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь создать факультет.',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canCreateFaculty?: boolean
+  all: boolean
 
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь создать группу.',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canCreateGroup?: boolean
+  availableFaculties: Types.ObjectId[]
 
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь удалить факультет.',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canDeleteFaculty?: boolean
+  availableGroups: Types.ObjectId[]
 
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь удалить группу.',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canDeleteGroup?: boolean
+  forbiddenGroups: Types.ObjectId[]
+}
 
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь обновить факультет.',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canUpdateFaculty?: boolean
-
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь обновить группу.',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canUpdateGroup?: boolean
-
-  // TODO: посмотреть
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь обновить ',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canUpdateSemesterRange?: boolean
-
-  @ApiProperty({
-    required: false,
-    title: 'Может ли пользователь создать расписание занятий',
-  })
-  @IsUndefinable()
-  @IsBoolean()
-  canCreateSchedule?: boolean
+export class AvailabilityDto implements AvailabilityModel {
+  createSchedule: CreateScheduleAvailabilityDto
 }
 
 export class CreateUserDto {

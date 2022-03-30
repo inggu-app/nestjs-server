@@ -5,7 +5,7 @@ import { QueryOptions, Types } from 'mongoose'
 import { UpdateGroupDto } from './dto/updateGroup.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
-import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
+import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
@@ -24,9 +24,6 @@ import { GroupModuleGetManyResponseDto } from './dto/responses/GroupModuleGetMan
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
-  @AdminUserAuth({
-    availability: 'canCreateGroup',
-  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет создать группу',
@@ -156,9 +153,6 @@ export class GroupController {
     }
   }
 
-  @AdminUserAuth({
-    availability: 'canUpdateGroup',
-  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить информацию о группе. В теле нужно передавать только те поля, которые нужно обновить',
@@ -172,9 +166,6 @@ export class GroupController {
     await this.groupService.update(dto)
   }
 
-  @AdminUserAuth({
-    availability: 'canDeleteGroup',
-  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить группу по переданному id',
   })

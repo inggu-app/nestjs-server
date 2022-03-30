@@ -5,7 +5,6 @@ import { QueryOptions, Types } from 'mongoose'
 import { UpdateFacultyDto } from './dto/updateFaculty.dto'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
-import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { IntQueryParam } from '../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
@@ -23,9 +22,6 @@ import { FacultyModuleGetManyResponseDto } from './dto/responses/FacultyModuleGe
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
 
-  @AdminUserAuth({
-    availability: 'canCreateFaculty',
-  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет создать факультет',
@@ -138,9 +134,6 @@ export class FacultyController {
     }
   }
 
-  @AdminUserAuth({
-    availability: 'canUpdateFaculty',
-  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description:
@@ -155,9 +148,6 @@ export class FacultyController {
     await this.facultyService.update(dto)
   }
 
-  @AdminUserAuth({
-    availability: 'canDeleteFaculty',
-  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить факультет',
   })

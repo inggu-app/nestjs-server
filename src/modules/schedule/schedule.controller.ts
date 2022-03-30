@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, HttpStatus, Post } from '@nestjs/common'
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { QueryOptions, Types } from 'mongoose'
@@ -9,12 +9,15 @@ import { NoteService } from '../note/note.service'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { DateQueryParam } from '../../global/decorators/DateQueryParam.decorator'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { AdminUserAuth } from '../../global/decorators/AdminUserAuth.decorator'
 import { MongoIdExample } from '../../global/constants/constants'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
 import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
 import { ScheduleModuleGetByGroupIdResponseDto } from './dto/responses/ScheduleModuleGetByGroupIdResponseDto'
 import { ScheduleModuleCheckScheduleUpdateResponseDto } from './dto/responses/ScheduleModuleCheckScheduleUpdateResponseDto'
+import { UserAuth } from '../../global/decorators/UserAuth.decorator'
+import { CreateScheduleAvailabilityModel } from '../user/models/user.model'
+import { RequestUser } from '../../global/decorators/RequestUser.decorator'
+import { FacultyService } from '../faculty/faculty.service'
 
 @ApiTags('Расписание занятий')
 @Controller()
@@ -22,23 +25,34 @@ export class ScheduleController {
   constructor(
     private readonly scheduleService: ScheduleService,
     private readonly groupService: GroupService,
+    private readonly facultyService: FacultyService,
     private readonly noteService: NoteService
   ) {}
 
+  @UserAuth({
+    availability: 'createSchedule',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет установить расписание занятий для группы.',
-  })
-  @AdminUserAuth({
-    availability: 'canCreateSchedule',
   })
   @ApiResponseException()
   @ApiResponse({
     status: HttpStatus.CREATED,
   })
   @Post('/')
-  async create(@Body() dto: CreateScheduleDto) {
-    await this.groupService.throwIfNotExists({ _id: dto.group })
+  async create(@Body() dto: CreateScheduleDto, @RequestUser() user: RequestUser<CreateScheduleAvailabilityModel>) {
+    if (!user.availability.all) {
+      if (user.availability.forbiddenGroups.includes(dto.group))
+        throw new BadRequestException('Для данной группы нельзя создать расписание')
+      if (!user.availability.availableGroups.includes(dto.group)) {
+        const group = await this.groupService.getById(dto.group, { projection: { faculty: 1 } })
+        if (!user.availability.availableFaculties.includes(group.faculty)) {
+          throw new BadRequestException('Для данной группы нельзя создать расписание')
+        }
+      }
+    }
 
     // Обновляем уже существующие занятия
     const existLessons = dto.schedule.filter(lesson => lesson.id)

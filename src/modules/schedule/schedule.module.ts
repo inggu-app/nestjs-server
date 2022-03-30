@@ -6,6 +6,7 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
 import { CallScheduleModule } from '../callSchedule/callSchedule.module'
 import { NoteModule } from '../note/note.module'
+import { FacultyModule } from '../faculty/faculty.module'
 
 @Module({
   controllers: [ScheduleController],
@@ -14,6 +15,7 @@ import { NoteModule } from '../note/note.module'
     GroupModule,
     CallScheduleModule,
     NoteModule,
+    FacultyModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: LessonModel,

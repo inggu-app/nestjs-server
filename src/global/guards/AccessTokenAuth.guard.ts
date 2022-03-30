@@ -14,7 +14,7 @@ export class AccessTokenAuthGuard implements CanActivate, IAccessTokenAuth {
   constructor(
     protected readonly jwtService: JwtService,
     protected readonly configService: ConfigService,
-    protected readonly adminUserService: UserService
+    protected readonly userService: UserService
   ) {}
 
   accessAllowed(tokenData: ITokenData, token: string, context: ExecutionContext): boolean | Promise<boolean | undefined> | undefined {
@@ -22,7 +22,7 @@ export class AccessTokenAuthGuard implements CanActivate, IAccessTokenAuth {
   }
 
   async canActivate(context: ExecutionContext) {
-    if ((await this.adminUserService.countMany()) === 0) return true
+    if ((await this.userService.countMany()) === 0) return true
     const token = context.switchToHttp().getRequest().cookies['access_token']
 
     if (token) {
