@@ -16,6 +16,7 @@ import { UserModule } from '../user/user.module'
 import { CallScheduleModule } from '../callSchedule/callSchedule.module'
 import { AppVersionModule } from '../appVersion/appVersion.module'
 import { LearningStageModule } from '../learningStage/learningStage.module'
+import { CheckExistsValidator } from '../../global/decorators/CheckExists.decorator'
 
 @Module({
   imports: [
@@ -44,6 +45,6 @@ import { LearningStageModule } from '../learningStage/learningStage.module'
       useFactory: getMongoConfig,
     }),
   ],
-  providers: [AppService],
+  providers: [AppService, CheckExistsValidator],
 })
 export class AppModule {}

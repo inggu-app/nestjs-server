@@ -7,6 +7,10 @@ import { Types } from 'mongoose'
 import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
 import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdWithTransform.decorator'
+import { CheckExists } from '../../../../global/decorators/CheckExists.decorator'
+import { FacultyModel } from '../../../faculty/faculty.model'
+import { GroupModel } from '../../../group/group.model'
+import { GroupService } from '../../../group/group.service'
 
 export class CreateScheduleAvailabilityDto implements CreateScheduleAvailabilityModel {
   @ApiProperty({
@@ -30,6 +34,7 @@ export class CreateScheduleAvailabilityDto implements CreateScheduleAvailability
     isArray: true,
   })
   @IsMongoIdWithTransform({ each: true })
+  @CheckExists(FacultyModel, true)
   availableFaculties: Types.ObjectId[]
 
   @ApiProperty({
@@ -40,6 +45,7 @@ export class CreateScheduleAvailabilityDto implements CreateScheduleAvailability
     isArray: true,
   })
   @IsMongoIdWithTransform({ each: true })
+  @CheckExists(GroupModel, true)
   availableGroups: Types.ObjectId[]
 
   @ApiProperty({
@@ -50,6 +56,7 @@ export class CreateScheduleAvailabilityDto implements CreateScheduleAvailability
     isArray: true,
   })
   @IsMongoIdWithTransform({ each: true })
+  @CheckExists(GroupService, true)
   forbiddenGroups: Types.ObjectId[]
 }
 
