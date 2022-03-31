@@ -5,6 +5,8 @@ import {
   CreateGroupAvailabilityModel,
   CreateScheduleAvailabilityModel,
   DeleteGroupAvailabilityModel,
+  UpdateFacultyAvailabilityAvailableFieldsModel,
+  UpdateFacultyAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
   UpdateGroupAvailabilityModel,
 } from '../../models/user.model'
@@ -242,6 +244,54 @@ export class CreateFacultyAvailabilityDto implements CreateFacultyAvailabilityMo
   available: boolean
 }
 
+export class UpdateFacultyAvailabilityAvailableFieldsDto implements UpdateFacultyAvailabilityAvailableFieldsModel {
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать название факультета',
+  })
+  @IsBoolean()
+  title: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать расписания звонков факультета',
+  })
+  @IsBoolean()
+  callSchedule: boolean
+}
+
+export class UpdateFacultyAvailabilityDto implements UpdateFacultyAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Доступны ли пользователю для обновления все факультеты. Если стоит true, то доступны все факультеты. Если стоит false, то нужно опираться на список в поле availableFaculties',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список разрешённых для редактирования факультетов. Имеет значение только если в all стоит значение false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform()
+  @CheckExists(FacultyModel, true)
+  availableFaculties: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Доступные для редактирования поля факультета.',
+    type: UpdateFacultyAvailabilityAvailableFieldsDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateFacultyAvailabilityAvailableFieldsDto)
+  availableFields: UpdateFacultyAvailabilityAvailableFieldsDto
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -297,6 +347,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => CreateFacultyAvailabilityDto)
   createFaculty?: CreateFacultyAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять факультеты',
+    type: UpdateFacultyAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateFacultyAvailabilityDto)
+  updateFaculty?: UpdateFacultyAvailabilityDto
 }
 
 export class CreateUserDto {
