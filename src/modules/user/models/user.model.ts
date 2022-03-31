@@ -7,6 +7,7 @@ import { RoleModel } from './role.model'
 import { GroupModel } from '../../group/group.model'
 import { Types } from 'mongoose'
 import { UpdateGroupDto } from '../../group/dto/updateGroup.dto'
+import { UpdateFacultyDto } from '../../faculty/dto/updateFaculty.dto'
 
 // работа с редактированием расписания занятий для группы
 export class CreateScheduleAvailabilityModel {
@@ -128,8 +129,38 @@ export class DeleteGroupAvailabilityModel {
 
 // работа с созданием факультетов
 export class CreateFacultyAvailabilityModel {
-  @prop({ default: true })
+  @prop({ default: false })
   available: boolean
+}
+
+export class UpdateFacultyAvailabilityAvailableFieldsModel implements Record<keyof Omit<UpdateFacultyDto, 'id'>, boolean> {
+  @prop({ default: false })
+  title: boolean
+
+  @prop({ default: false })
+  callSchedule: boolean
+}
+
+// работа с обновлением факультетов
+export class UpdateFacultyAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: true })
+  all: boolean
+
+  @prop({ ref: FacultyModel, default: [] })
+  availableFaculties: (Types.ObjectId | FacultyModel)[]
+
+  @prop({
+    type: UpdateFacultyAvailabilityAvailableFieldsModel,
+    default: <UpdateFacultyAvailabilityAvailableFieldsModel>{
+      title: false,
+      callSchedule: false,
+    },
+    _id: false,
+  })
+  availableFields: UpdateFacultyAvailabilityAvailableFieldsModel
 }
 
 export class AvailabilityModel {
@@ -192,6 +223,20 @@ export class AvailabilityModel {
     _id: false,
   })
   createFaculty: CreateFacultyAvailabilityModel
+
+  @prop({
+    type: UpdateFacultyAvailabilityModel,
+    default: <UpdateFacultyAvailabilityModel>{
+      available: false,
+      all: true,
+      availableFaculties: [],
+      availableFields: {
+        title: false,
+        callSchedule: false,
+      },
+    },
+  })
+  updateFaculty: UpdateFacultyAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

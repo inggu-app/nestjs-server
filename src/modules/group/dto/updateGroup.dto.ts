@@ -43,6 +43,7 @@ export class UpdateGroupDto {
     title: 'Id расписания звонков, на которое необходимо заменить текущее расписание',
     example: '6203ce8cff1a854919f38314',
     type: 'MongoId',
+    nullable: true,
   })
   @IsUndefinable()
   @IsNullable()

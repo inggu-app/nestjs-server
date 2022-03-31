@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
 import { FacultyService } from './faculty.service'
 import { CreateFacultyDto } from './dto/createFaculty.dto'
 import { QueryOptions, Types } from 'mongoose'
@@ -17,6 +17,8 @@ import { FacultyModuleGetByIdResponseDto } from './dto/responses/FacultyModuleGe
 import { FacultyModuleGetByIdsResponseDto } from './dto/responses/FacultyModuleGetByIdsResponseDto'
 import { FacultyModuleGetManyResponseDto } from './dto/responses/FacultyModuleGetManyResponseDto'
 import { UserAuth } from '../../global/decorators/UserAuth.decorator'
+import { RequestUser } from '../../global/decorators/RequestUser.decorator'
+import { UpdateFacultyAvailabilityModel } from '../user/models/user.model'
 
 @ApiTags('Факультеты')
 @Controller()
@@ -139,6 +141,10 @@ export class FacultyController {
     }
   }
 
+  @UserAuth({
+    availability: 'updateFaculty',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description:
@@ -149,7 +155,21 @@ export class FacultyController {
     status: HttpStatus.OK,
   })
   @Patch('/')
-  async update(@Body() dto: UpdateFacultyDto) {
+  async update(@Body() dto: UpdateFacultyDto, @RequestUser() user: RequestUser<UpdateFacultyAvailabilityModel>) {
+    // проверяем пытается ли пользователь обновить запрещённые ему поля
+    const availableFields = user.availability.availableFields
+    const errors: string[] = []
+    if (!availableFields.title && dto.title) errors.push('Пользователю запрещено редактировать поле title у факультета')
+    if (!availableFields.callSchedule && dto.callSchedule !== undefined)
+      errors.push('Пользователю запрещено редактировать поле callSchedule у факультета')
+    if (errors.length) throw new BadRequestException(errors)
+
+    // проверяем пытается ли пользователь обновить недоступный ему факультет
+    if (!user.availability.all) {
+      if (!user.availability.availableFaculties.includes(dto.id))
+        throw new BadRequestException(`Пользователь не может редактировать факультет с id ${dto.id}`)
+    }
+
     await this.facultyService.update(dto)
   }
 
