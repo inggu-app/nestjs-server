@@ -126,6 +126,12 @@ export class DeleteGroupAvailabilityModel {
   forbiddenGroups: (Types.ObjectId | GroupModel)[]
 }
 
+// работа с созданием факультетов
+export class CreateFacultyAvailabilityModel {
+  @prop({ default: true })
+  available: boolean
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -177,6 +183,15 @@ export class AvailabilityModel {
     _id: false,
   })
   deleteGroup: DeleteGroupAvailabilityModel
+
+  @prop({
+    type: CreateFacultyAvailabilityModel,
+    default: <CreateFacultyAvailabilityModel>{
+      available: false,
+    },
+    _id: false,
+  })
+  createFaculty: CreateFacultyAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

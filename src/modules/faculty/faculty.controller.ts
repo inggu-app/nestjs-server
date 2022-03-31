@@ -16,12 +16,17 @@ import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptio
 import { FacultyModuleGetByIdResponseDto } from './dto/responses/FacultyModuleGetByIdResponseDto'
 import { FacultyModuleGetByIdsResponseDto } from './dto/responses/FacultyModuleGetByIdsResponseDto'
 import { FacultyModuleGetManyResponseDto } from './dto/responses/FacultyModuleGetManyResponseDto'
+import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 
 @ApiTags('Факультеты')
 @Controller()
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
 
+  @UserAuth({
+    availability: 'createFaculty',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет создать факультет',

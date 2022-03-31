@@ -1,6 +1,7 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
 import {
   AvailabilityModel,
+  CreateFacultyAvailabilityModel,
   CreateGroupAvailabilityModel,
   CreateScheduleAvailabilityModel,
   DeleteGroupAvailabilityModel,
@@ -233,6 +234,14 @@ export class DeleteGroupAvailabilityDto implements DeleteGroupAvailabilityModel 
   forbiddenGroups: Types.ObjectId[]
 }
 
+export class CreateFacultyAvailabilityDto implements CreateFacultyAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -277,6 +286,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => DeleteGroupAvailabilityDto)
   deleteGroup?: DeleteGroupAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать факультеты',
+    type: CreateFacultyAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateFacultyAvailabilityDto)
+  createFaculty?: CreateFacultyAvailabilityDto
 }
 
 export class CreateUserDto {
