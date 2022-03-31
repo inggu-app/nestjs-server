@@ -1,5 +1,6 @@
 import {
   buildMessage,
+  IsArray,
   IsDefined,
   isMongoId,
   registerDecorator,
@@ -25,6 +26,7 @@ export const IsMongoIdWithTransform = (validationOptions?: ValidationOptions): P
   return (target: any, key: string | symbol): void => {
     IsDefined(validationOptions)(target, key)
     CustomIsMongoId(validationOptions)(target, key)
+    if (validationOptions?.each) IsArray()(target, key)
 
     Transform(transformMongoIdWithParams)(target, key)
   }
@@ -46,11 +48,15 @@ function CustomIsMongoId(validationOptions?: ValidationOptions) {
 @ValidatorConstraint({ async: true, name: 'CustomIsMongoId' })
 export class CustomIsMongoIdValidator implements ValidatorConstraintInterface {
   validate(value: any) {
-    if (value instanceof Types.ObjectId) return isMongoId(value.toHexString())
-    else return isMongoId(value)
+    return customIsMongoId(value)
   }
 
   defaultMessage(validationArguments?: ValidationArguments): string {
     return buildMessage(eachPrefix => `${eachPrefix}$property must be a mongo id`, validationArguments?.constraints[0])(validationArguments)
   }
+}
+
+export const customIsMongoId = (value: any) => {
+  if (value instanceof Types.ObjectId) return isMongoId(value.toHexString())
+  else return isMongoId(value)
 }
