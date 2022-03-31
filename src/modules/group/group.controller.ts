@@ -19,7 +19,7 @@ import { GroupModuleGetByIdsResponseDto } from './dto/responses/GroupModuleGetBy
 import { GroupModuleGetByFacultyIdResponseDto } from './dto/responses/GroupModuleGetByFacultyIdResponseDto'
 import { GroupModuleGetManyResponseDto } from './dto/responses/GroupModuleGetManyResponseDto'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
-import { CreateGroupAvailabilityModel } from '../user/models/user.model'
+import { CreateGroupAvailabilityModel, UpdateGroupAvailabilityModel } from '../user/models/user.model'
 
 @ApiTags('Группы')
 @Controller()
@@ -164,6 +164,10 @@ export class GroupController {
     }
   }
 
+  @UserAuth({
+    availability: 'updateGroup',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить информацию о группе. В теле нужно передавать только те поля, которые нужно обновить',
@@ -173,7 +177,38 @@ export class GroupController {
     status: HttpStatus.OK,
   })
   @Patch('/')
-  async update(@Body() dto: UpdateGroupDto) {
+  async update(@Body() dto: UpdateGroupDto, @RequestUser() user: RequestUser<UpdateGroupAvailabilityModel>) {
+    // Проверяем пытается ли пользователь обновить поля, которые ему недоступны
+    const availableFields = user.availability.availableFields
+    const errors: string[] = []
+    if (!availableFields.title && dto.title) errors.push('Пользователю запрещено редактировать поле title у группы')
+    if (!availableFields.faculty && dto.faculty) errors.push('Пользователю запрещено редактировать поле faculty у группы')
+    if (!availableFields.callSchedule && dto.callSchedule !== undefined)
+      errors.push('Пользователю запрещено редактировать поле callSchedule у группы')
+    if (errors.length) throw new BadRequestException(errors)
+
+    // Проверяем пытается ли пользователь обновить недоступную ему группу
+    if (!user.availability.allForUpdate) {
+      if (user.availability.forbiddenGroups.includes(dto.id))
+        throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${dto.id}`)
+
+      if (!user.availability.availableGroups.includes(dto.id)) {
+        const group = await this.groupService.getById(dto.id, { projection: { faculty: 1 } })
+        if (!user.availability.availableForUpdateFaculties.includes(group.faculty))
+          throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${dto.id}`)
+      }
+    }
+
+    // Проверяем пытается ли пользователь обновить принадлежность группы к запрещённому ему факультету
+    if (dto.faculty) {
+      if (!user.availability.allFacultiesForInstallation) {
+        if (!user.availability.availableForInstallationFaculties.includes(dto.faculty))
+          throw new BadRequestException(
+            `Пользователю запрещено обновлять принадлежность группы к факультету на факультет с id ${dto.faculty}`
+          )
+      }
+    }
+
     await this.groupService.update(dto)
   }
 

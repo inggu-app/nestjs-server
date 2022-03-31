@@ -1,5 +1,11 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
-import { AvailabilityModel, CreateGroupAvailabilityModel, CreateScheduleAvailabilityModel } from '../../models/user.model'
+import {
+  AvailabilityModel,
+  CreateGroupAvailabilityModel,
+  CreateScheduleAvailabilityModel,
+  UpdateGroupAvailabilityAvailableFieldsModel,
+  UpdateGroupAvailabilityModel,
+} from '../../models/user.model'
 import { Type } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
 import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
@@ -61,7 +67,7 @@ export class CreateScheduleAvailabilityDto implements CreateScheduleAvailability
 
 export class CreateGroupAvailabilityDto implements CreateGroupAvailabilityModel {
   @ApiProperty({
-    description: 'Разрешено ли пользователю оращаться к этому эндпоинту',
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
   })
   @IsBoolean()
   available: boolean
@@ -82,6 +88,103 @@ export class CreateGroupAvailabilityDto implements CreateGroupAvailabilityModel 
   @IsMongoIdWithTransform({ each: true })
   @CheckExists(FacultyModel, true)
   availableFaculties: Types.ObjectId[]
+}
+
+class UpdateGroupAvailabilityAvailableFieldsDto implements UpdateGroupAvailabilityAvailableFieldsModel {
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять названия группы',
+  })
+  @IsBoolean()
+  title: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять принадлежность группы к факультету',
+  })
+  @IsBoolean()
+  faculty: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять расписания звонков групп',
+  })
+  @IsBoolean()
+  callSchedule: boolean
+}
+
+export class UpdateGroupAvailabilityDto implements UpdateGroupAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description: 'Поля, которые может обновлять пользователь',
+    type: UpdateGroupAvailabilityAvailableFieldsDto,
+    example: <UpdateGroupAvailabilityAvailableFieldsDto>{
+      title: true,
+      faculty: false,
+      callSchedule: false,
+    },
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateGroupAvailabilityAvailableFieldsDto)
+  availableFields: UpdateGroupAvailabilityAvailableFieldsDto
+
+  @ApiProperty({
+    description:
+      'Доступны ли все группы для обновления. Если стоит true, то любая группа доступна для обновления. Если стоит false, то следует обращать внимание на поля availableForUpdateFaculties, availableGroups, forbiddenGroups',
+  })
+  @IsBoolean()
+  allForUpdate: boolean
+
+  @ApiProperty({
+    description: 'Список факультетов, группы которых можно обновлять. Имеет смысл только если в allForUpdate стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(FacultyModel, true)
+  availableForUpdateFaculties: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список групп, которые можно обновлять. Имеет смысл только если в allForUpdate стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(GroupModel, true)
+  availableGroups: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список групп, которые запрещено обновлять. Имеет смысл только если в allForUpdate стоит false',
+    type: MongoIdType,
+    isArray: false,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(GroupModel, true)
+  forbiddenGroups: Types.ObjectId[]
+
+  @ApiProperty({
+    description:
+      'Доступны ли для установки в поле faculty все факультеты. Не путать с полей allForUpdate. Данная настройка позволяет конфигурировать факультеты, которые можно назначить группе, но не позволяет конфигурировать факультеты, группы которых можно редактировать(за это отвечает allForUpdate)',
+  })
+  @IsBoolean()
+  allFacultiesForInstallation: boolean
+
+  @ApiProperty({
+    description:
+      'Список групп, которые можно устанавливать в поле faculty. Как и поле allFacultiesForInstallation, оно отличается от availableForUpdateFaculties. Имеет смысл только если в allFacultiesForInstallation стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(FacultyModel, true)
+  availableForInstallationFaculties: Types.ObjectId[]
 }
 
 export class AvailabilityDto implements Partial<AvailabilityModel> {
@@ -106,6 +209,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => CreateGroupAvailabilityDto)
   createGroup?: CreateGroupAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять группы',
+    type: UpdateGroupAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateGroupAvailabilityDto)
+  updateGroup?: UpdateGroupAvailabilityDto
 }
 
 export class CreateUserDto {

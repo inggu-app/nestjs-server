@@ -3,6 +3,7 @@ import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWith
 import { Types } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
+import { IsNullable } from '../../../global/decorators/IsNullable.decorator'
 
 export class UpdateGroupDto {
   @ApiProperty({
@@ -44,6 +45,7 @@ export class UpdateGroupDto {
     type: 'MongoId',
   })
   @IsUndefinable()
+  @IsNullable()
   @IsMongoIdWithTransform()
-  callSchedule?: Types.ObjectId
+  callSchedule?: Types.ObjectId | null
 }

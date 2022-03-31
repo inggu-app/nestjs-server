@@ -6,6 +6,7 @@ import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enu
 import { RoleModel } from './role.model'
 import { GroupModel } from '../../group/group.model'
 import { Types } from 'mongoose'
+import { UpdateGroupDto } from '../../group/dto/updateGroup.dto'
 
 // работа с редактированием расписания занятий для группы
 export class CreateScheduleAvailabilityModel {
@@ -37,6 +38,67 @@ export class CreateGroupAvailabilityModel {
   availableFaculties: (Types.ObjectId | FacultyModel)[]
 }
 
+// доступность полей для обновления группы. Относится к UpdateGroupAvailabilityModel
+export class UpdateGroupAvailabilityAvailableFieldsModel implements Record<keyof Omit<UpdateGroupDto, 'id'>, boolean> {
+  @prop({ default: false })
+  title: boolean
+
+  @prop({ default: false })
+  faculty: boolean
+
+  @prop({ default: false })
+  callSchedule: boolean
+}
+
+// работа с обновлением групп
+export class UpdateGroupAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({
+    type: UpdateGroupAvailabilityAvailableFieldsModel,
+    default: <UpdateGroupAvailabilityAvailableFieldsModel>{
+      title: false,
+      faculty: false,
+      callSchedule: false,
+    },
+    _id: false,
+  })
+  availableFields: UpdateGroupAvailabilityAvailableFieldsModel
+
+  // можно ли обновлять любую группу
+  @prop({ default: true })
+  allForUpdate: boolean
+
+  @prop({
+    ref: FacultyModel,
+    default: [],
+  })
+  availableForUpdateFaculties: (Types.ObjectId | FacultyModel)[]
+
+  @prop({
+    ref: GroupModel,
+    default: [],
+  })
+  availableGroups: (Types.ObjectId | GroupModel)[]
+
+  @prop({
+    ref: GroupModel,
+    default: [],
+  })
+  forbiddenGroups: (Types.ObjectId | GroupModel)[]
+
+  // факультеты, на которые можно обновить принадлежность группы
+  @prop({ default: true })
+  allFacultiesForInstallation: boolean
+
+  @prop({
+    ref: FacultyModel,
+    default: [],
+  })
+  availableForInstallationFaculties: (Types.ObjectId | FacultyModel)[]
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -61,6 +123,20 @@ export class AvailabilityModel {
     _id: false,
   })
   createGroup: CreateGroupAvailabilityModel
+
+  @prop({
+    type: UpdateGroupAvailabilityModel,
+    default: <UpdateGroupAvailabilityModel>{
+      available: false,
+      availableFields: {
+        title: false,
+        faculty: false,
+        callSchedule: false,
+      },
+    },
+    _id: false,
+  })
+  updateGroup: UpdateGroupAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет
