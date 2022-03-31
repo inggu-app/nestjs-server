@@ -7,7 +7,7 @@ import { RoleModel } from './role.model'
 import { GroupModel } from '../../group/group.model'
 import { Types } from 'mongoose'
 
-// работа с созданием расписания занятий для группы
+// работа с редактированием расписания занятий для группы
 export class CreateScheduleAvailabilityModel {
   @prop({ default: false })
   available: boolean
@@ -25,6 +25,18 @@ export class CreateScheduleAvailabilityModel {
   forbiddenGroups: (Types.ObjectId | GroupModel)[]
 }
 
+// работа с созданием групп
+export class CreateGroupAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: true })
+  allFaculties: boolean
+
+  @prop({ ref: FacultyModel, default: [] })
+  availableFaculties: (Types.ObjectId | FacultyModel)[]
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -38,6 +50,17 @@ export class AvailabilityModel {
     _id: false,
   })
   createSchedule: CreateScheduleAvailabilityModel
+
+  @prop({
+    type: CreateGroupAvailabilityModel,
+    default: <CreateGroupAvailabilityModel>{
+      available: false,
+      allFaculties: true,
+      availableFaculties: [],
+    },
+    _id: false,
+  })
+  createGroup: CreateGroupAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

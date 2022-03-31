@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
-import { AvailabilityModel, CreateScheduleAvailabilityModel } from '../../models/user.model'
+import { AvailabilityModel, CreateGroupAvailabilityModel, CreateScheduleAvailabilityModel } from '../../models/user.model'
 import { Type } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
 import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
@@ -10,7 +10,6 @@ import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdW
 import { CheckExists } from '../../../../global/decorators/CheckExists.decorator'
 import { FacultyModel } from '../../../faculty/faculty.model'
 import { GroupModel } from '../../../group/group.model'
-import { GroupService } from '../../../group/group.service'
 
 export class CreateScheduleAvailabilityDto implements CreateScheduleAvailabilityModel {
   @ApiProperty({
@@ -56,11 +55,36 @@ export class CreateScheduleAvailabilityDto implements CreateScheduleAvailability
     isArray: true,
   })
   @IsMongoIdWithTransform({ each: true })
-  @CheckExists(GroupService, true)
+  @CheckExists(GroupModel, true)
   forbiddenGroups: Types.ObjectId[]
 }
 
-export class AvailabilityDto implements AvailabilityModel {
+export class CreateGroupAvailabilityDto implements CreateGroupAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю оращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Доступность создания группы для любых факультетов. Если true, то пользователь может создать группу для любого факультета. Если false, то только для факультетов из availableFaculties',
+  })
+  @IsBoolean()
+  allFaculties: boolean
+
+  @ApiProperty({
+    description: 'Список факультетов, для которых можно создать группу. Имеет смысл только есть в поле allFaculties стоит значение false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(FacultyModel, true)
+  availableFaculties: Types.ObjectId[]
+}
+
+export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
     type: CreateScheduleAvailabilityDto,
@@ -70,7 +94,18 @@ export class AvailabilityDto implements AvailabilityModel {
   @IsObject()
   @ValidateNested()
   @Type(() => CreateScheduleAvailabilityDto)
-  createSchedule: CreateScheduleAvailabilityDto
+  createSchedule?: CreateScheduleAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать группы',
+    type: CreateGroupAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateGroupAvailabilityDto)
+  createGroup?: CreateGroupAvailabilityDto
 }
 
 export class CreateUserDto {

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
 import { GroupService } from './group.service'
 import { CreateGroupDto } from './dto/createGroup.dto'
 import { QueryOptions, Types } from 'mongoose'
@@ -18,12 +18,18 @@ import { GroupModuleGetByIdResponseDto } from './dto/responses/GroupModuleGetByI
 import { GroupModuleGetByIdsResponseDto } from './dto/responses/GroupModuleGetByIdsResponseDto'
 import { GroupModuleGetByFacultyIdResponseDto } from './dto/responses/GroupModuleGetByFacultyIdResponseDto'
 import { GroupModuleGetManyResponseDto } from './dto/responses/GroupModuleGetManyResponseDto'
+import { RequestUser } from '../../global/decorators/RequestUser.decorator'
+import { CreateGroupAvailabilityModel } from '../user/models/user.model'
 
 @ApiTags('Группы')
 @Controller()
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
+  @UserAuth({
+    availability: 'createGroup',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет создать группу',
@@ -34,7 +40,12 @@ export class GroupController {
     status: HttpStatus.CREATED,
   })
   @Post('/')
-  async create(@Body() dto: CreateGroupDto) {
+  async create(@Body() dto: CreateGroupDto, @RequestUser() user: RequestUser<CreateGroupAvailabilityModel>) {
+    if (!user.availability.allFaculties) {
+      if (!user.availability.availableFaculties.includes(dto.faculty))
+        throw new BadRequestException('Пользователю запрещено создавать группы для этого факультета')
+    }
+
     return {
       group: await this.groupService.create(dto),
     }
