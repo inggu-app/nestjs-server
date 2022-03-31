@@ -3,6 +3,7 @@ import {
   AvailabilityModel,
   CreateGroupAvailabilityModel,
   CreateScheduleAvailabilityModel,
+  DeleteGroupAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
   UpdateGroupAvailabilityModel,
 } from '../../models/user.model'
@@ -187,6 +188,51 @@ export class UpdateGroupAvailabilityDto implements UpdateGroupAvailabilityModel 
   availableForInstallationFaculties: Types.ObjectId[]
 }
 
+export class DeleteGroupAvailabilityDto implements DeleteGroupAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Доступны ли пользователю для удаления все группы. Если стоит true, то пользователь может удалить любую группу. Если стоит false, то следует опираться на поля ',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список факультетов, группы которых можно удалять. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(FacultyModel, true)
+  availableFaculties: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список групп, которые можно удалять. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(GroupModel, true)
+  availableGroups: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список групп, которые нельзя удалить. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(GroupModel, true)
+  forbiddenGroups: Types.ObjectId[]
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -220,6 +266,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => UpdateGroupAvailabilityDto)
   updateGroup?: UpdateGroupAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять группы',
+    type: DeleteGroupAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => DeleteGroupAvailabilityDto)
+  deleteGroup?: DeleteGroupAvailabilityDto
 }
 
 export class CreateUserDto {

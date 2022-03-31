@@ -19,7 +19,7 @@ import { GroupModuleGetByIdsResponseDto } from './dto/responses/GroupModuleGetBy
 import { GroupModuleGetByFacultyIdResponseDto } from './dto/responses/GroupModuleGetByFacultyIdResponseDto'
 import { GroupModuleGetManyResponseDto } from './dto/responses/GroupModuleGetManyResponseDto'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
-import { CreateGroupAvailabilityModel, UpdateGroupAvailabilityModel } from '../user/models/user.model'
+import { CreateGroupAvailabilityModel, DeleteGroupAvailabilityModel, UpdateGroupAvailabilityModel } from '../user/models/user.model'
 
 @ApiTags('Группы')
 @Controller()
@@ -212,6 +212,10 @@ export class GroupController {
     await this.groupService.update(dto)
   }
 
+  @UserAuth({
+    availability: 'deleteGroup',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить группу по переданному id',
   })
@@ -226,7 +230,18 @@ export class GroupController {
     status: HttpStatus.OK,
   })
   @Delete('/')
-  async delete(@MongoId('groupId') groupId: Types.ObjectId) {
+  async delete(@MongoId('groupId') groupId: Types.ObjectId, @RequestUser() user: RequestUser<DeleteGroupAvailabilityModel>) {
+    if (!user.availability.all) {
+      if (user.availability.forbiddenGroups.includes(groupId))
+        throw new BadRequestException(`Пользователь не может удалить группу с id ${groupId}`)
+
+      if (!user.availability.availableGroups.includes(groupId)) {
+        const group = await this.groupService.getById(groupId, { projection: { faculty: 1 } })
+        if (!user.availability.availableFaculties.includes(group.faculty))
+          throw new BadRequestException(`Пользователь не может удалить группу с id ${groupId}`)
+      }
+    }
+
     await this.groupService.delete(groupId)
   }
 }

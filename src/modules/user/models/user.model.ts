@@ -99,6 +99,33 @@ export class UpdateGroupAvailabilityModel {
   availableForInstallationFaculties: (Types.ObjectId | FacultyModel)[]
 }
 
+// работа с удалением групп
+export class DeleteGroupAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: true })
+  all: boolean
+
+  @prop({
+    ref: FacultyModel,
+    default: [],
+  })
+  availableFaculties: (Types.ObjectId | FacultyModel)[]
+
+  @prop({
+    ref: GroupModel,
+    default: [],
+  })
+  availableGroups: (Types.ObjectId | GroupModel)[]
+
+  @prop({
+    ref: GroupModel,
+    default: [],
+  })
+  forbiddenGroups: (Types.ObjectId | GroupModel)[]
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -137,6 +164,19 @@ export class AvailabilityModel {
     _id: false,
   })
   updateGroup: UpdateGroupAvailabilityModel
+
+  @prop({
+    type: DeleteGroupAvailabilityModel,
+    default: <DeleteGroupAvailabilityModel>{
+      available: false,
+      all: true,
+      availableFaculties: [],
+      availableGroups: [],
+      forbiddenGroups: [],
+    },
+    _id: false,
+  })
+  deleteGroup: DeleteGroupAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет
