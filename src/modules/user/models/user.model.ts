@@ -163,6 +163,17 @@ export class UpdateFacultyAvailabilityModel {
   availableFields: UpdateFacultyAvailabilityAvailableFieldsModel
 }
 
+export class DeleteFacultyAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: true })
+  all: boolean
+
+  @prop({ ref: FacultyModel, default: [] })
+  availableFaculties: (Types.ObjectId | FacultyModel)[]
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -235,8 +246,20 @@ export class AvailabilityModel {
         callSchedule: false,
       },
     },
+    _id: false,
   })
   updateFaculty: UpdateFacultyAvailabilityModel
+
+  @prop({
+    type: DeleteFacultyAvailabilityModel,
+    default: <DeleteFacultyAvailabilityModel>{
+      available: false,
+      all: true,
+      availableFaculties: [],
+    },
+    _id: false,
+  })
+  deleteFaculty: DeleteFacultyAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

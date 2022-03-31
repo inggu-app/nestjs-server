@@ -18,7 +18,7 @@ import { FacultyModuleGetByIdsResponseDto } from './dto/responses/FacultyModuleG
 import { FacultyModuleGetManyResponseDto } from './dto/responses/FacultyModuleGetManyResponseDto'
 import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
-import { UpdateFacultyAvailabilityModel } from '../user/models/user.model'
+import { DeleteFacultyAvailabilityModel, UpdateFacultyAvailabilityModel } from '../user/models/user.model'
 
 @ApiTags('Факультеты')
 @Controller()
@@ -173,6 +173,10 @@ export class FacultyController {
     await this.facultyService.update(dto)
   }
 
+  @UserAuth({
+    availability: 'deleteFaculty',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить факультет',
   })
@@ -187,7 +191,12 @@ export class FacultyController {
     status: HttpStatus.OK,
   })
   @Delete('/')
-  async delete(@MongoId('facultyId') facultyId: Types.ObjectId) {
+  async delete(@MongoId('facultyId') facultyId: Types.ObjectId, @RequestUser() user: RequestUser<DeleteFacultyAvailabilityModel>) {
+    if (!user.availability.all) {
+      if (!user.availability.availableFaculties.includes(facultyId))
+        throw new BadRequestException(`Пользователь не может удалить факультет с id ${facultyId}`)
+    }
+
     await this.facultyService.delete(facultyId)
   }
 }

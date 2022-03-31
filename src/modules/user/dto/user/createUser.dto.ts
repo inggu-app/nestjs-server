@@ -4,6 +4,7 @@ import {
   CreateFacultyAvailabilityModel,
   CreateGroupAvailabilityModel,
   CreateScheduleAvailabilityModel,
+  DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
   UpdateFacultyAvailabilityAvailableFieldsModel,
   UpdateFacultyAvailabilityModel,
@@ -278,7 +279,7 @@ export class UpdateFacultyAvailabilityDto implements UpdateFacultyAvailabilityMo
     isArray: true,
     example: [MongoIdExample],
   })
-  @IsMongoIdWithTransform()
+  @IsMongoIdWithTransform({ each: true })
   @CheckExists(FacultyModel, true)
   availableFaculties: Types.ObjectId[]
 
@@ -290,6 +291,31 @@ export class UpdateFacultyAvailabilityDto implements UpdateFacultyAvailabilityMo
   @ValidateNested()
   @Type(() => UpdateFacultyAvailabilityAvailableFieldsDto)
   availableFields: UpdateFacultyAvailabilityAvailableFieldsDto
+}
+
+export class DeleteFacultyAvailabilityDto implements DeleteFacultyAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Доступны ли пользователю для удаления все факультеты. Если стоит true, то доступны все факультеты. Если стоит false, то нужно опираться на список в поле availableFaculties',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список разрешённых для удаления факультетов. Имеет значение только если в all стоит значение false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(FacultyModel, true)
+  availableFaculties: Types.ObjectId[]
 }
 
 export class AvailabilityDto implements Partial<AvailabilityModel> {
@@ -358,6 +384,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => UpdateFacultyAvailabilityDto)
   updateFaculty?: UpdateFacultyAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять факультеты',
+    type: DeleteFacultyAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => DeleteFacultyAvailabilityDto)
+  deleteFaculty?: DeleteFacultyAvailabilityDto
 }
 
 export class CreateUserDto {
