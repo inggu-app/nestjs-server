@@ -40,7 +40,6 @@ export const ROLE_WITH_LABEL_EXISTS = (label: string) => `Роль с назва
 
 export const CALL_SCHEDULE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Расписание звонков с id ${id} не существует`
 export const CALL_SCHEDULE_WITH_NAME_EXISTS = (name: string) => `Расписание звонков с названием ${name} уже существует`
-export const CALL_SCHEDULE_WITH_NAME_NOT_FOUND = (name: string) => `Расписание звонков с названием ${name} не существует`
 export const DEFAULT_CALL_SCHEDULE_NOT_FOUND = `Дефолтное расписание звонков не существует`
 
 export const APP_VERSION_FOR_OS_WITH_VERSION_EXISTS = (os: OperationSystem, version: string) => `Для ${os} версия ${version} уже существует`
@@ -50,5 +49,3 @@ export const APP_VERSION_FOR_OS_WITH_VERSION_NOT_FOUND = (os: OperationSystem, v
 export const LEARNING_STAGE_WITH_ID_NOT_FOUND = (id: Types.ObjectId) => `Стадия с id ${id} не существует`
 export const LEARNING_STAGE_INTERVALS_COLLISION = 'Создаваемый интервал пересекается с уже сущестующими'
 export const LEARNING_STAGE_BY_DATE_NOT_FOUND = (date: Date) => `На момент ${date.toISOString()} не идёт никакая стадия обучения`
-
-export const SEMESTER_RANGE_DATE_INCORRECT_RANGE = `Некорректный промежуток дат`
