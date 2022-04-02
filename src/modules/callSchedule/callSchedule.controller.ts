@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
-import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { QueryOptions, Types } from 'mongoose'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
@@ -19,6 +18,7 @@ import { CallScheduleModuleGetByNameResponseDto } from './dto/responses/CallSche
 import { CallScheduleModuleGetByGroupIdResponseDto } from './dto/responses/CallScheduleModuleGetByGroupIdResponseDto'
 import { CallScheduleModuleGetByFacultyIdResponseDto } from './dto/responses/CallScheduleModuleGetByFacultyIdResponseDto'
 import { CallScheduleModuleGetDefaultScheduleResponseDto } from './dto/responses/CallScheduleModuleGetDefaultScheduleResponseDto'
+import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 
 @ApiTags('Расписание звонков')
 @Controller()
@@ -29,6 +29,10 @@ export class CallScheduleController {
     private readonly groupService: GroupService
   ) {}
 
+  @UserAuth({
+    availability: 'createCallSchedule',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description:
