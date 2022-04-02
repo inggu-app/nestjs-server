@@ -343,6 +343,12 @@ export class UpdateCallScheduleAvailabilityAvailableFieldsDto implements UpdateC
   })
   @IsBoolean()
   name: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь устанавливать расписания как дефолтное',
+  })
+  @IsBoolean()
+  isDefault: boolean
 }
 
 export class UpdateCallScheduleAvailabilityDto implements UpdateCallScheduleAvailabilityModel {

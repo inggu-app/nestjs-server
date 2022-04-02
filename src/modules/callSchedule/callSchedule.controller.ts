@@ -180,6 +180,8 @@ export class CallScheduleController {
     const errors: string[] = []
     if (!availableFields.schedule && dto.schedule) errors.push('Пользователю запрещено редактировать поле schedule у расписания звонков')
     if (!availableFields.name && dto.name) errors.push('Пользователю запрещено редактировать поле name у расписания звонков')
+    if (!availableFields.isDefault && dto.isDefault !== undefined)
+      errors.push('Пользователю запрещено редактировать поле isDefault у расписания звонков')
     if (errors.length) throw new BadRequestException(errors)
 
     // проверяем пытается ли пользователь редактировать недоступные ему расписания звонков

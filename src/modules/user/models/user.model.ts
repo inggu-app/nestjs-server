@@ -187,6 +187,9 @@ export class UpdateCallScheduleAvailabilityAvailableFieldsModel implements Recor
 
   @prop({ default: false })
   name: boolean
+
+  @prop({ default: false })
+  isDefault: boolean
 }
 
 export class UpdateCallScheduleAvailabilityModel {
@@ -325,6 +328,7 @@ export class AvailabilityModel {
       availableFields: {
         schedule: false,
         name: false,
+        isDefault: false,
       },
     },
   })
