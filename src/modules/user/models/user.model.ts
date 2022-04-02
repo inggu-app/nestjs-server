@@ -228,6 +228,11 @@ export class AppVersionAvailabilityModel {
   available: boolean
 }
 
+export class LearningStageAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -336,6 +341,7 @@ export class AvailabilityModel {
         isDefault: false,
       },
     },
+    _id: false,
   })
   updateCallSchedule: UpdateCallScheduleAvailabilityModel
 
@@ -346,6 +352,7 @@ export class AvailabilityModel {
       all: true,
       availableCallSchedules: [],
     },
+    _id: false,
   })
   deleteCallSchedule: DeleteCallScheduleAvailabilityModel
 
@@ -354,8 +361,18 @@ export class AvailabilityModel {
     default: <AppVersionAvailabilityModel>{
       available: false,
     },
+    _id: false,
   })
   appVersion: AppVersionAvailabilityModel
+
+  @prop({
+    type: LearningStageAvailabilityModel,
+    default: <LearningStageAvailabilityModel>{
+      available: false,
+    },
+    _id: false,
+  })
+  learningStage: LearningStageAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

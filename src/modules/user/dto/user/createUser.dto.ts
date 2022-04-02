@@ -9,6 +9,7 @@ import {
   DeleteCallScheduleAvailabilityModel,
   DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
+  LearningStageAvailabilityModel,
   UpdateCallScheduleAvailabilityAvailableFieldsModel,
   UpdateCallScheduleAvailabilityModel,
   UpdateFacultyAvailabilityAvailableFieldsModel,
@@ -419,6 +420,14 @@ export class AppVersionAvailabilityDto implements AppVersionAvailabilityModel {
   available: boolean
 }
 
+export class LearningStageAvailabilityDto implements LearningStageAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -540,6 +549,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => AppVersionAvailabilityDto)
   appVersion?: AppVersionAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь обращаться к эндпоинтам работы с стадиями обучения',
+    type: LearningStageAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => LearningStageAvailabilityDto)
+  learningStage?: LearningStageAvailabilityDto
 }
 
 export class CreateUserDto {

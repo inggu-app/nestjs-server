@@ -15,12 +15,17 @@ import { LearningStageModuleGetCurrentResponseDto } from './dto/responses/Learni
 import { LearningStageModuleGetByDateResponseDto } from './dto/responses/LearningStageModuleGetByDateResponse.dto'
 import { LearningStageModuleGetCurrentAndFutureResponseDto } from './dto/responses/LearningStageModuleGetCurrentAndFutureResponse.dto'
 import { MongoIdExample, MongoIdType } from '../../global/constants/constants'
+import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 
 @ApiTags('Стадии обучения')
 @Controller()
 export class LearningStageController {
   constructor(private readonly learningStageService: LearningStageService) {}
 
+  @UserAuth({
+    availability: 'learningStage',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет создать стадию обучения',
@@ -90,6 +95,10 @@ export class LearningStageController {
     }
   }
 
+  @UserAuth({
+    availability: 'learningStage',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить стадию обучения',
   })
@@ -103,6 +112,10 @@ export class LearningStageController {
     await this.learningStageService.update(dto)
   }
 
+  @UserAuth({
+    availability: 'learningStage',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить стадию обучения',
   })
