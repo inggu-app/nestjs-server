@@ -31,6 +31,7 @@ export const userServiceMethodDefaultOptions = {
   update: {
     checkExistence: {
       user: true,
+      roles: true,
     },
   },
   updateUserSuper: {

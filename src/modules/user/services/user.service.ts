@@ -11,7 +11,6 @@ import * as bcrypt from 'bcrypt'
 import { CheckExistenceService } from '../../../global/classes/CheckExistenceService'
 import { userServiceMethodDefaultOptions } from '../constants/user.constants'
 import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMethodOptions'
-import { UpdateRolesDto } from '../dto/user/updateRoles.dto'
 import { RoleService } from './role.service'
 
 @Injectable()
@@ -75,6 +74,7 @@ export class UserService extends CheckExistenceService<UserModel> {
   async update(dto: UpdateUserDto, options = userServiceMethodDefaultOptions.update) {
     options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.update)
     if (options.checkExistence.user) await this.throwIfNotExists({ _id: dto.id })
+    if (dto.roles && options.checkExistence.roles) await this.roleService.throwIfNotExists(dto.roles.map(role => ({ _id: role })))
     const { id, ...fields } = dto
     return this.userModel.updateOne({ _id: id }, { $set: fields })
   }
@@ -98,13 +98,6 @@ export class UserService extends CheckExistenceService<UserModel> {
       { _id: id },
       { $set: { availability: { ...(user.toObject() as DocumentType<UserModel>).availability, ...availabilityDto } } }
     )
-  }
-
-  async updateRoles(rolesDto: UpdateRolesDto, options = userServiceMethodDefaultOptions.updateRoles) {
-    options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.updateRoles)
-    if (options.checkExistence.user) await this.throwIfNotExists({ _id: rolesDto.id })
-    await this.roleService.throwIfNotExists(rolesDto.roles)
-    return this.userModel.updateOne({ _id: rolesDto.id }, { $set: { roles: rolesDto.roles } })
   }
 
   async addToken(id: Types.ObjectId, tokenData: TokenDataModel, options = userServiceMethodDefaultOptions.addToken) {

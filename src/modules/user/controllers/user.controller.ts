@@ -41,7 +41,6 @@ import { UserModuleGetByIdsResponseDto } from '../dto/user/responses/UserModuleG
 import { UserModuleGetManyResponseDto } from '../dto/user/responses/UserModuleGetManyResponse.dto'
 import { UserModuleCheckAuthorizedResponseDto } from '../dto/user/responses/UserModuleCheckAuthorizedResponse.dto'
 import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
-import { UpdateRolesDto } from '../dto/user/updateRoles.dto'
 import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
 import { objectKeys } from '../../../global/utils/objectKeys'
@@ -314,19 +313,6 @@ export class UserController {
   @Patch('/update-availability')
   async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
     await this.userService.updateAvailability(dto.id, dto.availability)
-  }
-
-  @WhitelistedValidationPipe()
-  @ApiOperation({
-    description: 'Эндпоинт позволяет обновить роли пользователя.',
-  })
-  @ApiResponseException()
-  @ApiResponse({
-    status: HttpStatus.OK,
-  })
-  @Patch('/update-roles')
-  async updateRoles(@Body() dto: UpdateRolesDto) {
-    await this.userService.updateRoles(dto)
   }
 
   @ApiOperation({
