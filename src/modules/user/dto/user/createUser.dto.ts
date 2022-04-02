@@ -5,6 +5,7 @@ import {
   CreateFacultyAvailabilityModel,
   CreateGroupAvailabilityModel,
   CreateScheduleAvailabilityModel,
+  DeleteCallScheduleAvailabilityModel,
   DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
   UpdateCallScheduleAvailabilityAvailableFieldsModel,
@@ -378,6 +379,31 @@ export class UpdateCallScheduleAvailabilityDto implements UpdateCallScheduleAvai
   availableFields: UpdateCallScheduleAvailabilityAvailableFieldsDto
 }
 
+export class DeleteCallScheduleAvailabilityDto implements DeleteCallScheduleAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Доступны ли пользователю для удаления все расписания звонков. Если стоит true, то доступны все. Если стоит false, то нужно опираться на список в поле availableCallSchedules',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список расписаний звонков, доступных для удаления. Имеет смысл только если в all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(CallScheduleModel, true)
+  availableCallSchedules: Types.ObjectId[]
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -477,6 +503,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => UpdateCallScheduleAvailabilityDto)
   updateCallSchedule?: UpdateCallScheduleAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять расписания звонков',
+    type: DeleteCallScheduleAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => DeleteCallScheduleAvailabilityDto)
+  deleteCallSchedule?: DeleteCallScheduleAvailabilityDto
 }
 
 export class CreateUserDto {

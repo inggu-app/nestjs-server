@@ -18,7 +18,7 @@ import { CallScheduleModuleGetByFacultyIdResponseDto } from './dto/responses/Cal
 import { CallScheduleModuleGetDefaultScheduleResponseDto } from './dto/responses/CallScheduleModuleGetDefaultScheduleResponseDto'
 import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
-import { UpdateCallScheduleAvailabilityModel } from '../user/models/user.model'
+import { DeleteCallScheduleAvailabilityModel, UpdateCallScheduleAvailabilityModel } from '../user/models/user.model'
 
 @ApiTags('Расписание звонков')
 @Controller()
@@ -209,6 +209,10 @@ export class CallScheduleController {
     await this.callScheduleService.updateDefaultSchedule(id)
   }
 
+  @UserAuth({
+    availability: 'deleteCallSchedule',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить расписание звонков по id.',
   })
@@ -223,7 +227,15 @@ export class CallScheduleController {
     status: HttpStatus.OK,
   })
   @Delete('/by-id')
-  async deleteById(@MongoId('callScheduleId') id: Types.ObjectId) {
-    await this.callScheduleService.deleteById(id)
+  async deleteById(
+    @MongoId('callScheduleId') callScheduleId: Types.ObjectId,
+    @RequestUser() user: RequestUser<DeleteCallScheduleAvailabilityModel>
+  ) {
+    if (!user.availability.all) {
+      if (!user.availability.availableCallSchedules.includes(callScheduleId))
+        throw new BadRequestException(`Пользователь не может удалить расписание звонков с id ${callScheduleId}`)
+    }
+
+    await this.callScheduleService.deleteById(callScheduleId)
   }
 }
