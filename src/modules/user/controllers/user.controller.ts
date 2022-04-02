@@ -23,7 +23,7 @@ import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS, NOT_AUTHORIZED } from '../../../global/constants/errors.constants'
 import { Request, Response } from 'express'
-import { UserModel, TokenDataModel } from '../models/user.model'
+import { UserModel, TokenDataModel, CreateUserAvailabilityModel } from '../models/user.model'
 import { addDays } from '../../../global/utils/date'
 import { UpdateAvailabilityDto } from '../dto/user/updateAvailability.dto'
 import { removeFields } from '../../../global/utils/removeFields'
@@ -42,6 +42,9 @@ import { UserModuleGetManyResponseDto } from '../dto/user/responses/UserModuleGe
 import { UserModuleCheckAuthorizedResponseDto } from '../dto/user/responses/UserModuleCheckAuthorizedResponse.dto'
 import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 import { UpdateRolesDto } from '../dto/user/updateRoles.dto'
+import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
+import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
+import { objectKeys } from '../../../global/utils/objectKeys'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -50,6 +53,10 @@ export class UserController {
     setInterval(async () => await this.userService.deleteExpiredTokens(), 60000)
   }
 
+  @UserAuth({
+    availability: 'createUser',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({ description: 'Эндпоинт позволяет создать пользователя' })
   @ApiResponseException()
@@ -58,7 +65,34 @@ export class UserController {
     status: HttpStatus.CREATED,
   })
   @Post('/')
-  async create(@Body() dto: CreateUserDto) {
+  async create(@Body() dto: CreateUserDto, @RequestUser() user: RequestUser<CreateUserAvailabilityModel>) {
+    // проверяем пытается ли пользователь установить недоступные ему клиентские интерфейсы для новосоздаваемого пользователя
+    const interfacesErrors: string[] = []
+    dto.interfaces.forEach(intrfc => {
+      if (!user.availability.availableForInstallationInterfaces.includes(intrfc))
+        interfacesErrors.push(`Пользователю запрещено назначать интерфейс ${intrfc}`)
+    })
+    if (interfacesErrors.length) throw new BadRequestException(interfacesErrors)
+
+    // проверяем пытается ли пользователь установить недоступные ему роли для новосоздаваемого пользователя
+    if (!user.availability.allRoles) {
+      const errors: string[] = []
+      dto.roles.forEach(role => {
+        if (!user.availability.availableForInstallationRoles.includes(role))
+          errors.push(`Пользователю запрещено создавать пользователя с ролью с id ${role}`)
+      })
+      if (errors.length) throw new BadRequestException(errors)
+    }
+
+    // проверяем пытается ли пользователь установить недоступные ему возможности для новосоздаваемого пользователя
+    const availabilities = user.availability.availableForInstallationAvailabilities
+    const availabilitiesErrors: string[] = []
+    objectKeys(dto.availability).forEach(availability => {
+      if (!availabilities[availability])
+        availabilitiesErrors.push(`Пользователю запрещено назначать новосоздаваемому пользователю возможность ${availability}`)
+    })
+    if (availabilitiesErrors.length) throw new BadRequestException(availabilitiesErrors)
+
     return {
       user: removeUserFields(await this.userService.create(dto), ['tokens', 'hashedPassword']),
     }

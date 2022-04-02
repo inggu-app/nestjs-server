@@ -14,6 +14,8 @@ import { GroupModel } from '../../modules/group/group.model'
 import { GroupService } from '../../modules/group/group.service'
 import { CallScheduleService } from '../../modules/callSchedule/callSchedule.service'
 import { CallScheduleModel } from '../../modules/callSchedule/callSchedule.model'
+import { RoleModel } from '../../modules/user/models/role.model'
+import { RoleService } from '../../modules/user/services/role.service'
 
 export function CheckExists(model: any, mustBeAnArray: boolean, validationOptions?: ValidationOptions) {
   return (object: Record<string, any>, propertyName: string | symbol) => {
@@ -34,7 +36,8 @@ export class CheckExistsValidator implements ValidatorConstraintInterface {
   constructor(
     private readonly facultyService: FacultyService,
     private readonly groupService: GroupService,
-    private readonly callScheduleService: CallScheduleService
+    private readonly callScheduleService: CallScheduleService,
+    private readonly roleService: RoleService
   ) {}
 
   async validate(value: any, validationArguments?: ValidationArguments) {
@@ -55,6 +58,9 @@ export class CheckExistsValidator implements ValidatorConstraintInterface {
         break
       case CallScheduleModel.name:
         await this.callScheduleService.throwIfNotExists(value)
+        break
+      case RoleModel.name:
+        await this.roleService.throwIfNotExists(value)
         break
     }
 

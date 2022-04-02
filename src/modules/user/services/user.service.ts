@@ -22,6 +22,7 @@ export class UserService extends CheckExistenceService<UserModel> {
 
   async create(dto: CreateUserDto, options = userServiceMethodDefaultOptions.create) {
     options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.create)
+    if (options.checkExistence.roles) await this.roleService.throwIfNotExists(dto.roles.map(role => ({ _id: role })))
     await this.throwIfExists({ login: dto.login }, { error: USER_WITH_LOGIN_EXISTS(dto.login) })
 
     const { password, ...fields } = dto

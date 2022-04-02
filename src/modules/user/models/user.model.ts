@@ -233,6 +233,76 @@ export class LearningStageAvailabilityModel {
   available: boolean
 }
 
+// --------
+// классы для конфигурации создания пользователя
+// --------
+export class CreateUserAvailableForInstallationAvailabilitiesModel implements Record<keyof AvailabilityModel, boolean> {
+  @prop({ default: false })
+  createSchedule: boolean
+
+  @prop({ default: false })
+  createGroup: boolean
+
+  @prop({ default: false })
+  updateGroup: boolean
+
+  @prop({ default: false })
+  deleteGroup: boolean
+
+  @prop({ default: false })
+  createFaculty: boolean
+
+  @prop({ default: false })
+  updateFaculty: boolean
+
+  @prop({ default: false })
+  deleteFaculty: boolean
+
+  @prop({ default: false })
+  createCallSchedule: boolean
+
+  @prop({ default: false })
+  updateCallSchedule: boolean
+
+  @prop({ default: false })
+  deleteCallSchedule: boolean
+
+  @prop({ default: false })
+  appVersion: boolean
+
+  @prop({ default: false })
+  learningStage: boolean
+
+  @prop({ default: false })
+  createUser: boolean
+}
+
+export class CreateUserAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: [], type: [String] })
+  availableForInstallationInterfaces: ClientInterfacesEnum[]
+
+  @prop({
+    type: CreateUserAvailableForInstallationAvailabilitiesModel,
+    _id: false,
+  })
+  availableForInstallationAvailabilities: CreateUserAvailableForInstallationAvailabilitiesModel
+
+  @prop({ default: true })
+  allRoles: boolean
+
+  @prop({
+    ref: RoleModel,
+    _id: false,
+  })
+  availableForInstallationRoles: (Types.ObjectId | RoleModel)[]
+}
+// --------
+// классы для конфигурации создания пользователя
+// --------
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -373,6 +443,33 @@ export class AvailabilityModel {
     _id: false,
   })
   learningStage: LearningStageAvailabilityModel
+
+  @prop({
+    type: CreateUserAvailabilityModel,
+    default: <CreateUserAvailabilityModel>{
+      available: false,
+      availableForInstallationInterfaces: [],
+      availableForInstallationAvailabilities: {
+        createSchedule: false,
+        createGroup: false,
+        updateGroup: false,
+        deleteGroup: false,
+        createFaculty: false,
+        updateFaculty: false,
+        deleteFaculty: false,
+        createCallSchedule: false,
+        updateCallSchedule: false,
+        deleteCallSchedule: false,
+        appVersion: false,
+        learningStage: false,
+        createUser: false,
+      },
+      allRoles: true,
+      availableForInstallationRoles: [],
+    },
+    _id: false,
+  })
+  createUser: CreateUserAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

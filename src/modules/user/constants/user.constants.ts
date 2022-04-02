@@ -3,7 +3,9 @@ import { UserService } from '../services/user.service'
 
 export const userServiceMethodDefaultOptions = {
   create: {
-    checkExistence: {},
+    checkExistence: {
+      roles: true,
+    },
   },
   getById: {
     checkExistence: {

@@ -6,6 +6,8 @@ import {
   CreateFacultyAvailabilityModel,
   CreateGroupAvailabilityModel,
   CreateScheduleAvailabilityModel,
+  CreateUserAvailabilityModel,
+  CreateUserAvailableForInstallationAvailabilitiesModel,
   DeleteCallScheduleAvailabilityModel,
   DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
@@ -28,6 +30,7 @@ import { CheckExists } from '../../../../global/decorators/CheckExists.decorator
 import { FacultyModel } from '../../../faculty/faculty.model'
 import { GroupModel } from '../../../group/group.model'
 import { CallScheduleModel } from '../../../callSchedule/callSchedule.model'
+import { RoleModel } from '../../models/role.model'
 
 export class CreateScheduleAvailabilityDto implements CreateScheduleAvailabilityModel {
   @ApiProperty({
@@ -428,6 +431,126 @@ export class LearningStageAvailabilityDto implements LearningStageAvailabilityMo
   available: boolean
 }
 
+export class CreateUserAvailableForInstallationAvailabilitiesDto implements CreateUserAvailableForInstallationAvailabilitiesModel {
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать расписание занятий',
+  })
+  @IsBoolean()
+  createSchedule: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать группы',
+  })
+  @IsBoolean()
+  createGroup: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять группы',
+  })
+  @IsBoolean()
+  updateGroup: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять группы',
+  })
+  @IsBoolean()
+  deleteGroup: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать факультеты',
+  })
+  @IsBoolean()
+  createFaculty: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять факультеты',
+  })
+  @IsBoolean()
+  updateFaculty: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять факультеты',
+  })
+  @IsBoolean()
+  deleteFaculty: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать расписания звонков',
+  })
+  @IsBoolean()
+  createCallSchedule: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять расписания звонков',
+  })
+  @IsBoolean()
+  updateCallSchedule: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять расписания звонков',
+  })
+  @IsBoolean()
+  deleteCallSchedule: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь работать с версиями приложений',
+  })
+  @IsBoolean()
+  appVersion: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь работать со стадиями обучения',
+  })
+  @IsBoolean()
+  learningStage: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать пользователей',
+  })
+  @IsBoolean()
+  createUser: boolean
+}
+
+export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description: 'Список интерфейсов, которые пользовать может назначать новосоздаваемому пользователю',
+    isArray: true,
+    enum: ClientInterfacesEnum,
+    example: [ClientInterfacesEnum.MAIN_MOBILE_APP],
+  })
+  @IsEnum(ClientInterfacesEnum)
+  availableForInstallationInterfaces: ClientInterfacesEnum[]
+
+  @ApiProperty({
+    description: 'Возможности, которые пользователь может назначать новосоздаваемому пользователю',
+    type: CreateUserAvailableForInstallationAvailabilitiesDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateUserAvailableForInstallationAvailabilitiesDto)
+  availableForInstallationAvailabilities: CreateUserAvailableForInstallationAvailabilitiesDto
+
+  @ApiProperty({
+    description:
+      'Может ли пользователь при создании нового пользователя назначать ему любые роли. Если стоит true, то можно назначить любую роль. Если стоит false, то следует обращать внимание на поле availableForInstallationRoles',
+  })
+  @IsBoolean()
+  allRoles: boolean
+
+  @ApiProperty({
+    description: 'Список ролей, которые пользователь может назначать новосоздаваемому пользователю',
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(RoleModel, true)
+  availableForInstallationRoles: Types.ObjectId[]
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -560,6 +683,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => LearningStageAvailabilityDto)
   learningStage?: LearningStageAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать других пользоватей',
+    type: CreateUserAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateUserAvailabilityDto)
+  createUser?: CreateUserAvailabilityDto
 }
 
 export class CreateUserDto {
@@ -611,4 +745,13 @@ export class CreateUserDto {
   })
   @IsEnum(ClientInterfacesEnum, { each: true })
   interfaces: ClientInterfacesEnum[]
+
+  @ApiProperty({
+    description: 'Список ролей, которые присвоены пользователю',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  roles: Types.ObjectId[]
 }

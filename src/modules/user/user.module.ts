@@ -21,6 +21,6 @@ import { RoleController } from './controllers/role.controller'
       },
     ]),
   ],
-  exports: [UserService],
+  exports: [UserService, RoleService],
 })
 export class UserModule {}
