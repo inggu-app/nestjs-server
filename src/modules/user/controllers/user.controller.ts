@@ -29,6 +29,7 @@ import {
   CreateUserAvailabilityModel,
   UpdateUserAvailabilityModel,
   DeleteUserAvailabilityModel,
+  UpdateUserPasswordAvailabilityModel,
 } from '../models/user.model'
 import { addDays } from '../../../global/utils/date'
 import { UpdateAvailabilityDto } from '../dto/user/updateAvailability.dto'
@@ -290,6 +291,10 @@ export class UserController {
     await this.userService.update(dto)
   }
 
+  @UserAuth({
+    availability: 'updateUserPassword',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить пароль пользователя. Доступен только если есть соответствующее разрешение.',
@@ -299,11 +304,27 @@ export class UserController {
     status: HttpStatus.OK,
   })
   @Patch('/update-password')
-  async updatePassword(@Body() dto: UpdatePasswordDto) {
-    await this.userService.updatePassword(dto.login, dto.password)
+  async updatePassword(@Body() dto: UpdatePasswordDto, @RequestUser() user: RequestUser<UpdateUserPasswordAvailabilityModel>) {
+    const updatableUser = await this.userService.getByLogin(dto.login, { projection: { login: 1, roles: 1, tokens: 1 } })
 
-    const user = await this.userService.getByLogin(dto.login, { projection: { tokens: 1 } }, { checkExistence: { user: false } })
-    for await (const token of user.tokens) {
+    // проверяем может ли пользователь обновить пароль пользователя
+    if (updatableUser.id !== user.id || !user.availability.self) {
+      if (!user.availability.all) {
+        if (!user.availability.availableUsers.includes(updatableUser.id)) {
+          if (user.availability.forbiddenUsers.includes(updatableUser.id))
+            throw new BadRequestException(`Пользователь не может обновить пароль пользователя с id ${updatableUser.id}`)
+
+          updatableUser.roles.forEach(role => {
+            if (!user.availability.availableRoles.includes(role))
+              throw new BadRequestException(`Пользователь не может обновить пароль пользователя с id ${updatableUser.id}`)
+          })
+        }
+      }
+    }
+
+    await this.userService.updatePassword(dto.login, dto.password, { checkExistence: { user: false } })
+
+    for await (const token of updatableUser.tokens) {
       await this.userService.deleteToken(user.id, (token as TokenDataModel).token, { checkExistence: { user: false } })
     }
   }

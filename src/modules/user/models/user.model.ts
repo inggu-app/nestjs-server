@@ -282,6 +282,9 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
 
   @prop({ default: false })
   deleteUser: boolean
+
+  @prop({ default: false })
+  updateUserPassword: boolean
 }
 
 export class CreateUserAvailabilityModel {
@@ -350,6 +353,26 @@ export class UpdateUserAvailabilityModel {
 export class DeleteUserAvailabilityModel {
   @prop({ default: false })
   available: boolean
+
+  @prop({ default: false })
+  all: boolean
+
+  @prop({ ref: RoleModel, default: [] })
+  availableRoles: (Types.ObjectId | RoleModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  availableUsers: (Types.ObjectId | UserModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  forbiddenUsers: (Types.ObjectId | UserModel)[]
+}
+
+export class UpdateUserPasswordAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: false })
+  self: boolean
 
   @prop({ default: false })
   all: boolean
@@ -526,6 +549,7 @@ export class AvailabilityModel {
         createUser: false,
         updateUser: false,
         deleteUser: false,
+        updateUserPassword: false,
       },
       allRoles: true,
       availableForInstallationRoles: [],
@@ -565,6 +589,20 @@ export class AvailabilityModel {
     _id: false,
   })
   deleteUser: DeleteUserAvailabilityModel
+
+  @prop({
+    type: UpdateUserPasswordAvailabilityModel,
+    default: <UpdateUserPasswordAvailabilityModel>{
+      available: false,
+      self: false,
+      all: false,
+      availableRoles: [],
+      availableUsers: [],
+      forbiddenUsers: [],
+    },
+    _id: false,
+  })
+  updateUserPassword: UpdateUserPasswordAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет
