@@ -6,7 +6,6 @@ import { QueryOptions, Types } from 'mongoose'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { UpdateCallScheduleDto } from './dto/updateCallSchedule.dto'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
-import { StringQueryParam } from '../../global/decorators/StringQueryParam.decorator'
 import { FacultyService } from '../faculty/faculty.service'
 import { GroupService } from '../group/group.service'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -14,7 +13,6 @@ import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptio
 import { CallScheduleModuleCreateResponseDto } from './dto/responses/CallScheduleModuleCreateResponseDto'
 import { ApiResponseException } from '../../global/decorators/ApiResponseException.decorator'
 import { CallScheduleModuleGetByIdResponseDto } from './dto/responses/CallScheduleModuleGetByIdResponseDto'
-import { CallScheduleModuleGetByNameResponseDto } from './dto/responses/CallScheduleModuleGetByNameResponseDto'
 import { CallScheduleModuleGetByGroupIdResponseDto } from './dto/responses/CallScheduleModuleGetByGroupIdResponseDto'
 import { CallScheduleModuleGetByFacultyIdResponseDto } from './dto/responses/CallScheduleModuleGetByFacultyIdResponseDto'
 import { CallScheduleModuleGetDefaultScheduleResponseDto } from './dto/responses/CallScheduleModuleGetDefaultScheduleResponseDto'
@@ -73,29 +71,6 @@ export class CallScheduleController {
   async getById(@MongoId('callScheduleId') id: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return {
       callSchedule: await this.callScheduleService.getById(id, queryOptions),
-    }
-  }
-
-  @ApiOperation({
-    description: 'Эндпоинт позволяет получить расписание звонков по названию.',
-  })
-  @ApiQuery({
-    name: 'callScheduleName',
-    example: 'Общее расписание звонков',
-    description: 'Название расписания звонков, которое нужно получить.',
-  })
-  @ApiMongoQueryOptions()
-  @ApiResponseException()
-  @ApiResponse({
-    type: CallScheduleModuleGetByNameResponseDto,
-    status: HttpStatus.OK,
-    description:
-      'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
-  })
-  @Get('/by-name')
-  async getByName(@StringQueryParam('callScheduleName') name: string, @MongoQueryOptions() queryOptions?: QueryOptions) {
-    return {
-      callSchedule: await this.callScheduleService.getByName(name, queryOptions),
     }
   }
 
@@ -250,22 +225,5 @@ export class CallScheduleController {
   @Delete('/by-id')
   async deleteById(@MongoId('callScheduleId') id: Types.ObjectId) {
     await this.callScheduleService.deleteById(id)
-  }
-
-  @ApiOperation({
-    description: 'Эндпоинт позволяет удалить расписание звонков по названию.',
-  })
-  @ApiQuery({
-    name: 'callScheduleName',
-    example: 'Общее расписание звонков',
-    description: 'Название расписания звонков, которое нужно удалить.',
-  })
-  @ApiResponseException()
-  @ApiResponse({
-    status: HttpStatus.OK,
-  })
-  @Delete('/by-name')
-  async deleteByName(@StringQueryParam('callScheduleName') name: string) {
-    await this.callScheduleService.deleteByName(name)
   }
 }

@@ -7,7 +7,6 @@ import { CheckExistenceService } from '../../global/classes/CheckExistenceServic
 import {
   CALL_SCHEDULE_WITH_ID_NOT_FOUND,
   CALL_SCHEDULE_WITH_NAME_EXISTS,
-  CALL_SCHEDULE_WITH_NAME_NOT_FOUND,
   DEFAULT_CALL_SCHEDULE_NOT_FOUND,
 } from '../../global/constants/errors.constants'
 import { QueryOptions, Types } from 'mongoose'
@@ -37,12 +36,6 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
     return this.callScheduleModel.findById(id, undefined, queryOptions)
   }
 
-  async getByName(name: string, queryOptions?: QueryOptions, options = callScheduleServiceMethodDefaultOptions.getByName) {
-    options = mergeOptionsWithDefaultOptions(options, callScheduleServiceMethodDefaultOptions.getByName)
-    if (options.checkExistence.callSchedule) await this.throwIfNotExists({ name }, { error: CALL_SCHEDULE_WITH_NAME_NOT_FOUND(name) })
-    return this.callScheduleModel.findOne({ name }, undefined, queryOptions)
-  }
-
   async getDefaultSchedule(queryOptions?: QueryOptions, options = callScheduleServiceMethodDefaultOptions.getDefaultSchedule) {
     options = mergeOptionsWithDefaultOptions(options, callScheduleServiceMethodDefaultOptions.getDefaultSchedule)
     if (options.checkExistence.callSchedule) await this.throwIfNotExists({ isDefault: true }, { error: DEFAULT_CALL_SCHEDULE_NOT_FOUND })
@@ -68,11 +61,5 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
     options = mergeOptionsWithDefaultOptions(options, callScheduleServiceMethodDefaultOptions.deleteById)
     if (options.checkExistence.callSchedule) await this.throwIfNotExists({ _id: id })
     return this.callScheduleModel.deleteOne({ _id: id })
-  }
-
-  async deleteByName(name: string, options = callScheduleServiceMethodDefaultOptions.deleteByName) {
-    options = mergeOptionsWithDefaultOptions(options, callScheduleServiceMethodDefaultOptions.deleteByName)
-    if (options.checkExistence.callSchedule) await this.throwIfNotExists({ name }, { error: CALL_SCHEDULE_WITH_NAME_NOT_FOUND(name) })
-    return this.callScheduleModel.deleteOne({ name })
   }
 }
