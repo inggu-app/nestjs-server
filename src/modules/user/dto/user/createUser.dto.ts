@@ -7,6 +7,8 @@ import {
   CreateScheduleAvailabilityModel,
   DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
+  UpdateCallScheduleAvailabilityAvailableFieldsModel,
+  UpdateCallScheduleAvailabilityModel,
   UpdateFacultyAvailabilityAvailableFieldsModel,
   UpdateFacultyAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
@@ -22,6 +24,7 @@ import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdW
 import { CheckExists } from '../../../../global/decorators/CheckExists.decorator'
 import { FacultyModel } from '../../../faculty/faculty.model'
 import { GroupModel } from '../../../group/group.model'
+import { CallScheduleModel } from '../../../callSchedule/callSchedule.model'
 
 export class CreateScheduleAvailabilityDto implements CreateScheduleAvailabilityModel {
   @ApiProperty({
@@ -327,6 +330,54 @@ export class CreateCallScheduleAvailabilityDto implements CreateCallScheduleAvai
   available: boolean
 }
 
+export class UpdateCallScheduleAvailabilityAvailableFieldsDto implements UpdateCallScheduleAvailabilityAvailableFieldsModel {
+  @ApiProperty({
+    description: 'Может ли пользователь обновить само расписание звонков',
+  })
+  @IsBoolean()
+  schedule: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновить название расписания звонков',
+  })
+  @IsBoolean()
+  name: boolean
+}
+
+export class UpdateCallScheduleAvailabilityDto implements UpdateCallScheduleAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Доступны ли пользователю для обновления все расписания звонков. Если стоит true, то доступны все. Если стоит false, то нужно опираться на список в поле availableCallSchedules',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список расписаний звонков, доступных для редактирования. Имеет смысл только если в all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(CallScheduleModel, true)
+  availableCallSchedules: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Доступные пользователю для редактирования поля',
+    type: UpdateCallScheduleAvailabilityAvailableFieldsDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateCallScheduleAvailabilityAvailableFieldsDto)
+  availableFields: UpdateCallScheduleAvailabilityAvailableFieldsDto
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -414,7 +465,18 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @IsObject()
   @ValidateNested()
   @Type(() => CreateCallScheduleAvailabilityDto)
-  createCallSchedule: CreateCallScheduleAvailabilityDto
+  createCallSchedule?: CreateCallScheduleAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять расписания звонков',
+    type: UpdateCallScheduleAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateCallScheduleAvailabilityDto)
+  updateCallSchedule?: UpdateCallScheduleAvailabilityDto
 }
 
 export class CreateUserDto {

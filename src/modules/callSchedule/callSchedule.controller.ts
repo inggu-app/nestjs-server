@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
 import { CallScheduleService } from './callSchedule.service'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
@@ -19,6 +19,8 @@ import { CallScheduleModuleGetByGroupIdResponseDto } from './dto/responses/CallS
 import { CallScheduleModuleGetByFacultyIdResponseDto } from './dto/responses/CallScheduleModuleGetByFacultyIdResponseDto'
 import { CallScheduleModuleGetDefaultScheduleResponseDto } from './dto/responses/CallScheduleModuleGetDefaultScheduleResponseDto'
 import { UserAuth } from '../../global/decorators/UserAuth.decorator'
+import { RequestUser } from '../../global/decorators/RequestUser.decorator'
+import { UpdateCallScheduleAvailabilityModel } from '../user/models/user.model'
 
 @ApiTags('Расписание звонков')
 @Controller()
@@ -184,6 +186,10 @@ export class CallScheduleController {
     }
   }
 
+  @UserAuth({
+    availability: 'updateCallSchedule',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить расписание звонков.',
@@ -193,7 +199,19 @@ export class CallScheduleController {
     status: HttpStatus.OK,
   })
   @Patch('/')
-  async update(@Body() dto: UpdateCallScheduleDto) {
+  async update(@Body() dto: UpdateCallScheduleDto, @RequestUser() user: RequestUser<UpdateCallScheduleAvailabilityModel>) {
+    // проверяем пытается ли пользователь редактировать недоступные ему поля
+    const availableFields = user.availability.availableFields
+    const errors: string[] = []
+    if (!availableFields.schedule && dto.schedule) errors.push('Пользователю запрещено редактировать поле schedule у расписания звонков')
+    if (!availableFields.name && dto.name) errors.push('Пользователю запрещено редактировать поле name у расписания звонков')
+    if (errors.length) throw new BadRequestException(errors)
+
+    // проверяем пытается ли пользователь редактировать недоступные ему расписания звонков
+    if (!user.availability.all) {
+      if (!user.availability.availableCallSchedules.includes(dto.id))
+        throw new BadRequestException(`Пользователю запрещено редактирвоать расписание звонков с id ${dto.id}`)
+    }
     await this.callScheduleService.update(dto)
   }
 

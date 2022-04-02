@@ -8,6 +8,8 @@ import { GroupModel } from '../../group/group.model'
 import { Types } from 'mongoose'
 import { UpdateGroupDto } from '../../group/dto/updateGroup.dto'
 import { UpdateFacultyDto } from '../../faculty/dto/updateFaculty.dto'
+import { UpdateCallScheduleDto } from '../../callSchedule/dto/updateCallSchedule.dto'
+import { CallScheduleModel } from '../../callSchedule/callSchedule.model'
 
 // работа с редактированием расписания занятий для группы
 export class CreateScheduleAvailabilityModel {
@@ -179,6 +181,34 @@ export class CreateCallScheduleAvailabilityModel {
   available: boolean
 }
 
+export class UpdateCallScheduleAvailabilityAvailableFieldsModel implements Record<keyof Omit<UpdateCallScheduleDto, 'id'>, boolean> {
+  @prop({ default: false })
+  schedule: boolean
+
+  @prop({ default: false })
+  name: boolean
+}
+
+export class UpdateCallScheduleAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: true })
+  all: boolean
+
+  @prop({ ref: CallScheduleModel, default: [] })
+  availableCallSchedules: (Types.ObjectId | CallScheduleModel)[]
+
+  @prop({
+    type: UpdateCallScheduleAvailabilityAvailableFieldsModel,
+    default: <UpdateCallScheduleAvailabilityAvailableFieldsModel>{
+      schedule: false,
+      name: false,
+    },
+  })
+  availableFields: UpdateCallScheduleAvailabilityAvailableFieldsModel
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -274,6 +304,20 @@ export class AvailabilityModel {
     _id: false,
   })
   createCallSchedule: CreateCallScheduleAvailabilityModel
+
+  @prop({
+    type: UpdateCallScheduleAvailabilityModel,
+    default: <UpdateCallScheduleAvailabilityModel>{
+      available: false,
+      all: true,
+      availableCallSchedules: [],
+      availableFields: {
+        schedule: false,
+        name: false,
+      },
+    },
+  })
+  updateCallSchedule: UpdateCallScheduleAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

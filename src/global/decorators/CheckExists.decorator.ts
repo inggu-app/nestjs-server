@@ -12,6 +12,8 @@ import { FacultyModel } from '../../modules/faculty/faculty.model'
 import { customIsMongoId } from './IsMongoIdWithTransform.decorator'
 import { GroupModel } from '../../modules/group/group.model'
 import { GroupService } from '../../modules/group/group.service'
+import { CallScheduleService } from '../../modules/callSchedule/callSchedule.service'
+import { CallScheduleModel } from '../../modules/callSchedule/callSchedule.model'
 
 export function CheckExists(model: any, mustBeAnArray: boolean, validationOptions?: ValidationOptions) {
   return (object: Record<string, any>, propertyName: string | symbol) => {
@@ -29,7 +31,11 @@ export function CheckExists(model: any, mustBeAnArray: boolean, validationOption
 @ValidatorConstraint({ async: true, name: 'CheckExists' })
 @Injectable()
 export class CheckExistsValidator implements ValidatorConstraintInterface {
-  constructor(private readonly facultyService: FacultyService, private readonly groupService: GroupService) {}
+  constructor(
+    private readonly facultyService: FacultyService,
+    private readonly groupService: GroupService,
+    private readonly callScheduleService: CallScheduleService
+  ) {}
 
   async validate(value: any, validationArguments?: ValidationArguments) {
     if (Array.isArray(value)) {
@@ -46,6 +52,9 @@ export class CheckExistsValidator implements ValidatorConstraintInterface {
         break
       case GroupModel.name:
         await this.groupService.throwIfNotExists(value)
+        break
+      case CallScheduleModel.name:
+        await this.callScheduleService.throwIfNotExists(value)
         break
     }
 
