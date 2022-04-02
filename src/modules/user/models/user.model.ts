@@ -10,6 +10,7 @@ import { UpdateGroupDto } from '../../group/dto/updateGroup.dto'
 import { UpdateFacultyDto } from '../../faculty/dto/updateFaculty.dto'
 import { UpdateCallScheduleDto } from '../../callSchedule/dto/updateCallSchedule.dto'
 import { CallScheduleModel } from '../../callSchedule/callSchedule.model'
+import { UpdateUserDto } from '../dto/user/updateUser.dto'
 
 // работа с редактированием расписания занятий для группы
 export class CreateScheduleAvailabilityModel {
@@ -275,6 +276,9 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
 
   @prop({ default: false })
   createUser: boolean
+
+  @prop({ default: false })
+  updateUser: boolean
 }
 
 export class CreateUserAvailabilityModel {
@@ -302,6 +306,43 @@ export class CreateUserAvailabilityModel {
 // --------
 // классы для конфигурации создания пользователя
 // --------
+
+export class UpdateUserAvailabilityAvailableFieldsModel implements Record<keyof Omit<UpdateUserDto, 'id'>, boolean> {
+  @prop({ default: false })
+  name: boolean
+
+  @prop({ default: false })
+  login: boolean
+
+  @prop({ default: false })
+  interfaces: boolean
+
+  @prop({ default: false })
+  roles: boolean
+}
+
+export class UpdateUserAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: false })
+  all: boolean
+
+  @prop({ ref: RoleModel, default: [] })
+  availableRoles: (Types.ObjectId | RoleModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  availableUsers: (Types.ObjectId | UserModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  forbiddenUsers: (Types.ObjectId | UserModel)[]
+
+  @prop({
+    type: UpdateUserAvailabilityAvailableFieldsModel,
+    _id: false,
+  })
+  availableFields: UpdateUserAvailabilityAvailableFieldsModel
+}
 
 export class AvailabilityModel {
   @prop({
@@ -463,6 +504,7 @@ export class AvailabilityModel {
         appVersion: false,
         learningStage: false,
         createUser: false,
+        updateUser: false,
       },
       allRoles: true,
       availableForInstallationRoles: [],
@@ -470,6 +512,25 @@ export class AvailabilityModel {
     _id: false,
   })
   createUser: CreateUserAvailabilityModel
+
+  @prop({
+    type: UpdateUserAvailabilityModel,
+    default: <UpdateUserAvailabilityModel>{
+      available: false,
+      all: false,
+      forbiddenUsers: [],
+      availableUsers: [],
+      availableRoles: [],
+      availableFields: {
+        name: false,
+        login: false,
+        interfaces: false,
+        roles: false,
+      },
+    },
+    _id: false,
+  })
+  updateUser: UpdateUserAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

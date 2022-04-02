@@ -4,6 +4,7 @@ import { Types } from 'mongoose'
 import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
 import { ClientInterfacesEnum } from '../../../../global/enums/ClientInterfaces.enum'
+import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -52,4 +53,15 @@ export class UpdateUserDto {
   @IsEnum(ClientInterfacesEnum, { each: true })
   @ArrayMaxSize(Object.keys(ClientInterfacesEnum).length)
   interfaces?: ClientInterfacesEnum[]
+
+  @ApiProperty({
+    required: false,
+    description: 'Список присваиваемых пользователю ролей',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsUndefinable()
+  @IsMongoIdWithTransform({ each: true })
+  roles?: Types.ObjectId[]
 }

@@ -23,7 +23,7 @@ import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS, NOT_AUTHORIZED } from '../../../global/constants/errors.constants'
 import { Request, Response } from 'express'
-import { UserModel, TokenDataModel, CreateUserAvailabilityModel } from '../models/user.model'
+import { UserModel, TokenDataModel, CreateUserAvailabilityModel, UpdateUserAvailabilityModel } from '../models/user.model'
 import { addDays } from '../../../global/utils/date'
 import { UpdateAvailabilityDto } from '../dto/user/updateAvailability.dto'
 import { removeFields } from '../../../global/utils/removeFields'
@@ -245,6 +245,10 @@ export class UserController {
     } else throw new UnauthorizedException(NOT_AUTHORIZED)
   }
 
+  @UserAuth({
+    availability: 'updateUser',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить информацию о пользователе. Доступен только если есть соответствующее разрешение.',
@@ -254,7 +258,30 @@ export class UserController {
     status: HttpStatus.OK,
   })
   @Patch('/')
-  async update(@Body() dto: UpdateUserDto) {
+  async update(@Body() dto: UpdateUserDto, @RequestUser() user: RequestUser<UpdateUserAvailabilityModel>) {
+    // проверяем пытается ли пользователь обновить недоступные ему поля
+    const availableFields = user.availability.availableFields
+    const fieldsErrors: string[] = []
+    const { id, ...fields } = dto
+    objectKeys(fields).forEach(field => {
+      if (!availableFields[field]) fieldsErrors.push(`Пользователю запрещено редактировать поле ${field}`)
+    })
+    if (fieldsErrors.length) throw new BadRequestException(fieldsErrors)
+
+    // проверяем пытается ли пользователь редактировать недоступных ему пользователей
+    if (!user.availability.all) {
+      if (!user.availability.availableUsers.includes(dto.id)) {
+        if (user.availability.forbiddenUsers.includes(dto.id))
+          throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${dto.id}`)
+
+        const editableUser = await this.userService.getById(dto.id, { projection: { roles: 1 } })
+        editableUser.roles.forEach(role => {
+          if (!user.availability.availableRoles.includes(role))
+            throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${dto.id}`)
+        })
+      }
+    }
+
     await this.userService.update(dto)
   }
 

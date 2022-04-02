@@ -18,6 +18,9 @@ import {
   UpdateFacultyAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
   UpdateGroupAvailabilityModel,
+  UpdateUserAvailabilityAvailableFieldsModel,
+  UpdateUserAvailabilityModel,
+  UserModel,
 } from '../../models/user.model'
 import { Type } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
@@ -509,6 +512,12 @@ export class CreateUserAvailableForInstallationAvailabilitiesDto implements Crea
   })
   @IsBoolean()
   createUser: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять пользователей',
+  })
+  @IsBoolean()
+  updateUser: boolean
 }
 
 export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
@@ -549,6 +558,86 @@ export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
   @IsMongoIdWithTransform({ each: true })
   @CheckExists(RoleModel, true)
   availableForInstallationRoles: Types.ObjectId[]
+}
+
+export class UpdateUserAvailabilityAvailableFieldsDto implements UpdateUserAvailabilityAvailableFieldsModel {
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать имя другого пользователя',
+  })
+  @IsBoolean()
+  name: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать логин другого пользователя',
+  })
+  @IsBoolean()
+  login: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать присвоенные пользователю интерфейсы',
+  })
+  @IsBoolean()
+  interfaces: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать присвоенные пользователю роли',
+  })
+  @IsBoolean()
+  roles: boolean
+}
+
+export class UpdateUserAvailabilityDto implements UpdateUserAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Может ли пользователь обновлять любых пользователей. Если стоит true, то может обновить любого. Если стоит false, то следует обращать внимание на другие параметры',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список ролей, пользователей с которыми может редактировать пользователь',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(RoleModel, true)
+  availableRoles: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список пользователей, которых может редактировать пользователь. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(UserModel, true)
+  availableUsers: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список пользователей, которых пользователь не может редактировать. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(UserModel, true)
+  forbiddenUsers: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Поля пользователя, которые может редактировать пользователь',
+    type: UpdateUserAvailabilityAvailableFieldsDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateUserAvailabilityAvailableFieldsDto)
+  availableFields: UpdateUserAvailabilityAvailableFieldsDto
 }
 
 export class AvailabilityDto implements Partial<AvailabilityModel> {
@@ -694,6 +783,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => CreateUserAvailabilityDto)
   createUser?: CreateUserAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь редактировать других пользователей',
+    type: UpdateUserAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateUserAvailabilityDto)
+  updateUser?: UpdateUserAvailabilityDto
 }
 
 export class CreateUserDto {
