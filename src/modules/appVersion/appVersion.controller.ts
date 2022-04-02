@@ -14,12 +14,17 @@ import { ApiResponseException } from '../../global/decorators/ApiResponseExcepti
 import { AppVersionModuleGetVersionResponseDto } from './dto/responses/AppVersionModuleGetVersionResponse.dto'
 import { AppVersionModuleGetFromVersionResponseDto } from './dto/responses/AppVersionModuleGetFromVersionResponse.dto'
 import { AppVersionModuleCheckResponseDto } from './dto/responses/AppVersionModuleCheckResponse.dto'
+import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 
 @ApiTags('Версия приложения')
 @Controller()
 export class AppVersionController {
   constructor(private readonly appVersionService: AppVersionService) {}
 
+  @UserAuth({
+    availability: 'appVersion',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description:
@@ -122,6 +127,10 @@ export class AppVersionController {
     }
   }
 
+  @UserAuth({
+    availability: 'appVersion',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить версию приложения.',
   })

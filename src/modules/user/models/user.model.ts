@@ -223,6 +223,11 @@ export class DeleteCallScheduleAvailabilityModel {
   availableCallSchedules: (Types.ObjectId | CallScheduleModel)[]
 }
 
+export class AppVersionAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+}
+
 export class AvailabilityModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
@@ -343,6 +348,14 @@ export class AvailabilityModel {
     },
   })
   deleteCallSchedule: DeleteCallScheduleAvailabilityModel
+
+  @prop({
+    type: AppVersionAvailabilityModel,
+    default: <AppVersionAvailabilityModel>{
+      available: false,
+    },
+  })
+  appVersion: AppVersionAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет
