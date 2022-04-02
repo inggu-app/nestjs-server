@@ -279,6 +279,9 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
 
   @prop({ default: false })
   updateUser: boolean
+
+  @prop({ default: false })
+  deleteUser: boolean
 }
 
 export class CreateUserAvailabilityModel {
@@ -342,6 +345,23 @@ export class UpdateUserAvailabilityModel {
     _id: false,
   })
   availableFields: UpdateUserAvailabilityAvailableFieldsModel
+}
+
+export class DeleteUserAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: false })
+  all: boolean
+
+  @prop({ ref: RoleModel, default: [] })
+  availableRoles: (Types.ObjectId | RoleModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  availableUsers: (Types.ObjectId | UserModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  forbiddenUsers: (Types.ObjectId | UserModel)[]
 }
 
 export class AvailabilityModel {
@@ -505,6 +525,7 @@ export class AvailabilityModel {
         learningStage: false,
         createUser: false,
         updateUser: false,
+        deleteUser: false,
       },
       allRoles: true,
       availableForInstallationRoles: [],
@@ -531,6 +552,19 @@ export class AvailabilityModel {
     _id: false,
   })
   updateUser: UpdateUserAvailabilityModel
+
+  @prop({
+    type: DeleteUserAvailabilityModel,
+    default: <DeleteUserAvailabilityModel>{
+      available: false,
+      all: false,
+      availableRoles: [],
+      availableUsers: [],
+      forbiddenUsers: [],
+    },
+    _id: false,
+  })
+  deleteUser: DeleteUserAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

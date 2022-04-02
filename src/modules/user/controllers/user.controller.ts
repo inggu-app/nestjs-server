@@ -23,7 +23,13 @@ import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { FORBIDDEN_CLIENT_INTERFACE, INCORRECT_CREDENTIALS, NOT_AUTHORIZED } from '../../../global/constants/errors.constants'
 import { Request, Response } from 'express'
-import { UserModel, TokenDataModel, CreateUserAvailabilityModel, UpdateUserAvailabilityModel } from '../models/user.model'
+import {
+  UserModel,
+  TokenDataModel,
+  CreateUserAvailabilityModel,
+  UpdateUserAvailabilityModel,
+  DeleteUserAvailabilityModel,
+} from '../models/user.model'
 import { addDays } from '../../../global/utils/date'
 import { UpdateAvailabilityDto } from '../dto/user/updateAvailability.dto'
 import { removeFields } from '../../../global/utils/removeFields'
@@ -315,6 +321,10 @@ export class UserController {
     await this.userService.updateAvailability(dto.id, dto.availability)
   }
 
+  @UserAuth({
+    availability: 'deleteUser',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить пользователя',
   })
@@ -329,7 +339,20 @@ export class UserController {
     status: HttpStatus.OK,
   })
   @Delete('/')
-  async deleteById(@MongoId('userId') userId: Types.ObjectId) {
+  async deleteById(@MongoId('userId') userId: Types.ObjectId, @RequestUser() user: RequestUser<DeleteUserAvailabilityModel>) {
+    // проверяем пытается ли пользователь удалить недоступного ему пользователя
+    if (!user.availability.all) {
+      if (user.availability.forbiddenUsers.includes(userId))
+        throw new BadRequestException(`Пользователь не может удалить пользователя с id ${userId}`)
+      if (!user.availability.availableUsers.includes(userId)) {
+        const deletableUser = await this.userService.getById(userId, { projection: { roles: 1 } })
+        deletableUser.roles.forEach(role => {
+          if (!user.availability.availableRoles.includes(role))
+            throw new BadRequestException(`Пользователь не может удалить пользователя с id ${userId}`)
+        })
+      }
+    }
+
     await this.userService.deleteById(userId)
   }
 }

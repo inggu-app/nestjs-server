@@ -11,6 +11,7 @@ import {
   DeleteCallScheduleAvailabilityModel,
   DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
+  DeleteUserAvailabilityModel,
   LearningStageAvailabilityModel,
   UpdateCallScheduleAvailabilityAvailableFieldsModel,
   UpdateCallScheduleAvailabilityModel,
@@ -518,6 +519,12 @@ export class CreateUserAvailableForInstallationAvailabilitiesDto implements Crea
   })
   @IsBoolean()
   updateUser: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять пользователей',
+  })
+  @IsBoolean()
+  deleteUser: boolean
 }
 
 export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
@@ -638,6 +645,51 @@ export class UpdateUserAvailabilityDto implements UpdateUserAvailabilityModel {
   @ValidateNested()
   @Type(() => UpdateUserAvailabilityAvailableFieldsDto)
   availableFields: UpdateUserAvailabilityAvailableFieldsDto
+}
+
+export class DeleteUserAvailabilityDto implements DeleteUserAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Может ли пользователь удалять любых пользователей. Если стоит true, то может удалить любого. Если стоит false, то следует обращать внимание на другие параметры',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список ролей, пользователей с которыми может удалить пользователь',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(RoleModel, true)
+  availableRoles: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список пользователей, которых может удалить пользователь. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(UserModel, true)
+  availableUsers: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список пользователей, которых пользователь не может удалить. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(UserModel, true)
+  forbiddenUsers: Types.ObjectId[]
 }
 
 export class AvailabilityDto implements Partial<AvailabilityModel> {
@@ -794,6 +846,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => UpdateUserAvailabilityDto)
   updateUser?: UpdateUserAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалить других пользователей',
+    type: DeleteUserAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => DeleteUserAvailabilityDto)
+  deleteUser?: DeleteUserAvailabilityDto
 }
 
 export class CreateUserDto {
