@@ -1,4 +1,4 @@
-import { ModelOptions, prop, Ref } from '@typegoose/typegoose'
+import { ModelOptions, prop } from '@typegoose/typegoose'
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
 import { getModelDefaultOptions } from '../../../configs/modelDefaultOptions.config'
 import { FacultyModel } from '../../faculty/faculty.model'
@@ -432,8 +432,8 @@ export class UserModel extends TimeStamps {
   availability: AvailabilityModel
 
   @prop({ _id: false, required: true, default: [], type: () => TokenDataModel })
-  tokens: Ref<TokenDataModel, undefined>[]
+  tokens: (Types.ObjectId | TokenDataModel)[]
 
   @prop({ ref: RoleModel, default: [] })
-  roles: Ref<RoleModel, undefined>[]
+  roles: (Types.ObjectId | RoleModel)[]
 }
