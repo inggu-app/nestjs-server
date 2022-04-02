@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsString, MaxLength, ValidateNested } from 'class-validator'
+import { IsArray, IsBoolean, IsNotEmpty, IsString, MaxLength, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CallScheduleItem } from './createCallSchedule.dto'
 import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
@@ -35,4 +35,12 @@ export class UpdateCallScheduleDto {
   @IsNotEmpty()
   @MaxLength(60)
   name?: string
+
+  @ApiProperty({
+    required: false,
+    title: 'Установка расписания как дефолтное расписание звонков. Если до этого было дефолтное расписание, то оно становится неактивным',
+  })
+  @IsUndefinable()
+  @IsBoolean()
+  isDefault: boolean
 }

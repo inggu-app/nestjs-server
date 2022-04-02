@@ -190,25 +190,6 @@ export class CallScheduleController {
     await this.callScheduleService.update(dto)
   }
 
-  @ApiOperation({
-    description:
-      'Эндпоинт позволяет установить новое глобальное расписание звонков. Расписание звонков с переданным id станет глобальным, а прошлое перестанет быть глобальным.',
-  })
-  @ApiQuery({
-    name: 'callScheduleId',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
-    description: 'id расписания звонков, которое необходимо сделать глобальным.',
-  })
-  @ApiResponseException()
-  @ApiResponse({
-    status: HttpStatus.OK,
-  })
-  @Patch('/default')
-  async updateDefaultSchedule(@MongoId('callScheduleId') id: Types.ObjectId) {
-    await this.callScheduleService.updateDefaultSchedule(id)
-  }
-
   @UserAuth({
     availability: 'deleteCallSchedule',
     availabilityKey: 'available',

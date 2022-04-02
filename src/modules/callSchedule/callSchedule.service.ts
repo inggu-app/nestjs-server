@@ -47,14 +47,8 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
     const { id, ...fields } = dto
     if (options.checkExistence.callSchedule) await this.throwIfNotExists({ _id: dto.id })
     if (fields.schedule) return this.callScheduleModel.updateOne({ _id: id }, { $set: { ...fields, scheduleUpdatedAt: new Date() } })
+    if (fields.isDefault) await this.callScheduleModel.updateOne({ isDefault: true }, { $set: { isDefault: false } })
     return this.callScheduleModel.updateOne({ _id: dto.id }, { $set: fields })
-  }
-
-  async updateDefaultSchedule(id: Types.ObjectId, options = callScheduleServiceMethodDefaultOptions.updateDefaultSchedule) {
-    options = mergeOptionsWithDefaultOptions(options, callScheduleServiceMethodDefaultOptions.updateDefaultSchedule)
-    if (options.checkExistence.callSchedule) await this.throwIfNotExists({ _id: id })
-    await this.callScheduleModel.updateOne({ isDefault: true }, { $set: { isDefault: false } })
-    return this.callScheduleModel.updateOne({ _id: id }, { $set: { isDefault: true } })
   }
 
   async deleteById(id: Types.ObjectId, options = callScheduleServiceMethodDefaultOptions.deleteById) {
