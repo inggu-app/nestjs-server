@@ -33,7 +33,7 @@ import {
   UpdateUserAvailabilitiesAvailabilityModel,
 } from '../models/user.model'
 import { addDays } from '../../../global/utils/date'
-import { UpdateAvailabilityDto } from '../dto/user/updateAvailability.dto'
+import { UpdateAvailabilitiesDto } from '../dto/user/updateAvailabilities.dto'
 import { removeFields } from '../../../global/utils/removeFields'
 import { DocumentType } from '@typegoose/typegoose'
 import { WhitelistedValidationPipe } from '../../../global/decorators/WhitelistedValidationPipe.decorator'
@@ -343,9 +343,9 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.OK,
   })
-  @Patch('/update-availability')
-  async updateAvailability(
-    @Body() dto: UpdateAvailabilityDto,
+  @Patch('/update-availabilities')
+  async updateAvailabilities(
+    @Body() dto: UpdateAvailabilitiesDto,
     @RequestUser() user: RequestUser<UpdateUserAvailabilitiesAvailabilityModel>
   ) {
     // проверяем пытается ли пользователь обновить недоступные ему поля

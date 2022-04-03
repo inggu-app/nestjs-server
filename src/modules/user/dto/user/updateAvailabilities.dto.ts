@@ -5,7 +5,7 @@ import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdW
 import { Types } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 
-export class UpdateAvailabilityDto {
+export class UpdateAvailabilitiesDto {
   @ApiProperty({
     title: 'id пользователя, разрешения которого необходимо обновить.',
     type: 'MongoId',
