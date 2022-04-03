@@ -92,15 +92,15 @@ export class UserService extends CheckExistenceService<UserModel> {
 
   async updateAvailability(
     id: Types.ObjectId,
-    availabilityDto: AvailabilitiesDto,
+    availabilitiesDto: AvailabilitiesDto,
     options = userServiceMethodDefaultOptions.updateAvailability
   ) {
     options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.updateAvailability)
     if (options.checkExistence.user) await this.throwIfNotExists({ _id: id })
-    const user = await this.getById(id, { projection: { _id: 0, availability: 1 } }, { checkExistence: { user: false } })
+    const user = await this.getById(id, { projection: { _id: 0, availabilities: 1 } }, { checkExistence: { user: false } })
     return this.userModel.updateOne(
       { _id: id },
-      { $set: { availability: { ...(user.toObject() as DocumentType<UserModel>).availabilities, ...availabilityDto } } }
+      { $set: { availabilities: { ...(user.toObject() as DocumentType<UserModel>).availabilities, ...availabilitiesDto } } }
     )
   }
 

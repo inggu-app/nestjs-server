@@ -369,7 +369,7 @@ export class UserController {
       }
     }
 
-    await this.userService.updateAvailability(dto.id, dto.availabilities, { checkExistence: { user: false } })
+    await this.userService.updateAvailability(dto.id, dto.availabilities)
   }
 
   @UserAuth({
