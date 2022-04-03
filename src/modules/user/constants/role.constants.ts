@@ -5,11 +5,26 @@ export const roleServiceMethodDefaultOptions = {
   create: {
     checkExistence: {},
   },
+  getById: {
+    checkExistence: {
+      role: true,
+    },
+  },
   getMany: {
     checkExistence: {},
   },
   countMany: {
     checkExistence: {},
+  },
+  update: {
+    checkExistence: {
+      role: true,
+    },
+  },
+  deleteById: {
+    checkExistence: {
+      role: true,
+    },
   },
 }
 

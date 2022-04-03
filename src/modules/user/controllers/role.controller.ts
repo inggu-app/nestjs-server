@@ -1,5 +1,5 @@
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
 import { RoleService } from '../services/role.service'
 import { WhitelistedValidationPipe } from '../../../global/decorators/WhitelistedValidationPipe.decorator'
 import { CreateRoleDto } from '../dto/role/createRole.dto'
@@ -7,10 +7,14 @@ import { ApiResponseException } from '../../../global/decorators/ApiResponseExce
 import { IntQueryParam } from '../../../global/decorators/IntQueryParam.decorator'
 import { StringQueryParam } from '../../../global/decorators/StringQueryParam.decorator'
 import { MongoQueryOptions } from '../../../global/decorators/MongoQueryOptions.decorator'
-import { QueryOptions } from 'mongoose'
+import { QueryOptions, Types } from 'mongoose'
 import { ApiMongoQueryOptions } from '../../../global/decorators/ApiMongoQueryOptions.decorator'
 import { UserModuleCreateRoleResponseDto } from '../dto/role/responses/UserModuleCreateRoleResponse.dto'
 import { UserModuleGetManyRolesResponseDto } from '../dto/role/responses/UserModuleGetManyRolesResponse.dto'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
+import { UserModuleGetRoleByIdResponseDto } from '../dto/role/responses/UserModuleGetRoleByIdResponse.dto'
+import { MongoId } from '../../../global/decorators/MongoId.decorator'
+import { UpdateRoleDto } from '../dto/role/updateRole.dto'
 
 @ApiTags('Роли')
 @Controller('/roles')
@@ -30,6 +34,28 @@ export class RoleController {
   async createRole(@Body() dto: CreateRoleDto) {
     return {
       role: await this.roleService.create(dto),
+    }
+  }
+
+  @ApiOperation({
+    description: 'Эндпоинт позволяет получить роль по id',
+  })
+  @ApiQuery({
+    name: 'roleId',
+    description: 'id роли',
+    type: MongoIdType,
+    example: MongoIdExample,
+  })
+  @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleGetRoleByIdResponseDto,
+    status: HttpStatus.OK,
+  })
+  @Get('/by-id')
+  async getRoleById(@MongoId('roleId') roleId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+    return {
+      role: await this.roleService.getById(roleId, queryOptions),
     }
   }
 
@@ -68,5 +94,36 @@ export class RoleController {
       roles: await this.roleService.getMany(page, count, label, queryOptions),
       count: await this.roleService.countMany(label),
     }
+  }
+
+  @WhitelistedValidationPipe()
+  @ApiOperation({
+    description: 'Эндпоинт позволяет обновить роль',
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
+  @Patch('/')
+  async update(@Body() dto: UpdateRoleDto) {
+    await this.roleService.update(dto)
+  }
+
+  @ApiOperation({
+    description: 'Эндпоинт позволяет удалить роль',
+  })
+  @ApiQuery({
+    name: 'roleId',
+    description: 'id роли',
+    type: MongoIdType,
+    example: MongoIdExample,
+  })
+  @ApiResponseException()
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
+  @Delete('/')
+  async deleteById(@MongoId('roleId') roleId: Types.ObjectId) {
+    await this.roleService.deleteById(roleId)
   }
 }

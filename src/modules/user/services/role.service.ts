@@ -7,8 +7,9 @@ import { ROLE_WITH_ID_NOT_FOUND, ROLE_WITH_LABEL_EXISTS } from '../../../global/
 import { CreateRoleDto } from '../dto/role/createRole.dto'
 import { roleServiceMethodDefaultOptions } from '../constants/role.constants'
 import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMethodOptions'
-import { FilterQuery, QueryOptions } from 'mongoose'
+import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { DocumentType } from '@typegoose/typegoose'
+import { UpdateRoleDto } from '../dto/role/updateRole.dto'
 
 @Injectable()
 export class RoleService extends CheckExistenceService<RoleModel> {
@@ -21,6 +22,13 @@ export class RoleService extends CheckExistenceService<RoleModel> {
     await this.throwIfExists({ label: dto.label }, { error: ROLE_WITH_LABEL_EXISTS(dto.label) })
 
     return this.roleModel.create(dto)
+  }
+
+  async getById(roleId: Types.ObjectId, queryOptions?: QueryOptions, options = roleServiceMethodDefaultOptions.getById) {
+    options = mergeOptionsWithDefaultOptions(options, roleServiceMethodDefaultOptions.getById)
+    if (options.checkExistence.role) await this.throwIfNotExists({ _id: roleId })
+
+    return this.roleModel.findById(roleId, queryOptions).exec()
   }
 
   async getMany(
@@ -45,5 +53,19 @@ export class RoleService extends CheckExistenceService<RoleModel> {
     if (label) filter.label = { $regex: label, $options: 'i' }
 
     return this.roleModel.countDocuments(filter).exec()
+  }
+
+  async update(dto: UpdateRoleDto, options = roleServiceMethodDefaultOptions.update) {
+    options = mergeOptionsWithDefaultOptions(options, roleServiceMethodDefaultOptions.update)
+    if (options.checkExistence.role) await this.throwIfNotExists({ _id: dto.id })
+
+    const { id, ...fields } = dto
+    return this.roleModel.updateOne({ _id: id }, { $set: fields })
+  }
+
+  async deleteById(roleId: Types.ObjectId, options = roleServiceMethodDefaultOptions.deleteById) {
+    if (options.checkExistence.role) await this.throwIfNotExists({ _id: roleId })
+
+    return this.roleModel.deleteOne({ _id: roleId })
   }
 }

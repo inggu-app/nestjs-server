@@ -9,6 +9,6 @@ export interface RoleModel extends Base {}
   }),
 })
 export class RoleModel extends TimeStamps {
-  @prop({ required: true })
+  @prop({ required: true, maxlength: 60 })
   label: string
 }
