@@ -39,7 +39,7 @@ export class UserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenA
 
       if (availability === 'createUser') {
         if (context.switchToHttp().getRequest().headers.admin === this.configService.get('ADMIN_SECRET_KEY')) {
-          if ((await this.userService.countMany()) === 0) return true
+          return true
         }
       }
       const user = await this.userService.getById(Types.ObjectId(tokenData.id), {

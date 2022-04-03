@@ -49,7 +49,7 @@ export class UserModuleResponseUser {
     type: AvailabilitiesDto,
     required: false,
   })
-  availability: AvailabilitiesDto
+  availabilities: AvailabilitiesDto
 
   @ApiProperty({
     description: 'Дата создания пользователя',

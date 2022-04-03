@@ -96,7 +96,7 @@ export class UserController {
       // проверяем пытается ли пользователь установить недоступные ему возможности для новосоздаваемого пользователя
       const availabilities = user.availability.availableForInstallationAvailabilities
       const availabilitiesErrors: string[] = []
-      objectKeys(dto.availability).forEach(availability => {
+      objectKeys(dto.availabilities).forEach(availability => {
         if (!availabilities[availability])
           availabilitiesErrors.push(`Пользователю запрещено назначать новосоздаваемому пользователю возможность ${availability}`)
       })
@@ -350,7 +350,7 @@ export class UserController {
   ) {
     // проверяем пытается ли пользователь обновить недоступные ему поля
     const errors: string[] = []
-    objectKeys(dto.availability).forEach(availability => {
+    objectKeys(dto.availabilities).forEach(availability => {
       if (!user.availability.availableForInstallationAvailabilities[availability])
         errors.push(`Пользователю запрещено редактировать поле ${availability}`)
     })
@@ -369,7 +369,7 @@ export class UserController {
       }
     }
 
-    await this.userService.updateAvailability(dto.id, dto.availability, { checkExistence: { user: false } })
+    await this.userService.updateAvailability(dto.id, dto.availabilities, { checkExistence: { user: false } })
   }
 
   @UserAuth({

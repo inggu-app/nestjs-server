@@ -1153,7 +1153,7 @@ export class CreateUserDto {
   @IsObject()
   @ValidateNested()
   @Type(() => AvailabilitiesDto)
-  availability: AvailabilitiesDto
+  availabilities: AvailabilitiesDto
 
   @ApiProperty({
     title: 'Список доступных для авторизации интерфейсов',

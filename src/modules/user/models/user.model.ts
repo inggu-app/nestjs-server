@@ -210,6 +210,7 @@ export class UpdateCallScheduleAvailabilityModel {
       schedule: false,
       name: false,
     },
+    _id: false,
   })
   availableFields: UpdateCallScheduleAvailabilityAvailableFieldsModel
 }

@@ -21,5 +21,5 @@ export class UpdateAvailabilityDto {
   @IsObject()
   @ValidateNested()
   @Type(() => AvailabilitiesDto)
-  availability: AvailabilitiesDto
+  availabilities: AvailabilitiesDto
 }
