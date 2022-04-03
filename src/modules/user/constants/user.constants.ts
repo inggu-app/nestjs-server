@@ -85,6 +85,9 @@ export const userServiceMethodDefaultOptions = {
       user: true,
     },
   },
+  clearFrom: {
+    checkExistence: {},
+  },
 }
 
 checkOptionsForServiceMethodExistence<UserService>(userServiceMethodDefaultOptions)

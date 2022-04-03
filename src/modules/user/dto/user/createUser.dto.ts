@@ -1,7 +1,7 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
 import {
   AppVersionAvailabilityModel,
-  AvailabilityModel,
+  AvailabilitiesModel,
   CreateCallScheduleAvailabilityModel,
   CreateFacultyAvailabilityModel,
   CreateGroupAvailabilityModel,
@@ -891,7 +891,7 @@ export class DeleteRoleAvailabilityDto implements DeleteRoleAvailabilityModel {
   available: boolean
 }
 
-export class AvailabilityDto implements Partial<AvailabilityModel> {
+export class AvailabilitiesDto implements Partial<AvailabilitiesModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
     type: CreateScheduleAvailabilityDto,
@@ -1152,8 +1152,8 @@ export class CreateUserDto {
   })
   @IsObject()
   @ValidateNested()
-  @Type(() => AvailabilityDto)
-  availability: AvailabilityDto
+  @Type(() => AvailabilitiesDto)
+  availability: AvailabilitiesDto
 
   @ApiProperty({
     title: 'Список доступных для авторизации интерфейсов',

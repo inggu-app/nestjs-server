@@ -53,6 +53,9 @@ export const groupServiceMethodDefaultOptions = {
   getMany: {
     checkExistence: {},
   },
+  clearFrom: {
+    checkExistence: {},
+  },
 }
 
 checkOptionsForServiceMethodExistence<GroupService>(groupServiceMethodDefaultOptions)

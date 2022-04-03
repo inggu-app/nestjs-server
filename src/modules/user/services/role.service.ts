@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { CheckExistenceService } from '../../../global/classes/CheckExistenceService'
 import { RoleModel } from '../models/role.model'
 import { InjectModel } from 'nestjs-typegoose'
@@ -10,10 +10,14 @@ import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMet
 import { FilterQuery, QueryOptions, Types } from 'mongoose'
 import { DocumentType } from '@typegoose/typegoose'
 import { UpdateRoleDto } from '../dto/role/updateRole.dto'
+import { UserService } from './user.service'
 
 @Injectable()
 export class RoleService extends CheckExistenceService<RoleModel> {
-  constructor(@InjectModel(RoleModel) private readonly roleModel: ModelType<RoleModel>) {
+  constructor(
+    @InjectModel(RoleModel) private readonly roleModel: ModelType<RoleModel>,
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService
+  ) {
     super(roleModel, undefined, arg => ROLE_WITH_ID_NOT_FOUND(arg._id))
   }
 
@@ -65,7 +69,7 @@ export class RoleService extends CheckExistenceService<RoleModel> {
 
   async deleteById(roleId: Types.ObjectId, options = roleServiceMethodDefaultOptions.deleteById) {
     if (options.checkExistence.role) await this.throwIfNotExists({ _id: roleId })
-
+    await this.userService.clearFrom(roleId, RoleModel)
     return this.roleModel.deleteOne({ _id: roleId })
   }
 }

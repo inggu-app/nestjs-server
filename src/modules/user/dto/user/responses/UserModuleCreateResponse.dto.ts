@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { MongoIdExample, MongoIdType } from '../../../../../global/constants/constants'
 import { Types } from 'mongoose'
 import { ClientInterfacesEnum } from '../../../../../global/enums/ClientInterfaces.enum'
-import { AvailabilityDto } from '../createUser.dto'
+import { AvailabilitiesDto } from '../createUser.dto'
 
 export class UserModuleResponseUser {
   @ApiProperty({
@@ -46,10 +46,10 @@ export class UserModuleResponseUser {
 
   @ApiProperty({
     description: 'Разрешения пользователя',
-    type: AvailabilityDto,
+    type: AvailabilitiesDto,
     required: false,
   })
-  availability: AvailabilityDto
+  availability: AvailabilitiesDto
 
   @ApiProperty({
     description: 'Дата создания пользователя',

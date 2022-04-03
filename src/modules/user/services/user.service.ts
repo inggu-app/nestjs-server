@@ -4,7 +4,7 @@ import { InjectModel } from 'nestjs-typegoose'
 import { UserModel, TokenDataModel } from '../models/user.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { USER_WITH_ID_NOT_FOUND, USER_WITH_LOGIN_EXISTS, USER_WITH_LOGIN_NOT_FOUND } from '../../../global/constants/errors.constants'
-import { AvailabilityDto, CreateUserDto } from '../dto/user/createUser.dto'
+import { AvailabilitiesDto, CreateUserDto } from '../dto/user/createUser.dto'
 import { DocumentType } from '@typegoose/typegoose'
 import { UpdateUserDto } from '../dto/user/updateUser.dto'
 import * as bcrypt from 'bcrypt'
@@ -12,6 +12,10 @@ import { CheckExistenceService } from '../../../global/classes/CheckExistenceSer
 import { userServiceMethodDefaultOptions } from '../constants/user.constants'
 import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMethodOptions'
 import { RoleService } from './role.service'
+import { RoleModel } from '../models/role.model'
+import { FacultyModel } from '../../faculty/faculty.model'
+import { GroupModel } from '../../group/group.model'
+import { CallScheduleModel } from '../../callSchedule/callSchedule.model'
 
 @Injectable()
 export class UserService extends CheckExistenceService<UserModel> {
@@ -88,7 +92,7 @@ export class UserService extends CheckExistenceService<UserModel> {
 
   async updateAvailability(
     id: Types.ObjectId,
-    availabilityDto: AvailabilityDto,
+    availabilityDto: AvailabilitiesDto,
     options = userServiceMethodDefaultOptions.updateAvailability
   ) {
     options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.updateAvailability)
@@ -96,7 +100,7 @@ export class UserService extends CheckExistenceService<UserModel> {
     const user = await this.getById(id, { projection: { _id: 0, availability: 1 } }, { checkExistence: { user: false } })
     return this.userModel.updateOne(
       { _id: id },
-      { $set: { availability: { ...(user.toObject() as DocumentType<UserModel>).availability, ...availabilityDto } } }
+      { $set: { availability: { ...(user.toObject() as DocumentType<UserModel>).availabilities, ...availabilityDto } } }
     )
   }
 
@@ -125,6 +129,73 @@ export class UserService extends CheckExistenceService<UserModel> {
   async deleteById(id: Types.ObjectId, options = userServiceMethodDefaultOptions.deleteById) {
     options = mergeOptionsWithDefaultOptions(options, userServiceMethodDefaultOptions.deleteById)
     if (options.checkExistence.user) await this.throwIfNotExists({ _id: id })
+    await this.clearFrom(id, UserModel)
     return this.userModel.deleteOne({ _id: id })
+  }
+
+  async clearFrom(
+    ids: Types.ObjectId | Types.ObjectId[],
+    model: typeof RoleModel | typeof FacultyModel | typeof GroupModel | typeof CallScheduleModel | typeof UserModel
+  ) {
+    if (!Array.isArray(ids)) ids = [ids]
+
+    let paths: string[] = []
+    switch (model.name) {
+      case RoleModel.name:
+        await this.userModel.updateMany({ roles: { $in: ids } }, { $pullAll: { roles: { $in: ids } } })
+        paths = [
+          'availabilities.createUser.availableForInstallationRoles',
+          'availabilities.updateUser.availableRoles',
+          'availabilities.deleteUser.availableRoles',
+          'availabilities.updateUserPassword.availableRoles',
+          'availabilities.updateUserAvailabilities.availableRoles',
+          'availabilities.updateRole.availableRoles',
+        ]
+        break
+      case FacultyModel.name:
+        paths = [
+          'availabilities.createSchedule.availableFaculties',
+          'availabilities.createGroup.availableFaculties',
+          'availabilities.updateGroup.availableForUpdateFaculties',
+          'availabilities.updateGroup.availableForInstallationFaculties',
+          'availabilities.deleteGroup.availableFaculties',
+          'availabilities.updateFaculty.availableFaculties',
+          'availabilities.deleteFaculty.availableFaculties',
+        ]
+        break
+      case GroupModel.name:
+        paths = [
+          'availabilities.createSchedule.availableGroups',
+          'availabilities.createSchedule.forbiddenGroups',
+          'availabilities.updateGroup.availableGroups',
+          'availabilities.updateGroup.forbiddenGroups',
+          'availabilities.deleteGroup.availableGroups',
+          'availabilities.deleteGroup.forbiddenGroups',
+        ]
+        break
+      case CallScheduleModel.name:
+        paths = ['availabilities.updateCallSchedule.availableCallSchedules', 'availabilities.deleteCallSchedule.availableCallSchedules']
+        break
+      case UserModel.name:
+        paths = [
+          'availabilities.updateUser.forbiddenUsers',
+          'availabilities.updateUser.availableUsers',
+          'availabilities.deleteUser.forbiddenUsers',
+          'availabilities.deleteUser.availableUsers',
+          'availabilities.updateUserPassword.forbiddenUsers',
+          'availabilities.updateUserPassword.availableUsers',
+          'availabilities.updateUserAvailabilities.forbiddenUsers',
+          'availabilities.updateUserAvailabilities.availableUsers',
+        ]
+        break
+    }
+    return this.userModel.updateMany(
+      {
+        $or: paths.map(path => ({ [path]: { $in: ids } })),
+      },
+      {
+        $pullAll: paths.reduce((obj, path) => (obj[path] = { $in: ids }), {} as Record<typeof paths[number], any>),
+      }
+    )
   }
 }

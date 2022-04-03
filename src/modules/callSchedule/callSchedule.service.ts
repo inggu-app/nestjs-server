@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { CreateCallScheduleDto } from './dto/createCallSchedule.dto'
@@ -13,10 +13,18 @@ import { QueryOptions, Types } from 'mongoose'
 import { UpdateCallScheduleDto } from './dto/updateCallSchedule.dto'
 import { callScheduleServiceMethodDefaultOptions } from './callSchedule.constants'
 import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
+import { UserService } from '../user/services/user.service'
+import { FacultyService } from '../faculty/faculty.service'
+import { GroupService } from '../group/group.service'
 
 @Injectable()
 export class CallScheduleService extends CheckExistenceService<CallScheduleModel> {
-  constructor(@InjectModel(CallScheduleModel) private readonly callScheduleModel: ModelType<CallScheduleModel>) {
+  constructor(
+    @InjectModel(CallScheduleModel) private readonly callScheduleModel: ModelType<CallScheduleModel>,
+    private readonly userService: UserService,
+    @Inject(forwardRef(() => FacultyService)) private readonly facultyService: FacultyService,
+    @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService
+  ) {
     super(callScheduleModel, undefined, callSchedule => CALL_SCHEDULE_WITH_ID_NOT_FOUND(callSchedule._id))
   }
 
@@ -54,6 +62,9 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
   async deleteById(id: Types.ObjectId, options = callScheduleServiceMethodDefaultOptions.deleteById) {
     options = mergeOptionsWithDefaultOptions(options, callScheduleServiceMethodDefaultOptions.deleteById)
     if (options.checkExistence.callSchedule) await this.throwIfNotExists({ _id: id })
+    await this.userService.clearFrom(id, CallScheduleModel)
+    await this.facultyService.clearFrom(id)
+    await this.groupService.clearFrom(id)
     return this.callScheduleModel.deleteOne({ _id: id })
   }
 }

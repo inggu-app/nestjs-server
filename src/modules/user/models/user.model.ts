@@ -238,7 +238,7 @@ export class LearningStageAvailabilityModel {
 // --------
 // классы для конфигурации создания пользователя
 // --------
-export class CreateUserAvailableForInstallationAvailabilitiesModel implements Record<keyof AvailabilityModel, boolean> {
+export class CreateUserAvailableForInstallationAvailabilitiesModel implements Record<keyof AvailabilitiesModel, boolean> {
   @prop({ default: false })
   createSchedule: boolean
 
@@ -458,7 +458,7 @@ export class DeleteRoleAvailabilityModel {
   available: boolean
 }
 
-export class AvailabilityModel {
+export class AvailabilitiesModel {
   @prop({
     type: CreateScheduleAvailabilityModel,
     default: <CreateScheduleAvailabilityModel>{
@@ -785,8 +785,8 @@ export class UserModel extends TimeStamps {
   @prop({ required: true })
   hashedPassword: string
 
-  @prop({ _id: false, required: true, type: () => AvailabilityModel })
-  availability: AvailabilityModel
+  @prop({ _id: false, required: true, type: () => AvailabilitiesModel })
+  availabilities: AvailabilitiesModel
 
   @prop({ _id: false, required: true, default: [], type: () => TokenDataModel })
   tokens: (Types.ObjectId | TokenDataModel)[]

@@ -13,6 +13,7 @@ import { CallScheduleService } from '../callSchedule/callSchedule.service'
 import { ScheduleService } from '../schedule/schedule.service'
 import { groupServiceMethodDefaultOptions } from './group.constants'
 import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
+import { UserService } from '../user/services/user.service'
 
 @Injectable()
 export class GroupService extends CheckExistenceService<GroupModel> {
@@ -20,7 +21,8 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
     @Inject(forwardRef(() => FacultyService)) private readonly facultyService: FacultyService,
     private readonly scheduleService: ScheduleService,
-    private readonly callScheduleService: CallScheduleService
+    private readonly callScheduleService: CallScheduleService,
+    private readonly userService: UserService
   ) {
     super(groupModel, undefined, group => GROUP_WITH_ID_NOT_FOUND(group._id))
   }
@@ -105,6 +107,13 @@ export class GroupService extends CheckExistenceService<GroupModel> {
       groups.map(g => g._id),
       { checkExistence: { groups: false } }
     )
+    await this.userService.clearFrom(facultyId, GroupModel)
     return this.groupModel.deleteMany({ faculty: facultyId })
+  }
+
+  clearFrom(ids: Types.ObjectId | Types.ObjectId[]) {
+    if (!Array.isArray(ids)) ids = [ids]
+
+    return this.groupModel.updateMany({ callSchedule: { $in: ids } }, { $set: { callSchedule: null } })
   }
 }

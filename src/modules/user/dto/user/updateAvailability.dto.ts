@@ -1,6 +1,6 @@
 import { IsObject, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
-import { AvailabilityDto } from './createUser.dto'
+import { AvailabilitiesDto } from './createUser.dto'
 import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { Types } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
@@ -20,6 +20,6 @@ export class UpdateAvailabilityDto {
   })
   @IsObject()
   @ValidateNested()
-  @Type(() => AvailabilityDto)
-  availability: AvailabilityDto
+  @Type(() => AvailabilitiesDto)
+  availability: AvailabilitiesDto
 }

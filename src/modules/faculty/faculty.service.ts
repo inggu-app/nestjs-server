@@ -12,13 +12,15 @@ import { GroupService } from '../group/group.service'
 import { facultyServiceMethodDefaultOptions } from './faculty.constants'
 import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
 import { CallScheduleService } from '../callSchedule/callSchedule.service'
+import { UserService } from '../user/services/user.service'
 
 @Injectable()
 export class FacultyService extends CheckExistenceService<FacultyModel> {
   constructor(
     @InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>,
     @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService,
-    private readonly callScheduleService: CallScheduleService
+    private readonly callScheduleService: CallScheduleService,
+    private readonly userService: UserService
   ) {
     super(facultyModel, undefined, arg => FACULTY_WITH_ID_NOT_FOUND(arg._id))
   }
@@ -70,6 +72,12 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
     options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.delete)
     if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: id })
     await this.groupService.deleteAllByFacultyId(id, { checkExistence: { faculty: false } })
+    await this.userService.clearFrom(id, FacultyModel)
     return this.facultyModel.deleteOne({ _id: id })
+  }
+
+  clearFrom(ids: Types.ObjectId | Types.ObjectId[]) {
+    if (!Array.isArray(ids)) ids = [ids]
+    return this.facultyModel.updateMany({ callSchedule: { $in: ids } }, { $set: { callSchedule: null } })
   }
 }

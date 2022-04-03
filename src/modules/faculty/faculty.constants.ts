@@ -35,6 +35,9 @@ export const facultyServiceMethodDefaultOptions = {
       faculty: true,
     },
   },
+  clearFrom: {
+    checkExistence: {},
+  },
 }
 
 checkOptionsForServiceMethodExistence<FacultyService>(facultyServiceMethodDefaultOptions)
