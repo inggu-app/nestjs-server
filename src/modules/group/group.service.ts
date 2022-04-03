@@ -96,6 +96,7 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     options = mergeOptionsWithDefaultOptions(options, groupServiceMethodDefaultOptions.delete)
     if (options.checkExistence.group) await this.throwIfNotExists({ _id: id })
     await this.scheduleService.deleteByGroupId(id, { checkExistence: { group: false } })
+    await this.userService.clearFrom(id, GroupModel)
     return this.groupModel.deleteOne({ _id: id })
   }
 
@@ -107,7 +108,10 @@ export class GroupService extends CheckExistenceService<GroupModel> {
       groups.map(g => g._id),
       { checkExistence: { groups: false } }
     )
-    await this.userService.clearFrom(facultyId, GroupModel)
+    await this.userService.clearFrom(
+      groups.map(g => g._id),
+      GroupModel
+    )
     return this.groupModel.deleteMany({ faculty: facultyId })
   }
 

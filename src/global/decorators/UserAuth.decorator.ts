@@ -43,7 +43,7 @@ export class UserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenA
         }
       }
       const user = await this.userService.getById(Types.ObjectId(tokenData.id), {
-        projection: { availability: 1, tokens: 1 },
+        projection: { availabilities: 1, tokens: 1 },
       })
       context.switchToHttp().getRequest().user = {
         id: Types.ObjectId(user.id),

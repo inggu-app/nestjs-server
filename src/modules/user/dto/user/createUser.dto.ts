@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
+import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
 import {
   AppVersionAvailabilityModel,
   AvailabilitiesModel,
@@ -576,7 +576,8 @@ export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
     enum: ClientInterfacesEnum,
     example: [ClientInterfacesEnum.MAIN_MOBILE_APP],
   })
-  @IsEnum(ClientInterfacesEnum)
+  @IsArray()
+  @IsEnum(ClientInterfacesEnum, { each: true })
   availableForInstallationInterfaces: ClientInterfacesEnum[]
 
   @ApiProperty({

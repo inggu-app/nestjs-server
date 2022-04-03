@@ -194,7 +194,10 @@ export class UserService extends CheckExistenceService<UserModel> {
         $or: paths.map(path => ({ [path]: { $in: ids } })),
       },
       {
-        $pullAll: paths.reduce((obj, path) => (obj[path] = { $in: ids }), {} as Record<typeof paths[number], any>),
+        $pullAll: paths.reduce((obj, path) => {
+          obj[path] = ids
+          return obj
+        }, {} as Record<typeof paths[number], any>),
       }
     )
   }
