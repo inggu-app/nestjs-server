@@ -276,11 +276,10 @@ export class UserController {
     if (fieldsErrors.length) throw new BadRequestException(fieldsErrors)
 
     // проверяем пытается ли пользователь редактировать недоступных ему пользователей
+    if (user.availability.forbiddenUsers.includes(dto.id))
+      throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${dto.id}`)
     if (!user.availability.all) {
       if (!user.availability.availableUsers.includes(dto.id)) {
-        if (user.availability.forbiddenUsers.includes(dto.id))
-          throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${dto.id}`)
-
         const editableUser = await this.userService.getById(dto.id, { projection: { roles: 1 } })
         editableUser.roles.forEach(role => {
           if (!user.availability.availableRoles.includes(role))
@@ -310,11 +309,10 @@ export class UserController {
 
     // проверяем может ли пользователь обновить пароль пользователя
     if (updatableUser.id !== user.id || !user.availability.self) {
+      if (user.availability.forbiddenUsers.includes(updatableUser.id))
+        throw new BadRequestException(`Пользователь не может обновить пароль пользователя с id ${updatableUser.id}`)
       if (!user.availability.all) {
         if (!user.availability.availableUsers.includes(updatableUser.id)) {
-          if (user.availability.forbiddenUsers.includes(updatableUser.id))
-            throw new BadRequestException(`Пользователь не может обновить пароль пользователя с id ${updatableUser.id}`)
-
           updatableUser.roles.forEach(role => {
             if (!user.availability.availableRoles.includes(role))
               throw new BadRequestException(`Пользователь не может обновить пароль пользователя с id ${updatableUser.id}`)
@@ -356,13 +354,11 @@ export class UserController {
     if (errors.length) throw new BadRequestException(errors)
 
     // проверяем пытается ли пользователь обновить недоступного ему пользователя
+    if (user.availability.forbiddenUsers.includes(dto.id))
+      throw new BadRequestException(`Пользователю запрещено обновлять возможности пользователя с id ${dto.id}`)
     if (!user.availability.all) {
-      if (user.availability.forbiddenUsers.includes(dto.id))
-        throw new BadRequestException(`Пользователю запрещено обновлять возможности пользователя с id ${dto.id}`)
-
       if (!user.availability.availableUsers.includes(dto.id)) {
         const editableUser = await this.userService.getById(dto.id, { projection: { roles: 1 } })
-
         editableUser.roles.forEach(role => {
           if (!user.availability.availableRoles.includes(role))
             throw new BadRequestException(`Пользователю запрещено обновлять возможности пользователя с id ${dto.id}`)
@@ -393,9 +389,9 @@ export class UserController {
   @Delete('/')
   async deleteById(@MongoId('userId') userId: Types.ObjectId, @RequestUser() user: RequestUser<DeleteUserAvailabilityModel>) {
     // проверяем пытается ли пользователь удалить недоступного ему пользователя
+    if (user.availability.forbiddenUsers.includes(userId))
+      throw new BadRequestException(`Пользователь не может удалить пользователя с id ${userId}`)
     if (!user.availability.all) {
-      if (user.availability.forbiddenUsers.includes(userId))
-        throw new BadRequestException(`Пользователь не может удалить пользователя с id ${userId}`)
       if (!user.availability.availableUsers.includes(userId)) {
         const deletableUser = await this.userService.getById(userId, { projection: { roles: 1 } })
         deletableUser.roles.forEach(role => {

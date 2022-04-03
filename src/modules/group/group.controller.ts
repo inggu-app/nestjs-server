@@ -188,10 +188,9 @@ export class GroupController {
     if (errors.length) throw new BadRequestException(errors)
 
     // Проверяем пытается ли пользователь обновить недоступную ему группу
+    if (user.availability.forbiddenGroups.includes(dto.id))
+      throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${dto.id}`)
     if (!user.availability.allForUpdate) {
-      if (user.availability.forbiddenGroups.includes(dto.id))
-        throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${dto.id}`)
-
       if (!user.availability.availableGroups.includes(dto.id)) {
         const group = await this.groupService.getById(dto.id, { projection: { faculty: 1 } })
         if (!user.availability.availableForUpdateFaculties.includes(group.faculty))
@@ -231,10 +230,9 @@ export class GroupController {
   })
   @Delete('/')
   async delete(@MongoId('groupId') groupId: Types.ObjectId, @RequestUser() user: RequestUser<DeleteGroupAvailabilityModel>) {
+    if (user.availability.forbiddenGroups.includes(groupId))
+      throw new BadRequestException(`Пользователь не может удалить группу с id ${groupId}`)
     if (!user.availability.all) {
-      if (user.availability.forbiddenGroups.includes(groupId))
-        throw new BadRequestException(`Пользователь не может удалить группу с id ${groupId}`)
-
       if (!user.availability.availableGroups.includes(groupId)) {
         const group = await this.groupService.getById(groupId, { projection: { faculty: 1 } })
         if (!user.availability.availableFaculties.includes(group.faculty))

@@ -447,6 +447,12 @@ export class AvailabilityModel {
         faculty: false,
         callSchedule: false,
       },
+      allForUpdate: false,
+      availableForUpdateFaculties: [],
+      availableGroups: [],
+      forbiddenGroups: [],
+      allFacultiesForInstallation: false,
+      availableForInstallationFaculties: [],
     },
     _id: false,
   })
