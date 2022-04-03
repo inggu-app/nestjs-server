@@ -668,27 +668,6 @@ export class AvailabilityModel {
     _id: false,
   })
   updateUserAvailabilities: UpdateUserAvailabilitiesAvailabilityModel
-  //
-  // @prop({ default: false })
-  // canUpdateFaculty: boolean // можно ли обновить факультет
-  //
-  // @prop({ default: false })
-  // canDeleteFaculty: boolean // можно ли удалить факультет
-  //
-  // @prop({ default: false })
-  // canCreateGroup: boolean // можно ли создать группу
-  //
-  // @prop({ default: false })
-  // canUpdateGroup: boolean // можно ли обновить группу
-  //
-  // @prop({ default: false })
-  // canDeleteGroup: boolean // можно ли удалить группу
-  //
-  // @prop({ default: false })
-  // canUpdateCallSchedule: boolean // можно ли обновить расписание звонков
-  //
-  // @prop({ default: false })
-  // canUpdateSemesterRange: boolean // можно ли обновить длительность семестра
 }
 
 export class TokenDataModel {
