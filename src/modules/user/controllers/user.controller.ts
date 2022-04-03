@@ -73,32 +73,35 @@ export class UserController {
   })
   @Post('/')
   async create(@Body() dto: CreateUserDto, @RequestUser() user: RequestUser<CreateUserAvailabilityModel>) {
-    // проверяем пытается ли пользователь установить недоступные ему клиентские интерфейсы для новосоздаваемого пользователя
-    const interfacesErrors: string[] = []
-    dto.interfaces.forEach(intrfc => {
-      if (!user.availability.availableForInstallationInterfaces.includes(intrfc))
-        interfacesErrors.push(`Пользователю запрещено назначать интерфейс ${intrfc}`)
-    })
-    if (interfacesErrors.length) throw new BadRequestException(interfacesErrors)
-
-    // проверяем пытается ли пользователь установить недоступные ему роли для новосоздаваемого пользователя
-    if (!user.availability.allRoles) {
-      const errors: string[] = []
-      dto.roles.forEach(role => {
-        if (!user.availability.availableForInstallationRoles.includes(role))
-          errors.push(`Пользователю запрещено создавать пользователя с ролью с id ${role}`)
+    // если это самый первый создаваемый пользователь
+    if (user) {
+      // проверяем пытается ли пользователь установить недоступные ему клиентские интерфейсы для новосоздаваемого пользователя
+      const interfacesErrors: string[] = []
+      dto.interfaces.forEach(intrfc => {
+        if (!user.availability.availableForInstallationInterfaces.includes(intrfc))
+          interfacesErrors.push(`Пользователю запрещено назначать интерфейс ${intrfc}`)
       })
-      if (errors.length) throw new BadRequestException(errors)
-    }
+      if (interfacesErrors.length) throw new BadRequestException(interfacesErrors)
 
-    // проверяем пытается ли пользователь установить недоступные ему возможности для новосоздаваемого пользователя
-    const availabilities = user.availability.availableForInstallationAvailabilities
-    const availabilitiesErrors: string[] = []
-    objectKeys(dto.availability).forEach(availability => {
-      if (!availabilities[availability])
-        availabilitiesErrors.push(`Пользователю запрещено назначать новосоздаваемому пользователю возможность ${availability}`)
-    })
-    if (availabilitiesErrors.length) throw new BadRequestException(availabilitiesErrors)
+      // проверяем пытается ли пользователь установить недоступные ему роли для новосоздаваемого пользователя
+      if (!user.availability.allRoles) {
+        const errors: string[] = []
+        dto.roles.forEach(role => {
+          if (!user.availability.availableForInstallationRoles.includes(role))
+            errors.push(`Пользователю запрещено создавать пользователя с ролью с id ${role}`)
+        })
+        if (errors.length) throw new BadRequestException(errors)
+      }
+
+      // проверяем пытается ли пользователь установить недоступные ему возможности для новосоздаваемого пользователя
+      const availabilities = user.availability.availableForInstallationAvailabilities
+      const availabilitiesErrors: string[] = []
+      objectKeys(dto.availability).forEach(availability => {
+        if (!availabilities[availability])
+          availabilitiesErrors.push(`Пользователю запрещено назначать новосоздаваемому пользователю возможность ${availability}`)
+      })
+      if (availabilitiesErrors.length) throw new BadRequestException(availabilitiesErrors)
+    }
 
     return {
       user: removeUserFields(await this.userService.create(dto), ['tokens', 'hashedPassword']),

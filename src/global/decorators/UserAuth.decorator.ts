@@ -29,7 +29,7 @@ export class UserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenA
     protected readonly configService: ConfigService,
     protected readonly userService: UserService
   ) {
-    super(jwtService, configService, userService)
+    super(jwtService, configService)
   }
 
   async accessAllowed(tokenData: ITokenData, requestToken: string, context: ExecutionContext) {
@@ -37,7 +37,12 @@ export class UserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenA
       const availability: keyof AvailabilitiesModel = this.reflector.get('availability', context.getHandler())
       const availabilityKey: keyof AvailabilitiesModel[typeof availability] = this.reflector.get('availabilityKey', context.getHandler())
 
-      const user = await this.userService.getById(new Types.ObjectId(tokenData.id), {
+      if (availability === 'createUser') {
+        if (context.switchToHttp().getRequest().headers.admin === this.configService.get('ADMIN_SECRET_KEY')) {
+          if ((await this.userService.countMany()) === 0) return true
+        }
+      }
+      const user = await this.userService.getById(Types.ObjectId(tokenData.id), {
         projection: { availability: 1, tokens: 1 },
       })
       context.switchToHttp().getRequest().user = {
@@ -49,6 +54,8 @@ export class UserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenA
         user.availabilities[availability][availabilityKey] &&
         !!user.tokens.find(tokenData => (tokenData as TokenDataModel).token === requestToken)
       )
-    } catch (e) {}
+    } catch (e) {
+      throw e
+    }
   }
 }

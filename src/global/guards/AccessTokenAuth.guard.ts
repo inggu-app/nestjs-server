@@ -3,7 +3,6 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@
 import { envVariables } from '../constants/envVariables.constants'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { UserService } from '../../modules/user/services/user.service'
 
 export interface IAccessTokenAuth {
   accessAllowed(tokenData: ITokenData, token: string, context: ExecutionContext): boolean | Promise<boolean | undefined> | undefined
@@ -11,18 +10,13 @@ export interface IAccessTokenAuth {
 
 @Injectable()
 export class AccessTokenAuthGuard implements CanActivate, IAccessTokenAuth {
-  constructor(
-    protected readonly jwtService: JwtService,
-    protected readonly configService: ConfigService,
-    protected readonly userService: UserService
-  ) {}
+  constructor(protected readonly jwtService: JwtService, protected readonly configService: ConfigService) {}
 
   accessAllowed(tokenData: ITokenData, token: string, context: ExecutionContext): boolean | Promise<boolean | undefined> | undefined {
     return true
   }
 
   async canActivate(context: ExecutionContext) {
-    if ((await this.userService.countMany()) === 0) return true
     const token = context.switchToHttp().getRequest().cookies['access_token']
 
     if (token) {
