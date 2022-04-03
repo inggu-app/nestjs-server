@@ -11,6 +11,7 @@ import { UpdateFacultyDto } from '../../faculty/dto/updateFaculty.dto'
 import { UpdateCallScheduleDto } from '../../callSchedule/dto/updateCallSchedule.dto'
 import { CallScheduleModel } from '../../callSchedule/callSchedule.model'
 import { UpdateUserDto } from '../dto/user/updateUser.dto'
+import { UpdateRoleDto } from '../dto/role/updateRole.dto'
 
 // работа с редактированием расписания занятий для группы
 export class CreateScheduleAvailabilityModel {
@@ -288,6 +289,15 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
 
   @prop({ default: false })
   updateUserAvailabilities: boolean
+
+  @prop({ default: false })
+  createRole: boolean
+
+  @prop({ default: false })
+  updateRole: boolean
+
+  @prop({ default: false })
+  deleteRole: boolean
 }
 
 export class CreateUserAvailabilityModel {
@@ -411,6 +421,41 @@ export class UpdateUserAvailabilitiesAvailabilityModel {
 
   @prop({ ref: () => UserModel, default: [] })
   forbiddenUsers: (Types.ObjectId | UserModel)[]
+}
+
+export class CreateRoleAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+}
+
+export class UpdateRoleAvailabilityAvailableFieldsModel implements Record<keyof Omit<UpdateRoleDto, 'id'>, boolean> {
+  @prop({ default: false })
+  label: boolean
+}
+
+export class UpdateRoleAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({
+    type: UpdateRoleAvailabilityAvailableFieldsModel,
+    default: <UpdateRoleAvailabilityAvailableFieldsModel>{
+      label: false,
+    },
+    _id: false,
+  })
+  availableFields: UpdateRoleAvailabilityAvailableFieldsModel
+
+  @prop({ default: false })
+  all: boolean
+
+  @prop({ ref: RoleModel, default: [] })
+  availableRoles: (Types.ObjectId | RoleModel)[]
+}
+
+export class DeleteRoleAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
 }
 
 export class AvailabilityModel {
@@ -583,6 +628,9 @@ export class AvailabilityModel {
         deleteUser: false,
         updateUserPassword: false,
         updateUserAvailabilities: false,
+        createRole: false,
+        updateRole: false,
+        deleteRole: false,
       },
       allRoles: true,
       availableForInstallationRoles: [],
@@ -660,6 +708,9 @@ export class AvailabilityModel {
         deleteUser: false,
         updateUserPassword: false,
         updateUserAvailabilities: false,
+        createRole: false,
+        updateRole: false,
+        deleteRole: false,
       },
       availableRoles: [],
       availableUsers: [],
@@ -668,6 +719,38 @@ export class AvailabilityModel {
     _id: false,
   })
   updateUserAvailabilities: UpdateUserAvailabilitiesAvailabilityModel
+
+  @prop({
+    type: CreateRoleAvailabilityModel,
+    default: <CreateRoleAvailabilityModel>{
+      available: false,
+    },
+    _id: false,
+  })
+  createRole: CreateRoleAvailabilityModel
+
+  @prop({
+    type: UpdateRoleAvailabilityModel,
+    default: <UpdateRoleAvailabilityModel>{
+      available: false,
+      all: false,
+      availableFields: {
+        label: false,
+      },
+      availableRoles: [],
+    },
+    _id: false,
+  })
+  updateRole: UpdateRoleAvailabilityModel
+
+  @prop({
+    type: DeleteRoleAvailabilityModel,
+    default: <DeleteRoleAvailabilityModel>{
+      available: false,
+    },
+    _id: false,
+  })
+  deleteRole: DeleteRoleAvailabilityModel
 }
 
 export class TokenDataModel {

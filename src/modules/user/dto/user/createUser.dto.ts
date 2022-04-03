@@ -5,12 +5,14 @@ import {
   CreateCallScheduleAvailabilityModel,
   CreateFacultyAvailabilityModel,
   CreateGroupAvailabilityModel,
+  CreateRoleAvailabilityModel,
   CreateScheduleAvailabilityModel,
   CreateUserAvailabilityModel,
   CreateUserAvailableForInstallationAvailabilitiesModel,
   DeleteCallScheduleAvailabilityModel,
   DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
+  DeleteRoleAvailabilityModel,
   DeleteUserAvailabilityModel,
   LearningStageAvailabilityModel,
   UpdateCallScheduleAvailabilityAvailableFieldsModel,
@@ -19,6 +21,8 @@ import {
   UpdateFacultyAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
   UpdateGroupAvailabilityModel,
+  UpdateRoleAvailabilityAvailableFieldsModel,
+  UpdateRoleAvailabilityModel,
   UpdateUserAvailabilitiesAvailabilityModel,
   UpdateUserAvailabilityAvailableFieldsModel,
   UpdateUserAvailabilityModel,
@@ -539,6 +543,24 @@ export class CreateUserAvailableForInstallationAvailabilitiesDto implements Crea
   })
   @IsBoolean()
   updateUserAvailabilities: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать роли',
+  })
+  @IsBoolean()
+  createRole: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять роли',
+  })
+  @IsBoolean()
+  updateRole: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять роли',
+  })
+  @IsBoolean()
+  deleteRole: boolean
 }
 
 export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
@@ -811,6 +833,64 @@ export class UpdateUserAvailabilitiesAvailabilityDto implements UpdateUserAvaila
   forbiddenUsers: Types.ObjectId[]
 }
 
+export class CreateRoleAvailabilityDto implements CreateRoleAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+}
+
+export class UpdateRoleAvailabilityAvailableFieldsDto implements UpdateRoleAvailabilityAvailableFieldsModel {
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять название роли',
+  })
+  @IsBoolean()
+  label: boolean
+}
+
+export class UpdateRoleAvailabilityDto implements UpdateRoleAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Может ли пользователь обновлять любые роли. Если стоит true, то может обновить любую роль. Если стоит false, то следует обращать внимание на другие параметры',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Список ролей, которые пользователь может редактировать. Имеет смысл только если в all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(RoleModel, true)
+  availableRoles: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Поля, которые может обновлять пользователь',
+    type: UpdateRoleAvailabilityAvailableFieldsDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateRoleAvailabilityAvailableFieldsDto)
+  availableFields: UpdateRoleAvailabilityAvailableFieldsDto
+}
+
+export class DeleteRoleAvailabilityDto implements DeleteRoleAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -998,6 +1078,39 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => UpdateUserAvailabilitiesAvailabilityDto)
   updateUserAvailabilities?: UpdateUserAvailabilitiesAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь создавать роли',
+    type: CreateRoleAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateRoleAvailabilityDto)
+  createRole?: CreateRoleAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять роли',
+    type: UpdateRoleAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateRoleAvailabilityDto)
+  updateRole?: UpdateRoleAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь удалять роли',
+    type: DeleteRoleAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => DeleteRoleAvailabilityDto)
+  deleteRole?: DeleteRoleAvailabilityDto
 }
 
 export class CreateUserDto {

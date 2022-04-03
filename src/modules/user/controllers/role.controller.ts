@@ -1,5 +1,5 @@
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Patch, Post } from '@nestjs/common'
 import { RoleService } from '../services/role.service'
 import { WhitelistedValidationPipe } from '../../../global/decorators/WhitelistedValidationPipe.decorator'
 import { CreateRoleDto } from '../dto/role/createRole.dto'
@@ -15,12 +15,20 @@ import { MongoIdExample, MongoIdType } from '../../../global/constants/constants
 import { UserModuleGetRoleByIdResponseDto } from '../dto/role/responses/UserModuleGetRoleByIdResponse.dto'
 import { MongoId } from '../../../global/decorators/MongoId.decorator'
 import { UpdateRoleDto } from '../dto/role/updateRole.dto'
+import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
+import { objectKeys } from '../../../global/utils/objectKeys'
+import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
+import { UpdateRoleAvailabilityModel } from '../models/user.model'
 
 @ApiTags('Роли')
 @Controller('/roles')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
+  @UserAuth({
+    availability: 'createRole',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет создать роль',
@@ -96,6 +104,10 @@ export class RoleController {
     }
   }
 
+  @UserAuth({
+    availability: 'updateRole',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить роль',
@@ -105,10 +117,28 @@ export class RoleController {
     status: HttpStatus.OK,
   })
   @Patch('/')
-  async update(@Body() dto: UpdateRoleDto) {
+  async update(@Body() dto: UpdateRoleDto, @RequestUser() user: RequestUser<UpdateRoleAvailabilityModel>) {
+    // проверяем пытается ли пользователь обновлить недоступные ему поля
+    const errors: string[] = []
+    const { id, ...fields } = dto
+    objectKeys(fields).forEach(field => {
+      if (!user.availability.availableFields[field]) errors.push(`Пользователю запрещено редактировать поле ${field}`)
+    })
+    if (errors.length) throw new BadRequestException(errors)
+
+    // проверяем пытается ли пользователь редактировать недоступные ему роли
+    if (!user.availability.all) {
+      if (!user.availability.availableRoles.includes(dto.id))
+        throw new BadRequestException(`Пользователь не может редактировать роль с id ${dto.id}`)
+    }
+
     await this.roleService.update(dto)
   }
 
+  @UserAuth({
+    availability: 'deleteRole',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет удалить роль',
   })
