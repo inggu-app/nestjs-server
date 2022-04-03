@@ -18,7 +18,7 @@ export class CreateScheduleAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: true })
+  @prop({ default: false })
   all: boolean
 
   @prop({ ref: FacultyModel, default: [] })
@@ -36,7 +36,7 @@ export class CreateGroupAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: true })
+  @prop({ default: false })
   allFaculties: boolean
 
   @prop({ ref: FacultyModel, default: [] })
@@ -72,7 +72,7 @@ export class UpdateGroupAvailabilityModel {
   availableFields: UpdateGroupAvailabilityAvailableFieldsModel
 
   // можно ли обновлять любую группу
-  @prop({ default: true })
+  @prop({ default: false })
   allForUpdate: boolean
 
   @prop({
@@ -94,7 +94,7 @@ export class UpdateGroupAvailabilityModel {
   forbiddenGroups: (Types.ObjectId | GroupModel)[]
 
   // факультеты, на которые можно обновить принадлежность группы
-  @prop({ default: true })
+  @prop({ default: false })
   allFacultiesForInstallation: boolean
 
   @prop({
@@ -109,7 +109,7 @@ export class DeleteGroupAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: true })
+  @prop({ default: false })
   all: boolean
 
   @prop({
@@ -150,7 +150,7 @@ export class UpdateFacultyAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: true })
+  @prop({ default: false })
   all: boolean
 
   @prop({ ref: FacultyModel, default: [] })
@@ -171,7 +171,7 @@ export class DeleteFacultyAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: true })
+  @prop({ default: false })
   all: boolean
 
   @prop({ ref: FacultyModel, default: [] })
@@ -198,7 +198,7 @@ export class UpdateCallScheduleAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: true })
+  @prop({ default: false })
   all: boolean
 
   @prop({ ref: CallScheduleModel, default: [] })
@@ -219,7 +219,7 @@ export class DeleteCallScheduleAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: true })
+  @prop({ default: false })
   all: boolean
 
   @prop({ ref: CallScheduleModel, default: [] })
@@ -314,7 +314,7 @@ export class CreateUserAvailabilityModel {
   })
   availableForInstallationAvailabilities: CreateUserAvailableForInstallationAvailabilitiesModel
 
-  @prop({ default: true })
+  @prop({ default: false })
   allRoles: boolean
 
   @prop({
@@ -464,7 +464,7 @@ export class AvailabilitiesModel {
     type: CreateScheduleAvailabilityModel,
     default: <CreateScheduleAvailabilityModel>{
       available: false,
-      all: true,
+      all: false,
       availableFaculties: [],
       availableGroups: [],
       forbiddenGroups: [],
@@ -477,7 +477,7 @@ export class AvailabilitiesModel {
     type: CreateGroupAvailabilityModel,
     default: <CreateGroupAvailabilityModel>{
       available: false,
-      allFaculties: true,
+      allFaculties: false,
       availableFaculties: [],
     },
     _id: false,
@@ -508,7 +508,7 @@ export class AvailabilitiesModel {
     type: DeleteGroupAvailabilityModel,
     default: <DeleteGroupAvailabilityModel>{
       available: false,
-      all: true,
+      all: false,
       availableFaculties: [],
       availableGroups: [],
       forbiddenGroups: [],
@@ -530,7 +530,7 @@ export class AvailabilitiesModel {
     type: UpdateFacultyAvailabilityModel,
     default: <UpdateFacultyAvailabilityModel>{
       available: false,
-      all: true,
+      all: false,
       availableFaculties: [],
       availableFields: {
         title: false,
@@ -545,7 +545,7 @@ export class AvailabilitiesModel {
     type: DeleteFacultyAvailabilityModel,
     default: <DeleteFacultyAvailabilityModel>{
       available: false,
-      all: true,
+      all: false,
       availableFaculties: [],
     },
     _id: false,
@@ -565,7 +565,7 @@ export class AvailabilitiesModel {
     type: UpdateCallScheduleAvailabilityModel,
     default: <UpdateCallScheduleAvailabilityModel>{
       available: false,
-      all: true,
+      all: false,
       availableCallSchedules: [],
       availableFields: {
         schedule: false,
@@ -581,7 +581,7 @@ export class AvailabilitiesModel {
     type: DeleteCallScheduleAvailabilityModel,
     default: <DeleteCallScheduleAvailabilityModel>{
       available: false,
-      all: true,
+      all: false,
       availableCallSchedules: [],
     },
     _id: false,
@@ -633,7 +633,7 @@ export class AvailabilitiesModel {
         updateRole: false,
         deleteRole: false,
       },
-      allRoles: true,
+      allRoles: false,
       availableForInstallationRoles: [],
     },
     _id: false,
