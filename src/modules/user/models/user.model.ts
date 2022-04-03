@@ -285,6 +285,9 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
 
   @prop({ default: false })
   updateUserPassword: boolean
+
+  @prop({ default: false })
+  updateUserAvailabilities: boolean
 }
 
 export class CreateUserAvailabilityModel {
@@ -373,6 +376,29 @@ export class UpdateUserPasswordAvailabilityModel {
 
   @prop({ default: false })
   self: boolean
+
+  @prop({ default: false })
+  all: boolean
+
+  @prop({ ref: RoleModel, default: [] })
+  availableRoles: (Types.ObjectId | RoleModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  availableUsers: (Types.ObjectId | UserModel)[]
+
+  @prop({ ref: () => UserModel, default: [] })
+  forbiddenUsers: (Types.ObjectId | UserModel)[]
+}
+
+export class UpdateUserAvailabilitiesAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({
+    type: CreateUserAvailableForInstallationAvailabilitiesModel,
+    _id: false,
+  })
+  availableForInstallationAvailabilities: CreateUserAvailableForInstallationAvailabilitiesModel
 
   @prop({ default: false })
   all: boolean
@@ -550,6 +576,7 @@ export class AvailabilityModel {
         updateUser: false,
         deleteUser: false,
         updateUserPassword: false,
+        updateUserAvailabilities: false,
       },
       allRoles: true,
       availableForInstallationRoles: [],
@@ -603,6 +630,38 @@ export class AvailabilityModel {
     _id: false,
   })
   updateUserPassword: UpdateUserPasswordAvailabilityModel
+
+  @prop({
+    type: UpdateUserAvailabilitiesAvailabilityModel,
+    default: <UpdateUserAvailabilitiesAvailabilityModel>{
+      available: false,
+      all: false,
+      availableForInstallationAvailabilities: {
+        createSchedule: false,
+        createGroup: false,
+        updateGroup: false,
+        deleteGroup: false,
+        createFaculty: false,
+        updateFaculty: false,
+        deleteFaculty: false,
+        createCallSchedule: false,
+        updateCallSchedule: false,
+        deleteCallSchedule: false,
+        appVersion: false,
+        learningStage: false,
+        createUser: false,
+        updateUser: false,
+        deleteUser: false,
+        updateUserPassword: false,
+        updateUserAvailabilities: false,
+      },
+      availableRoles: [],
+      availableUsers: [],
+      forbiddenUsers: [],
+    },
+    _id: false,
+  })
+  updateUserAvailabilities: UpdateUserAvailabilitiesAvailabilityModel
   //
   // @prop({ default: false })
   // canUpdateFaculty: boolean // можно ли обновить факультет

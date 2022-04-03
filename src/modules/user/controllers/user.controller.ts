@@ -30,6 +30,7 @@ import {
   UpdateUserAvailabilityModel,
   DeleteUserAvailabilityModel,
   UpdateUserPasswordAvailabilityModel,
+  UpdateUserAvailabilitiesAvailabilityModel,
 } from '../models/user.model'
 import { addDays } from '../../../global/utils/date'
 import { UpdateAvailabilityDto } from '../dto/user/updateAvailability.dto'
@@ -329,6 +330,10 @@ export class UserController {
     }
   }
 
+  @UserAuth({
+    availability: 'updateUserAvailabilities',
+    availabilityKey: 'available',
+  })
   @WhitelistedValidationPipe()
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить разрешения пользователя.',
@@ -338,8 +343,34 @@ export class UserController {
     status: HttpStatus.OK,
   })
   @Patch('/update-availability')
-  async updateAvailability(@Body() dto: UpdateAvailabilityDto) {
-    await this.userService.updateAvailability(dto.id, dto.availability)
+  async updateAvailability(
+    @Body() dto: UpdateAvailabilityDto,
+    @RequestUser() user: RequestUser<UpdateUserAvailabilitiesAvailabilityModel>
+  ) {
+    // проверяем пытается ли пользователь обновить недоступные ему поля
+    const errors: string[] = []
+    objectKeys(dto.availability).forEach(availability => {
+      if (!user.availability.availableForInstallationAvailabilities[availability])
+        errors.push(`Пользователю запрещено редактировать поле ${availability}`)
+    })
+    if (errors.length) throw new BadRequestException(errors)
+
+    // проверяем пытается ли пользователь обновить недоступного ему пользователя
+    if (!user.availability.all) {
+      if (user.availability.forbiddenUsers.includes(dto.id))
+        throw new BadRequestException(`Пользователю запрещено обновлять возможности пользователя с id ${dto.id}`)
+
+      if (!user.availability.availableUsers.includes(dto.id)) {
+        const editableUser = await this.userService.getById(dto.id, { projection: { roles: 1 } })
+
+        editableUser.roles.forEach(role => {
+          if (!user.availability.availableRoles.includes(role))
+            throw new BadRequestException(`Пользователю запрещено обновлять возможности пользователя с id ${dto.id}`)
+        })
+      }
+    }
+
+    await this.userService.updateAvailability(dto.id, dto.availability, { checkExistence: { user: false } })
   }
 
   @UserAuth({

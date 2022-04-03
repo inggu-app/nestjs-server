@@ -19,6 +19,7 @@ import {
   UpdateFacultyAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
   UpdateGroupAvailabilityModel,
+  UpdateUserAvailabilitiesAvailabilityModel,
   UpdateUserAvailabilityAvailableFieldsModel,
   UpdateUserAvailabilityModel,
   UpdateUserPasswordAvailabilityModel,
@@ -532,6 +533,12 @@ export class CreateUserAvailableForInstallationAvailabilitiesDto implements Crea
   })
   @IsBoolean()
   updateUserPassword: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять возможности пользователей',
+  })
+  @IsBoolean()
+  updateUserAvailabilities: boolean
 }
 
 export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
@@ -750,6 +757,60 @@ export class UpdateUserPasswordAvailabilityDto implements UpdateUserPasswordAvai
   forbiddenUsers: Types.ObjectId[]
 }
 
+export class UpdateUserAvailabilitiesAvailabilityDto implements UpdateUserAvailabilitiesAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Может ли пользователь обновлять возможности любых пользователей. Если стоит true, то может обновить возможности любого. Если стоит false, то следует обращать внимание на другие параметры',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Возможности, которые пользователь может обновлять у пользователя',
+    type: CreateUserAvailableForInstallationAvailabilitiesDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateUserAvailableForInstallationAvailabilitiesDto)
+  availableForInstallationAvailabilities: CreateUserAvailableForInstallationAvailabilitiesDto
+
+  @ApiProperty({
+    description: 'Список ролей, возможности пользователей с которыми может обновить пользователь',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(RoleModel, true)
+  availableRoles: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список пользователей, возможности которых может обновить пользователь. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(UserModel, true)
+  availableUsers: Types.ObjectId[]
+
+  @ApiProperty({
+    description: 'Список пользователей, возможности которых пользователь не может обновить. Имеет смысл только если в поле all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(UserModel, true)
+  forbiddenUsers: Types.ObjectId[]
+}
+
 export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ApiProperty({
     description: 'Может ли пользователь редактировать расписание занятий',
@@ -926,6 +987,17 @@ export class AvailabilityDto implements Partial<AvailabilityModel> {
   @ValidateNested()
   @Type(() => UpdateUserPasswordAvailabilityDto)
   updateUserPassword?: UpdateUserPasswordAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять возможности других пользователей',
+    type: UpdateUserAvailabilitiesAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateUserAvailabilitiesAvailabilityDto)
+  updateUserAvailabilities?: UpdateUserAvailabilitiesAvailabilityDto
 }
 
 export class CreateUserDto {
