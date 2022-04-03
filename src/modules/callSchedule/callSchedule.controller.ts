@@ -19,6 +19,7 @@ import { CallScheduleModuleGetDefaultScheduleResponseDto } from './dto/responses
 import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
 import { DeleteCallScheduleAvailabilityModel, UpdateCallScheduleAvailabilityModel } from '../user/models/user.model'
+import { objectKeys } from '../../global/utils/objectKeys'
 
 @ApiTags('Расписание звонков')
 @Controller()
@@ -178,16 +179,16 @@ export class CallScheduleController {
     // проверяем пытается ли пользователь редактировать недоступные ему поля
     const availableFields = user.availability.availableFields
     const errors: string[] = []
-    if (!availableFields.schedule && dto.schedule) errors.push('Пользователю запрещено редактировать поле schedule у расписания звонков')
-    if (!availableFields.name && dto.name) errors.push('Пользователю запрещено редактировать поле name у расписания звонков')
-    if (!availableFields.isDefault && dto.isDefault !== undefined)
-      errors.push('Пользователю запрещено редактировать поле isDefault у расписания звонков')
+    const { id, ...fields } = dto
+    objectKeys(fields).forEach(field => {
+      if (!availableFields[field]) errors.push(`Пользователю запрещено редактировать поле ${field} у расписания звонков`)
+    })
     if (errors.length) throw new BadRequestException(errors)
 
     // проверяем пытается ли пользователь редактировать недоступные ему расписания звонков
     if (!user.availability.all) {
-      if (!user.availability.availableCallSchedules.includes(dto.id))
-        throw new BadRequestException(`Пользователю запрещено редактирвоать расписание звонков с id ${dto.id}`)
+      if (!user.availability.availableCallSchedules.includes(id))
+        throw new BadRequestException(`Пользователю запрещено редактирвоать расписание звонков с id ${id}`)
     }
     await this.callScheduleService.update(dto)
   }

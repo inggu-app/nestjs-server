@@ -276,14 +276,14 @@ export class UserController {
     if (fieldsErrors.length) throw new BadRequestException(fieldsErrors)
 
     // проверяем пытается ли пользователь редактировать недоступных ему пользователей
-    if (user.availability.forbiddenUsers.includes(dto.id))
-      throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${dto.id}`)
+    if (user.availability.forbiddenUsers.includes(id))
+      throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${id}`)
     if (!user.availability.all) {
-      if (!user.availability.availableUsers.includes(dto.id)) {
-        const editableUser = await this.userService.getById(dto.id, { projection: { roles: 1 } })
+      if (!user.availability.availableUsers.includes(id)) {
+        const editableUser = await this.userService.getById(id, { projection: { roles: 1 } })
         editableUser.roles.forEach(role => {
           if (!user.availability.availableRoles.includes(role))
-            throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${dto.id}`)
+            throw new BadRequestException(`Пользователю запрещено редактировать пользователя с id ${id}`)
         })
       }
     }

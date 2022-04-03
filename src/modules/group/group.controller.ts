@@ -20,6 +20,7 @@ import { GroupModuleGetByFacultyIdResponseDto } from './dto/responses/GroupModul
 import { GroupModuleGetManyResponseDto } from './dto/responses/GroupModuleGetManyResponseDto'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
 import { CreateGroupAvailabilityModel, DeleteGroupAvailabilityModel, UpdateGroupAvailabilityModel } from '../user/models/user.model'
+import { objectKeys } from '../../global/utils/objectKeys'
 
 @ApiTags('Группы')
 @Controller()
@@ -181,20 +182,19 @@ export class GroupController {
     // Проверяем пытается ли пользователь обновить поля, которые ему недоступны
     const availableFields = user.availability.availableFields
     const errors: string[] = []
-    if (!availableFields.title && dto.title) errors.push('Пользователю запрещено редактировать поле title у группы')
-    if (!availableFields.faculty && dto.faculty) errors.push('Пользователю запрещено редактировать поле faculty у группы')
-    if (!availableFields.callSchedule && dto.callSchedule !== undefined)
-      errors.push('Пользователю запрещено редактировать поле callSchedule у группы')
+    const { id, ...fields } = dto
+    objectKeys(fields).forEach(field => {
+      if (!availableFields[field]) errors.push(`Пользователю запрещено редактировать поле ${field} у группы`)
+    })
     if (errors.length) throw new BadRequestException(errors)
 
     // Проверяем пытается ли пользователь обновить недоступную ему группу
-    if (user.availability.forbiddenGroups.includes(dto.id))
-      throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${dto.id}`)
+    if (user.availability.forbiddenGroups.includes(id)) throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${id}`)
     if (!user.availability.allForUpdate) {
-      if (!user.availability.availableGroups.includes(dto.id)) {
-        const group = await this.groupService.getById(dto.id, { projection: { faculty: 1 } })
+      if (!user.availability.availableGroups.includes(id)) {
+        const group = await this.groupService.getById(id, { projection: { faculty: 1 } })
         if (!user.availability.availableForUpdateFaculties.includes(group.faculty))
-          throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${dto.id}`)
+          throw new BadRequestException(`Пользователю запрещено обновлять группу с id ${id}`)
       }
     }
 

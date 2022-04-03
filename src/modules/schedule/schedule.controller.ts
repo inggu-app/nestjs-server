@@ -43,9 +43,8 @@ export class ScheduleController {
   })
   @Post('/')
   async create(@Body() dto: CreateScheduleDto, @RequestUser() user: RequestUser<CreateScheduleAvailabilityModel>) {
+    if (user.availability.forbiddenGroups.includes(dto.group)) throw new BadRequestException('Для данной группы нельзя создать расписание')
     if (!user.availability.all) {
-      if (user.availability.forbiddenGroups.includes(dto.group))
-        throw new BadRequestException('Для данной группы нельзя создать расписание')
       if (!user.availability.availableGroups.includes(dto.group)) {
         const group = await this.groupService.getById(dto.group, { projection: { faculty: 1 } })
         if (!user.availability.availableFaculties.includes(group.faculty)) {

@@ -19,6 +19,7 @@ import { FacultyModuleGetManyResponseDto } from './dto/responses/FacultyModuleGe
 import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
 import { DeleteFacultyAvailabilityModel, UpdateFacultyAvailabilityModel } from '../user/models/user.model'
+import { objectKeys } from '../../global/utils/objectKeys'
 
 @ApiTags('Факультеты')
 @Controller()
@@ -159,15 +160,16 @@ export class FacultyController {
     // проверяем пытается ли пользователь обновить запрещённые ему поля
     const availableFields = user.availability.availableFields
     const errors: string[] = []
-    if (!availableFields.title && dto.title) errors.push('Пользователю запрещено редактировать поле title у факультета')
-    if (!availableFields.callSchedule && dto.callSchedule !== undefined)
-      errors.push('Пользователю запрещено редактировать поле callSchedule у факультета')
+    const { id, ...fields } = dto
+    objectKeys(fields).forEach(field => {
+      if (!availableFields[field]) errors.push(`Пользователю запрещено редактировать поле ${field} у факультета`)
+    })
     if (errors.length) throw new BadRequestException(errors)
 
     // проверяем пытается ли пользователь обновить недоступный ему факультет
     if (!user.availability.all) {
-      if (!user.availability.availableFaculties.includes(dto.id))
-        throw new BadRequestException(`Пользователь не может редактировать факультет с id ${dto.id}`)
+      if (!user.availability.availableFaculties.includes(id))
+        throw new BadRequestException(`Пользователь не может редактировать факультет с id ${id}`)
     }
 
     await this.facultyService.update(dto)
