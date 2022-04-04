@@ -7,6 +7,7 @@ import { UserService } from '../../modules/user/services/user.service'
 import { ITokenData } from '../types'
 import { Types } from 'mongoose'
 import { AccessTokenAuthGuard, IAccessTokenAuth } from '../guards/AccessTokenAuth.guard'
+import { envVariables } from '../constants/envVariables.constants'
 
 type UserAuthOptions<T extends keyof AvailabilitiesModel> = {
   availability: T
@@ -38,7 +39,7 @@ export class UserAuthGuard extends AccessTokenAuthGuard implements IAccessTokenA
       const availabilityKey: keyof AvailabilitiesModel[typeof availability] = this.reflector.get('availabilityKey', context.getHandler())
 
       if (availability === 'createUser') {
-        if (context.switchToHttp().getRequest().headers.admin === this.configService.get('ADMIN_SECRET_KEY')) {
+        if (context.switchToHttp().getRequest().headers.admin === this.configService.get(envVariables.adminSecretKey)) {
           return true
         }
       }

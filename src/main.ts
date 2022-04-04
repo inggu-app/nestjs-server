@@ -3,6 +3,7 @@ import { AppModule } from './modules/app/app.module'
 import * as cookieParser from 'cookie-parser'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { useContainer } from 'class-validator'
+import { checkEnvVariables } from './global/utils/checkEnvVariables'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -18,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document)
 
   app.use(cookieParser())
-
+  checkEnvVariables()
   await app.listen(3000)
 }
 
