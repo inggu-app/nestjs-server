@@ -133,6 +133,12 @@ class UpdateGroupAvailabilityAvailableFieldsDto implements UpdateGroupAvailabili
   })
   @IsBoolean()
   callSchedule: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять стадии обучения групп',
+  })
+  @IsBoolean()
+  learningStages: boolean
 }
 
 export class UpdateGroupAvailabilityDto implements UpdateGroupAvailabilityModel {

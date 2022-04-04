@@ -4,6 +4,21 @@ import { Types } from 'mongoose'
 import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { CallScheduleModel } from '../callSchedule/callSchedule.model'
+import { LearningStage } from '../learningStage/learningStage.constants'
+
+export class GroupLearningStageModel {
+  @prop({ enum: LearningStage })
+  stage: LearningStage
+
+  @prop({ required: true })
+  start: Date
+
+  @prop({ required: true })
+  end: Date
+
+  @prop({ required: true })
+  label: string
+}
 
 export interface GroupModel extends Base {}
 @modelOptions({
@@ -26,4 +41,7 @@ export class GroupModel extends TimeStamps {
 
   @prop({ ref: () => CallScheduleModel, default: null })
   callSchedule: Ref<CallScheduleModel, Types.ObjectId> | null
+
+  @prop({ type: [GroupLearningStageModel], _id: false, default: [] })
+  learningStages: GroupLearningStageModel[]
 }
