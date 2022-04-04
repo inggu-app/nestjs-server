@@ -7,7 +7,7 @@ export const ApiMongoQueryOptions = () => {
     ApiExtraModels(MongoQueryOptionsDto),
     ApiQuery({
       name: 'queryOptions',
-      description: 'опции запроса',
+      description: `Опции запроса. Описание опций необходимо смотреть в модели ${MongoQueryOptionsDto.name}`,
       style: 'deepObject',
       explode: false,
       required: false,

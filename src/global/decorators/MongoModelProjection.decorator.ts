@@ -6,80 +6,65 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator'
-import { objectValues } from '../utils/objectKeys'
+import { objectKeys } from '../utils/objectKeys'
+
+interface Projection {
+  [x: string]: Projection | 0 | 1
+}
 
 @ValidatorConstraint({ name: 'mongoModelProjection', async: false })
 class MongoModelProjectionConstraint implements ValidatorConstraintInterface {
-  validate(value: Record<string, any>, validationArguments?: ValidationArguments): Promise<boolean> | boolean {
-    if (!this.checkIsObject(validationArguments)) return false
-    if (!this.checkOnly01Characters(validationArguments)) return false
-    if (this.checkBothIdKeys(validationArguments)) return false
-    if (!this.checkOnly0Character(validationArguments) && !this.checkOnly1Character(validationArguments)) return false
-
-    return true
+  validate(value: Record<string, any>): Promise<boolean> | boolean {
+    if (!isObject(value)) return false
+    return typeof this.recursiveValidator(value as Projection) === 'boolean'
   }
 
   defaultMessage(validationArguments?: ValidationArguments): string {
-    if (!this.checkIsObject(validationArguments)) return `${validationArguments?.property} должно быть объектом`
-    if (!this.checkOnly01Characters(validationArguments))
-      return `В значениях полей в объекте ${validationArguments?.property} могут находиться только 0 и 1`
-    if (this.checkBothIdKeys(validationArguments))
-      return `В объекте ${validationArguments?.property} не могут одновременно находиться _id и id`
-    if (!this.checkOnly0Character(validationArguments) && !this.checkOnly1Character(validationArguments))
-      return `В полях объекта ${validationArguments?.property} могут лежать одновременно только 0 или только 1, не считая поля _id и id`
+    if (!isObject(validationArguments?.value)) return `${validationArguments?.property} должно быть объектом`
+
+    const validationResult = this.recursiveValidator(validationArguments?.value as Projection, validationArguments?.property)
+    if (typeof validationResult === 'string') return `В объекте ${validationResult} содержится ошибка`
 
     return 'Неизвестная ошибка'
   }
 
-  // Проверка на то, что значение является объектом
-  // Если значение это объект, то возвращается true
-  // Если значение это не объект, то возвращается false
-  checkIsObject(validationArguments?: ValidationArguments) {
-    return isObject(validationArguments?.value)
-  }
+  recursiveValidator(projection: Projection, path = 'projection', nested = false): boolean | string {
+    if (objectKeys(projection).includes('_id')) return path
+    if (!objectKeys(projection).length) return path
 
-  // Проверка на то, что в значениях полей лежат только нули и единицы
-  // Если лежат только нули и единицы, то возвращается true
-  // Если лежит что-то кроме нулей е единиц, то возвращается false
-  checkOnly01Characters(validationArguments?: ValidationArguments) {
+    const isHaveZeroKeys: string[] = []
+    const isHaveOneKeys: string[] = []
+    const isHaveNestedProjectionKeys: string[] = []
+
     let isCorrect = true
-    for (const value of objectValues(validationArguments?.value)) {
-      if (value !== 1 && value !== 0) isCorrect = false
+    for (const key of objectKeys(projection)) {
+      if ((nested && key === 'id') || (projection[key] !== 0 && projection[key] !== 1 && !isObject(projection[key]))) {
+        isCorrect = false
+        break
+      }
+      if (projection[key] === 0 && key !== 'id') isHaveZeroKeys.push(key as string)
+      if (projection[key] === 1 && key !== 'id') isHaveOneKeys.push(key as string)
+      if (isObject(projection[key])) {
+        if (key === 'id') {
+          isCorrect = false
+          break
+        }
+        isHaveNestedProjectionKeys.push(key as string)
+      }
     }
-    return isCorrect
-  }
+    if (!isCorrect) return path
 
-  // Проверка на нахождение в объекте одновременно _id и id
-  // Если оба поля есть, то возвращается true
-  // Если есть один из ключей или нет ни одного, то возвращается false
-  checkBothIdKeys(validationArguments?: ValidationArguments) {
-    return validationArguments?.value.id !== undefined && validationArguments.value._id !== undefined
-  }
+    if (isHaveZeroKeys.length && (isHaveOneKeys.length || isHaveNestedProjectionKeys.length)) {
+      return path
+    } else {
+      let isCorrect: string | boolean = true
+      for (const key of objectKeys(projection)) {
+        const value = projection[key]
+        if (isObject(value)) isCorrect = this.recursiveValidator(value, `${path}.${key}`, true)
+      }
 
-  // Проверка на то, что все поля кроме _id или id имеют значение единицы
-  // Если все единицы, то возвращается true
-  // Если не все единицы, то возвращается false
-  checkOnly1Character(validationArguments?: ValidationArguments) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, _id, ...fields }: Record<string, number> = validationArguments?.value
-    let isCorrect = true
-    for (const value of objectValues(fields)) {
-      if (value !== 1) isCorrect = false
+      return isCorrect
     }
-    return isCorrect
-  }
-
-  // Проверка на то, что все поля кроме _id или id имеют значение нуля
-  // Если все нули, то возвращается true
-  // Если не все нули, то возвращается false
-  checkOnly0Character(validationArguments?: ValidationArguments) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, _id, ...fields }: Record<string, number> = validationArguments?.value
-    let isCorrect = true
-    for (const value of objectValues(fields)) {
-      if (value !== 0) isCorrect = false
-    }
-    return isCorrect
   }
 }
 
