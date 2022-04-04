@@ -7,6 +7,7 @@ import { IsNullable } from '../../../global/decorators/IsNullable.decorator'
 import { GroupLearningStageModel } from '../group.model'
 import { LearningStage } from '../../learningStage/learningStage.constants'
 import { Type } from 'class-transformer'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 
 export class UpdateGroupLearningStageDto implements GroupLearningStageModel {
   @ApiProperty({
@@ -48,8 +49,8 @@ export class UpdateGroupDto {
   @ApiProperty({
     title: 'Id группы',
     description: 'Id группы, которую необходимо обновить',
-    example: '6203ce8cff1a854919f38314',
-    type: 'MongoId',
+    example: MongoIdExample,
+    type: MongoIdType,
   })
   @IsMongoIdWithTransform()
   id: Types.ObjectId
@@ -70,8 +71,8 @@ export class UpdateGroupDto {
   @ApiProperty({
     required: false,
     title: 'Id факультета, на который необходимо заменить текущий факультет',
-    example: '6203ce8cff1a854919f38314',
-    type: 'MongoId',
+    example: MongoIdExample,
+    type: MongoIdType,
   })
   @IsUndefinable()
   @IsMongoIdWithTransform()
@@ -80,8 +81,8 @@ export class UpdateGroupDto {
   @ApiProperty({
     required: false,
     title: 'Id расписания звонков, на которое необходимо заменить текущее расписание',
-    example: '6203ce8cff1a854919f38314',
-    type: 'MongoId',
+    example: MongoIdExample,
+    type: MongoIdType,
     nullable: true,
   })
   @IsUndefinable()

@@ -5,12 +5,13 @@ import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWith
 import { Types } from 'mongoose'
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 
 export class UpdateCallScheduleDto {
   @ApiProperty({
     title: 'Id расписания звонков, которое необходимо обновить',
-    example: '6203ce8cff1a854919f38314',
-    type: 'MongoId',
+    example: MongoIdExample,
+    type: MongoIdType,
   })
   @IsMongoIdWithTransform()
   id: Types.ObjectId

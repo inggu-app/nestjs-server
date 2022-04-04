@@ -4,7 +4,7 @@ import { Types } from 'mongoose'
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 import { IsNullable } from '../../../global/decorators/IsNullable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
-import { MongoIdType } from '../../../global/constants/constants'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 import { LearningStage } from '../../learningStage/learningStage.constants'
 import { Type } from 'class-transformer'
 import { FacultyLearningStageModel } from '../faculty.model'
@@ -48,8 +48,8 @@ export class UpdateFacultyLearningStageDto implements FacultyLearningStageModel 
 export class UpdateFacultyDto {
   @ApiProperty({
     title: 'Id факультета, который нужно обновить.',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
   })
   @IsMongoIdWithTransform()
   id: Types.ObjectId
@@ -70,7 +70,7 @@ export class UpdateFacultyDto {
 
   @ApiProperty({
     required: false,
-    type: 'MongoId',
+    type: MongoIdType,
     title: 'Id расписания звонков',
     description:
       'Id расписания звонков, на которое необходимо заменить текущее расписание звонков. Можно передать null чтобы сбросить установленное расписание.',

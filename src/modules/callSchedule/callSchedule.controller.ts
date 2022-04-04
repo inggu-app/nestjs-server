@@ -20,6 +20,7 @@ import { UserAuth } from '../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../global/decorators/RequestUser.decorator'
 import { DeleteCallScheduleAvailabilityModel, UpdateCallScheduleAvailabilityModel } from '../user/models/user.model'
 import { objectKeys } from '../../global/utils/objectKeys'
+import { MongoIdExample, MongoIdType } from '../../global/constants/constants'
 
 @ApiTags('Расписание звонков')
 @Controller()
@@ -56,8 +57,8 @@ export class CallScheduleController {
   })
   @ApiQuery({
     name: 'callScheduleId',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
     description: 'id расписания звонков, которое нужно получить.',
   })
   @ApiMongoQueryOptions()
@@ -81,9 +82,9 @@ export class CallScheduleController {
   })
   @ApiQuery({
     name: 'groupId',
-    example: '6203ce8cff1a854919f38314',
+    example: MongoIdExample,
     description: 'id группы, для которой нужно получить расписание звонков.',
-    type: 'MongoId',
+    type: MongoIdType,
   })
   @ApiMongoQueryOptions()
   @ApiResponseException()
@@ -120,8 +121,8 @@ export class CallScheduleController {
   })
   @ApiQuery({
     name: 'facultyId',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
     description: 'id факультета, расписание звонков для которого нужно получить.',
   })
   @ApiMongoQueryOptions()
@@ -202,8 +203,8 @@ export class CallScheduleController {
   })
   @ApiQuery({
     name: 'callScheduleId',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
     description: 'id расписания звонков, которое необходимо удалить.',
   })
   @ApiResponseException()

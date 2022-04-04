@@ -19,6 +19,7 @@ import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWith
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNullable } from '../../../global/decorators/IsNullable.decorator'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 
 export class Lesson {
   @ApiProperty({
@@ -26,8 +27,8 @@ export class Lesson {
     title: 'Id существующего занятия',
     description:
       'Если передать id, то обновится уже сущестующее занятие, при условии, что занятие с таким id существует. Если id не передать, то создастся новое занятие.',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
   })
   @IsUndefinable()
   @IsMongoIdWithTransform()
@@ -130,8 +131,8 @@ export class Lesson {
 export class CreateScheduleDto {
   @ApiProperty({
     title: 'Id группы, к которой призывается расписание занятий',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
   })
   @IsMongoIdWithTransform()
   group: Types.ObjectId

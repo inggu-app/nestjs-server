@@ -1,10 +1,3 @@
-// {
-//   "label": "Администратор",
-//   "createdAt": "2022-03-29T21:14:35.003Z",
-//   "updatedAt": "2022-03-29T21:14:35.003Z",
-//   "id": "624376ba20e41cd0deceee4c"
-// }
-
 import { ApiProperty } from '@nestjs/swagger'
 import { MongoIdExample, MongoIdType } from '../../../../../global/constants/constants'
 import { Types } from 'mongoose'

@@ -3,6 +3,7 @@ import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWith
 import { Types } from 'mongoose'
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 
 export class CreateFacultyDto {
   @ApiProperty({
@@ -18,11 +19,11 @@ export class CreateFacultyDto {
 
   @ApiProperty({
     required: false,
-    type: 'MongoId',
+    type: MongoIdType,
     title: 'Id расписания звонков',
     description:
       'Сюда необходимо передать id расписания звонков, которое нужно назначить факультету. Назначенное расписание звонков будет распространяться на все группы этого факультета, если у этих групп нет собственного расписания звонков.',
-    example: '6203ce8cff1a854919f38314',
+    example: MongoIdExample,
   })
   @IsUndefinable()
   @IsMongoIdWithTransform()

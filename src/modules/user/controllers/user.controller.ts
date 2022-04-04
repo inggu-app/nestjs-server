@@ -113,8 +113,8 @@ export class UserController {
   @ApiQuery({
     name: 'userId',
     description: 'id нужного пользователя',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
   })
   @ApiResponseException()
   @ApiResponse({
@@ -132,7 +132,7 @@ export class UserController {
   @ApiQuery({
     name: 'userIds',
     description: 'Список id пользователей, которых нужно получить. id нужно перечислять через запятую',
-    type: 'MongoId',
+    type: MongoIdType,
     isArray: true,
     example: '6203ce8cff1a854919f38314,6203ce8cff1a854919f38314',
   })

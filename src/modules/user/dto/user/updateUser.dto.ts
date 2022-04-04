@@ -9,8 +9,8 @@ import { MongoIdExample, MongoIdType } from '../../../../global/constants/consta
 export class UpdateUserDto {
   @ApiProperty({
     title: 'id пользователя, которого необходимо обновить',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
   })
   @IsMongoIdWithTransform()
   id: Types.ObjectId

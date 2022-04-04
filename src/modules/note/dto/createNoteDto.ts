@@ -3,6 +3,7 @@ import { DeviceId } from '../../../global/types'
 import { Types } from 'mongoose'
 import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { ApiProperty } from '@nestjs/swagger'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 
 export class CreateNoteDto {
   @ApiProperty({
@@ -34,8 +35,8 @@ export class CreateNoteDto {
 
   @ApiProperty({
     title: 'Id занятия, к которому привязана заметка',
-    example: '6203ce8cff1a854919f38314',
-    type: 'MongoId',
+    example: MongoIdExample,
+    type: MongoIdType,
   })
   @IsMongoIdWithTransform()
   lesson: Types.ObjectId

@@ -3,6 +3,7 @@ import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWith
 import { Types } from 'mongoose'
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
+import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 
 export class CreateGroupDto {
   @ApiProperty({
@@ -18,8 +19,8 @@ export class CreateGroupDto {
 
   @ApiProperty({
     title: 'Id факультета, к которому привязывается группа',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
   })
   @IsMongoIdWithTransform()
   faculty: Types.ObjectId
@@ -29,7 +30,7 @@ export class CreateGroupDto {
     title: 'Id расписания звонков',
     description:
       'Расписание звонков, которое привязывается к группе. Если расписание звонков не указать, то группе будет присвоено расписания звонков факультета, если оно у него есть, или глобальное расписание звонков.',
-    example: '6203ce8cff1a854919f38314',
+    example: MongoIdExample,
     type: 'MongoId',
   })
   @IsUndefinable()

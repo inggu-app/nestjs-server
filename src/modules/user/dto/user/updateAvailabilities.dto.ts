@@ -4,12 +4,13 @@ import { AvailabilitiesDto } from './createUser.dto'
 import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { Types } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
+import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
 export class UpdateAvailabilitiesDto {
   @ApiProperty({
     title: 'id пользователя, разрешения которого необходимо обновить.',
-    type: 'MongoId',
-    example: '6203ce8cff1a854919f38314',
+    type: MongoIdType,
+    example: MongoIdExample,
   })
   @IsMongoIdWithTransform()
   id: Types.ObjectId
