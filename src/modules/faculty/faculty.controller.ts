@@ -172,6 +172,25 @@ export class FacultyController {
         throw new BadRequestException(`Пользователь не может редактировать факультет с id ${id}`)
     }
 
+    //проверяем пересекаются ли устанавливаемые стадии обучения
+    if (dto.learningStages)
+      dto.learningStages.forEach((firstStage, firstIndex) => {
+        if (firstStage.start.getTime() >= firstStage.end.getTime())
+          throw new BadRequestException(`Некорректный промежуток в ${JSON.stringify(firstStage)}`)
+        dto.learningStages?.forEach((secondStage, secondIndex) => {
+          if (firstIndex === secondIndex) return
+
+          if (
+            (firstStage.start <= secondStage.start && secondStage.start <= firstStage.end) ||
+            (firstStage.start <= secondStage.end && secondStage.end <= firstStage.end) ||
+            (secondStage.start < firstStage.start && firstStage.end < secondStage.end)
+          )
+            throw new BadRequestException(
+              `Пересечение во времени в стадиях обучения ${JSON.stringify(firstStage)} и ${JSON.stringify(secondStage)}`
+            )
+        })
+      })
+
     await this.facultyService.update(dto)
   }
 

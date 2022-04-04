@@ -147,6 +147,9 @@ export class UpdateFacultyAvailabilityAvailableFieldsModel implements Record<key
 
   @prop({ default: false })
   callSchedule: boolean
+
+  @prop({ default: false })
+  learningStages: boolean
 }
 
 // работа с обновлением факультетов
@@ -540,6 +543,7 @@ export class AvailabilitiesModel {
       availableFields: {
         title: false,
         callSchedule: false,
+        learningStages: false,
       },
     },
     _id: false,
