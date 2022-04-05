@@ -117,6 +117,17 @@ export class UpdateGroupCallScheduleForFacultiesAvailabilityModel {
   availableFaculties: (Types.ObjectId | FacultyModel)[]
 }
 
+export class UpdateGroupLearningStageForFacultiesAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: false })
+  all: boolean
+
+  @prop({ ref: () => FacultyModel, default: [] })
+  availableFaculties: (Types.ObjectId | FacultyModel)[]
+}
+
 // работа с удалением групп
 export class DeleteGroupAvailabilityModel {
   @prop({ default: false })
@@ -214,6 +225,9 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
 
   @prop({ default: false })
   updateGroupCallScheduleForFaculties: boolean
+
+  @prop({ default: false })
+  updateGroupLearningStageForFaculties: boolean
 
   @prop({ default: false })
   deleteGroup: boolean
@@ -483,6 +497,17 @@ export class AvailabilitiesModel {
   updateGroupCallScheduleForFaculties: UpdateGroupCallScheduleForFacultiesAvailabilityModel
 
   @prop({
+    type: UpdateGroupLearningStageForFacultiesAvailabilityModel,
+    default: <UpdateGroupLearningStageForFacultiesAvailabilityModel>{
+      available: false,
+      all: false,
+      availableFaculties: [],
+    },
+    _id: false,
+  })
+  updateGroupLearningStageForFaculties: UpdateGroupLearningStageForFacultiesAvailabilityModel
+
+  @prop({
     type: DeleteGroupAvailabilityModel,
     default: <DeleteGroupAvailabilityModel>{
       available: false,
@@ -550,6 +575,7 @@ export class AvailabilitiesModel {
         createGroup: false,
         updateGroup: false,
         updateGroupCallScheduleForFaculties: false,
+        updateGroupLearningStageForFaculties: false,
         deleteGroup: false,
         createFaculty: false,
         updateFaculty: false,
@@ -631,6 +657,7 @@ export class AvailabilitiesModel {
         createGroup: false,
         updateGroup: false,
         updateGroupCallScheduleForFaculties: false,
+        updateGroupLearningStageForFaculties: false,
         deleteGroup: false,
         createFaculty: false,
         updateFaculty: false,

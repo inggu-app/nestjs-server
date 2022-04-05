@@ -1,14 +1,20 @@
-import { Body, Controller, HttpStatus } from '@nestjs/common'
+import { BadRequestException, Body, Controller, HttpStatus } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { ApiResponseException } from '../../../global/decorators/ApiResponseException.decorator'
 import { LearningStageService } from '../services/learningStage.service'
 import { UpdateLearningStageByFacultyDto } from '../dto/learningStage/updateLearningStageByFaculty.dto'
-import { UpdateLearningStageForAllDto } from '../dto/learningStage/updateLearningStageForAll.dto'
+import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
+import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
+import { UpdateGroupLearningStageForFacultiesAvailabilityModel } from '../../user/models/user.model'
 
 @Controller()
 export class LearningStageController {
   constructor(private readonly learningStageService: LearningStageService) {}
 
+  @UserAuth({
+    availability: 'updateGroupLearningStageForFaculties',
+    availabilityKey: 'available',
+  })
   @ApiOperation({
     description: 'Эндпоинт позволяет обновить стадию обучения для всех групп факультета',
   })
@@ -16,18 +22,18 @@ export class LearningStageController {
     status: HttpStatus.OK,
   })
   @ApiResponseException()
-  async updateByFacultyId(@Body() dto: UpdateLearningStageByFacultyDto) {
-    await this.learningStageService.updateByFacultyId(dto.facultyId, dto.learningStage)
-  }
+  async updateByFacultyId(
+    @Body() dto: UpdateLearningStageByFacultyDto,
+    @RequestUser() user: RequestUser<UpdateGroupLearningStageForFacultiesAvailabilityModel>
+  ) {
+    // проверяем пытается ли пользователь редактировать недоступные ему факультеты
+    if (!user.availability.all) {
+      if (!user.availability.availableFaculties.includes(dto.facultyId))
+        throw new BadRequestException(
+          `Пользователь не может редактировать стадию обучения для групп, принадлежащих факультету с id ${dto.facultyId}`
+        )
+    }
 
-  @ApiOperation({
-    description: 'Эндпоинт позволяет обновить стадию обучения для всех групп в целом',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-  })
-  @ApiResponseException()
-  async updateForAllGroups(@Body() dto: UpdateLearningStageForAllDto) {
-    await this.learningStageService.updateForAllGroups(dto.learningStage)
+    await this.learningStageService.updateByFacultyId(dto.facultyId, dto.learningStage)
   }
 }
