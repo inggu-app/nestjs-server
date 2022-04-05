@@ -7,7 +7,7 @@ import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.dec
 import { UpdateCallScheduleDto } from './dto/updateCallSchedule.dto'
 import { WhitelistedValidationPipe } from '../../global/decorators/WhitelistedValidationPipe.decorator'
 import { FacultyService } from '../faculty/faculty.service'
-import { GroupService } from '../group/group.service'
+import { GroupService } from '../group/services/group.service'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
 import { CallScheduleModuleCreateResponseDto } from './dto/responses/CallScheduleModuleCreateResponseDto'
@@ -97,10 +97,6 @@ export class CallScheduleController {
   @Get('/by-group-id')
   async getByGroupId(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     const group = await this.groupService.getById(groupId, { projection: { callSchedule: 1, faculty: 1 } })
-    if (group.callSchedule)
-      return {
-        callSchedule: await this.callScheduleService.getById(group.callSchedule as Types.ObjectId, queryOptions),
-      }
     const faculty = await this.facultyService.getById(
       group.faculty as Types.ObjectId,
       { projection: { callSchedule: 1 } },

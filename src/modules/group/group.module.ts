@@ -1,19 +1,21 @@
 import { forwardRef, Module } from '@nestjs/common'
-import { GroupController } from './group.controller'
-import { GroupService } from './group.service'
+import { GroupController } from './controllers/group.controller'
+import { GroupService } from './services/group.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { GroupModel } from './group.model'
 import { FacultyModule } from '../faculty/faculty.module'
-import { CallScheduleModule } from '../callSchedule/callSchedule.module'
 import { ScheduleModule } from '../schedule/schedule.module'
+import { CallScheduleService } from './services/callSchedule.service'
+import { CallScheduleController } from './controllers/callSchedule.controller'
+import { LearningStageController } from './controllers/learningStage.controller'
+import { LearningStageService } from './services/learningStage.service'
 
 @Module({
-  controllers: [GroupController],
-  providers: [GroupService],
+  controllers: [GroupController, CallScheduleController, LearningStageController],
+  providers: [GroupService, CallScheduleService, LearningStageService],
   imports: [
     forwardRef(() => FacultyModule),
     forwardRef(() => ScheduleModule),
-    CallScheduleModule,
     TypegooseModule.forFeature([
       {
         typegooseClass: GroupModel,

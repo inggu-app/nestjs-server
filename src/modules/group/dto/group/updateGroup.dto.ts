@@ -1,13 +1,13 @@
 import { IsArray, IsDate, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
-import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
+import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { Types } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
-import { IsNullable } from '../../../global/decorators/IsNullable.decorator'
-import { GroupLearningStageModel } from '../group.model'
-import { LearningStage } from '../../learningStage/learningStage.constants'
+import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
+import { IsNullable } from '../../../../global/decorators/IsNullable.decorator'
+import { GroupLearningStageModel } from '../../group.model'
+import { LearningStage } from '../../../learningStage/learningStage.constants'
 import { Type } from 'class-transformer'
-import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
+import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
 export class UpdateGroupLearningStageDto implements GroupLearningStageModel {
   @ApiProperty({

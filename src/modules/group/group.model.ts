@@ -3,8 +3,8 @@ import { modelOptions, prop, Ref } from '@typegoose/typegoose'
 import { Types } from 'mongoose'
 import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
-import { CallScheduleModel } from '../callSchedule/callSchedule.model'
 import { LearningStage } from '../learningStage/learningStage.constants'
+import { timeRegExp } from '../../global/regex'
 
 export class GroupLearningStageModel {
   @prop({ enum: LearningStage })
@@ -18,6 +18,17 @@ export class GroupLearningStageModel {
 
   @prop({ required: true })
   label: string
+}
+
+export class CallScheduleItemModel {
+  @prop()
+  lessonNumber: number
+
+  @prop({ match: timeRegExp })
+  start: string
+
+  @prop({ match: timeRegExp })
+  end: string
 }
 
 export interface GroupModel extends Base {}
@@ -39,9 +50,9 @@ export class GroupModel extends TimeStamps {
   @prop({ default: false })
   isHaveSchedule: boolean
 
-  @prop({ ref: () => CallScheduleModel, default: null })
-  callSchedule: Ref<CallScheduleModel, Types.ObjectId> | null
+  @prop({ type: CallScheduleItemModel, default: [] })
+  callSchedule: CallScheduleItemModel[]
 
-  @prop({ type: [GroupLearningStageModel], _id: false, default: [] })
-  learningStages: GroupLearningStageModel[]
+  @prop({ required: true, enum: LearningStage })
+  learningStage: LearningStage
 }

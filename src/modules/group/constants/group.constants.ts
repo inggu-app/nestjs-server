@@ -1,12 +1,11 @@
-import { GroupService } from './group.service'
-import { checkOptionsForServiceMethodExistence } from '../../global/utils/serviceMethodOptions'
+import { GroupService } from '../services/group.service'
+import { checkOptionsForServiceMethodExistence } from '../../../global/utils/serviceMethodOptions'
 
 export const groupServiceMethodDefaultOptions = {
   create: {
     checkExistence: {
       group: true,
       faculty: true,
-      callSchedule: true,
     },
   },
   getById: {
@@ -29,7 +28,6 @@ export const groupServiceMethodDefaultOptions = {
       groupById: true,
       groupByTitleAndFaculty: true,
       faculty: true,
-      callSchedule: true,
     },
   },
   updateLastScheduleUpdate: {

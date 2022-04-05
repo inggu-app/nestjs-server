@@ -6,7 +6,7 @@ import { ClientInterfacesEnum } from '../../../global/enums/ClientInterfaces.enu
 import { RoleModel } from './role.model'
 import { GroupModel } from '../../group/group.model'
 import { Types } from 'mongoose'
-import { UpdateGroupDto } from '../../group/dto/updateGroup.dto'
+import { UpdateGroupDto } from '../../group/dto/group/updateGroup.dto'
 import { UpdateFacultyDto } from '../../faculty/dto/updateFaculty.dto'
 import { UpdateCallScheduleDto } from '../../callSchedule/dto/updateCallSchedule.dto'
 import { CallScheduleModel } from '../../callSchedule/callSchedule.model'

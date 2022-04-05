@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { GroupModel } from '../../group.model'
-import { MongoIdType, MongoIdExample } from '../../../../global/constants/constants'
+import { GroupModel } from '../../../group.model'
+import { MongoIdType, MongoIdExample } from '../../../../../global/constants/constants'
+import { CallScheduleItemDto } from '../../callSchedule/updateByFaculty.dto'
+import { LearningStage } from '../../../../learningStage/learningStage.constants'
 
 export class GroupModuleResponseGroup implements Partial<GroupModel> {
   @ApiProperty({
@@ -42,13 +44,18 @@ export class GroupModuleResponseGroup implements Partial<GroupModel> {
 
   @ApiProperty({
     title: 'Расписание звонков группы',
-    description: 'Если значение null, то расписание звонков будет либо факультета, если оно у него есть, либо глобальное расписание',
-    type: MongoIdType,
-    example: MongoIdExample,
-    nullable: true,
     required: false,
+    type: CallScheduleItemDto,
+    isArray: true,
   })
-  callSchedule: Types.ObjectId | null
+  callSchedule: CallScheduleItemDto[]
+
+  @ApiProperty({
+    title: 'Стадия обучения группы',
+    required: false,
+    enum: LearningStage,
+  })
+  learningStage: LearningStage
 
   @ApiProperty({
     title: 'Дата создания группы',

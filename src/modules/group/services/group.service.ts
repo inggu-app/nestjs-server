@@ -1,19 +1,18 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from 'nestjs-typegoose'
-import { GroupModel } from './group.model'
+import { GroupModel } from '../group.model'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { DocumentType } from '@typegoose/typegoose'
-import { CreateGroupDto } from './dto/createGroup.dto'
+import { CreateGroupDto } from '../dto/group/createGroup.dto'
 import { FilterQuery, QueryOptions, Types } from 'mongoose'
-import { UpdateGroupDto } from './dto/updateGroup.dto'
-import { FacultyService } from '../faculty/faculty.service'
-import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../global/constants/errors.constants'
-import { CheckExistenceService } from '../../global/classes/CheckExistenceService'
-import { CallScheduleService } from '../callSchedule/callSchedule.service'
-import { ScheduleService } from '../schedule/schedule.service'
-import { groupServiceMethodDefaultOptions } from './group.constants'
-import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
-import { UserService } from '../user/services/user.service'
+import { UpdateGroupDto } from '../dto/group/updateGroup.dto'
+import { FacultyService } from '../../faculty/faculty.service'
+import { GROUP_WITH_ID_NOT_FOUND, GROUP_WITH_TITLE_EXISTS } from '../../../global/constants/errors.constants'
+import { CheckExistenceService } from '../../../global/classes/CheckExistenceService'
+import { ScheduleService } from '../../schedule/schedule.service'
+import { groupServiceMethodDefaultOptions } from '../constants/group.constants'
+import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMethodOptions'
+import { UserService } from '../../user/services/user.service'
 
 @Injectable()
 export class GroupService extends CheckExistenceService<GroupModel> {
@@ -21,7 +20,6 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
     @Inject(forwardRef(() => FacultyService)) private readonly facultyService: FacultyService,
     private readonly scheduleService: ScheduleService,
-    private readonly callScheduleService: CallScheduleService,
     private readonly userService: UserService
   ) {
     super(groupModel, undefined, group => GROUP_WITH_ID_NOT_FOUND(group._id))
@@ -32,7 +30,6 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     if (options.checkExistence.group)
       await this.throwIfExists({ title: dto.title, faculty: dto.faculty }, { error: GROUP_WITH_TITLE_EXISTS(dto.title) })
     if (options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: dto.faculty })
-    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
     return this.groupModel.create(dto)
   }
 
@@ -81,7 +78,6 @@ export class GroupService extends CheckExistenceService<GroupModel> {
         { error: GROUP_WITH_TITLE_EXISTS(dto.title ?? group.title) }
       )
     if (dto.faculty && options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: dto.faculty })
-    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
     const { id, ...fields } = dto
     return this.groupModel.updateOne({ _id: id }, { $set: fields }).exec()
   }
@@ -113,11 +109,5 @@ export class GroupService extends CheckExistenceService<GroupModel> {
       GroupModel
     )
     return this.groupModel.deleteMany({ faculty: facultyId })
-  }
-
-  clearFrom(ids: Types.ObjectId | Types.ObjectId[]) {
-    if (!Array.isArray(ids)) ids = [ids]
-
-    return this.groupModel.updateMany({ callSchedule: { $in: ids } }, { $set: { callSchedule: null } })
   }
 }

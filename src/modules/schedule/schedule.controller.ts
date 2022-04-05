@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, HttpStatus, Post } from '@n
 import { CreateScheduleDto } from './dto/createSchedule.dto'
 import { ScheduleService } from './schedule.service'
 import { QueryOptions, Types } from 'mongoose'
-import { GroupService } from '../group/group.service'
+import { GroupService } from '../group/services/group.service'
 import { MongoId } from '../../global/decorators/MongoId.decorator'
 import { MongoQueryOptions } from '../../global/decorators/MongoQueryOptions.decorator'
 import { NoteService } from '../note/note.service'

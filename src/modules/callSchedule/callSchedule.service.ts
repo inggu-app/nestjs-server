@@ -15,7 +15,7 @@ import { callScheduleServiceMethodDefaultOptions } from './callSchedule.constant
 import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
 import { UserService } from '../user/services/user.service'
 import { FacultyService } from '../faculty/faculty.service'
-import { GroupService } from '../group/group.service'
+import { GroupService } from '../group/services/group.service'
 
 @Injectable()
 export class CallScheduleService extends CheckExistenceService<CallScheduleModel> {
@@ -64,7 +64,6 @@ export class CallScheduleService extends CheckExistenceService<CallScheduleModel
     if (options.checkExistence.callSchedule) await this.throwIfNotExists({ _id: id })
     await this.userService.clearFrom(id, CallScheduleModel)
     await this.facultyService.clearFrom(id)
-    await this.groupService.clearFrom(id)
     return this.callScheduleModel.deleteOne({ _id: id })
   }
 }
