@@ -15,7 +15,6 @@ import { RoleService } from './role.service'
 import { RoleModel } from '../models/role.model'
 import { FacultyModel } from '../../faculty/faculty.model'
 import { GroupModel } from '../../group/group.model'
-import { CallScheduleModel } from '../../callSchedule/callSchedule.model'
 
 @Injectable()
 export class UserService extends CheckExistenceService<UserModel> {
@@ -135,7 +134,7 @@ export class UserService extends CheckExistenceService<UserModel> {
 
   async clearFrom(
     ids: Types.ObjectId | Types.ObjectId[],
-    model: typeof RoleModel | typeof FacultyModel | typeof GroupModel | typeof CallScheduleModel | typeof UserModel
+    model: typeof RoleModel | typeof FacultyModel | typeof GroupModel | typeof UserModel
   ) {
     if (!Array.isArray(ids)) ids = [ids]
 
@@ -172,9 +171,6 @@ export class UserService extends CheckExistenceService<UserModel> {
           'availabilities.deleteGroup.availableGroups',
           'availabilities.deleteGroup.forbiddenGroups',
         ]
-        break
-      case CallScheduleModel.name:
-        paths = ['availabilities.updateCallSchedule.availableCallSchedules', 'availabilities.deleteCallSchedule.availableCallSchedules']
         break
       case UserModel.name:
         paths = [

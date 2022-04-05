@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { CheckExistenceService } from '../../../global/classes/CheckExistenceService'
-import { GroupModel } from '../group.model'
+import { CallScheduleItemModel, GroupModel } from '../group.model'
 import { GROUP_WITH_ID_NOT_FOUND } from '../../../global/constants/errors.constants'
 import { ModelType } from '@typegoose/typegoose/lib/types'
 import { Types } from 'mongoose'
 import { callScheduleMethodDefaultOptions } from '../constants/callSchedule.constants'
 import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMethodOptions'
 import { FacultyService } from '../../faculty/faculty.service'
-import { CallScheduleItem } from '../../callSchedule/dto/createCallSchedule.dto'
 import { InjectModel } from 'nestjs-typegoose'
 
 @Injectable()
@@ -21,7 +20,7 @@ export class CallScheduleService extends CheckExistenceService<GroupModel> {
 
   async updateByFacultyId(
     facultyId: Types.ObjectId,
-    callSchedule: CallScheduleItem[],
+    callSchedule: CallScheduleItemModel[],
     options = callScheduleMethodDefaultOptions.updateByFacultyId
   ) {
     options = mergeOptionsWithDefaultOptions(options, callScheduleMethodDefaultOptions.updateByFacultyId)
@@ -29,7 +28,7 @@ export class CallScheduleService extends CheckExistenceService<GroupModel> {
     return this.groupModel.updateMany({ faculty: facultyId }, { $set: { callSchedule } })
   }
 
-  updateForAllGroups(callSchedule: CallScheduleItem[]) {
+  updateForAllGroups(callSchedule: CallScheduleItemModel[]) {
     return this.groupModel.updateMany({}, { $set: { callSchedule } })
   }
 }

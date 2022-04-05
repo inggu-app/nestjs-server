@@ -6,7 +6,6 @@ export enum ModuleRoutesEnum {
   USER_MODULE = '/users',
   SETTINGS_MODULE = '/settings',
   APP_VERSION_MODULE = '/app-version',
-  CALL_SCHEDULE_MODULE = '/call-schedule',
   SECRET_LABEL_MODULE = '/secret-label',
   SEMESTER_RANGE_MODULE = '/semester-range',
 }

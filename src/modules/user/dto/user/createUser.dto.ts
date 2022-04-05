@@ -2,21 +2,16 @@ import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, 
 import {
   AppVersionAvailabilityModel,
   AvailabilitiesModel,
-  CreateCallScheduleAvailabilityModel,
   CreateFacultyAvailabilityModel,
   CreateGroupAvailabilityModel,
   CreateRoleAvailabilityModel,
   CreateScheduleAvailabilityModel,
   CreateUserAvailabilityModel,
   CreateUserAvailableForInstallationAvailabilitiesModel,
-  DeleteCallScheduleAvailabilityModel,
   DeleteFacultyAvailabilityModel,
   DeleteGroupAvailabilityModel,
   DeleteRoleAvailabilityModel,
   DeleteUserAvailabilityModel,
-  LearningStageAvailabilityModel,
-  UpdateCallScheduleAvailabilityAvailableFieldsModel,
-  UpdateCallScheduleAvailabilityModel,
   UpdateFacultyAvailabilityAvailableFieldsModel,
   UpdateFacultyAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
@@ -39,7 +34,6 @@ import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdW
 import { CheckExists } from '../../../../global/decorators/CheckExists.decorator'
 import { FacultyModel } from '../../../faculty/faculty.model'
 import { GroupModel } from '../../../group/group.model'
-import { CallScheduleModel } from '../../../callSchedule/callSchedule.model'
 import { RoleModel } from '../../models/role.model'
 
 export class CreateScheduleAvailabilityDto implements CreateScheduleAvailabilityModel {
@@ -350,102 +344,7 @@ export class DeleteFacultyAvailabilityDto implements DeleteFacultyAvailabilityMo
   availableFaculties: Types.ObjectId[]
 }
 
-export class CreateCallScheduleAvailabilityDto implements CreateCallScheduleAvailabilityModel {
-  @ApiProperty({
-    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
-  })
-  @IsBoolean()
-  available: boolean
-}
-
-export class UpdateCallScheduleAvailabilityAvailableFieldsDto implements UpdateCallScheduleAvailabilityAvailableFieldsModel {
-  @ApiProperty({
-    description: 'Может ли пользователь обновить само расписание звонков',
-  })
-  @IsBoolean()
-  schedule: boolean
-
-  @ApiProperty({
-    description: 'Может ли пользователь обновить название расписания звонков',
-  })
-  @IsBoolean()
-  name: boolean
-
-  @ApiProperty({
-    description: 'Может ли пользователь устанавливать расписания как дефолтное',
-  })
-  @IsBoolean()
-  isDefault: boolean
-}
-
-export class UpdateCallScheduleAvailabilityDto implements UpdateCallScheduleAvailabilityModel {
-  @ApiProperty({
-    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
-  })
-  @IsBoolean()
-  available: boolean
-
-  @ApiProperty({
-    description:
-      'Доступны ли пользователю для обновления все расписания звонков. Если стоит true, то доступны все. Если стоит false, то нужно опираться на список в поле availableCallSchedules',
-  })
-  @IsBoolean()
-  all: boolean
-
-  @ApiProperty({
-    description: 'Список расписаний звонков, доступных для редактирования. Имеет смысл только если в all стоит false',
-    type: MongoIdType,
-    isArray: true,
-    example: [MongoIdExample],
-  })
-  @IsMongoIdWithTransform({ each: true })
-  @CheckExists(CallScheduleModel, true)
-  availableCallSchedules: Types.ObjectId[]
-
-  @ApiProperty({
-    description: 'Доступные пользователю для редактирования поля',
-    type: UpdateCallScheduleAvailabilityAvailableFieldsDto,
-  })
-  @IsObject()
-  @ValidateNested()
-  @Type(() => UpdateCallScheduleAvailabilityAvailableFieldsDto)
-  availableFields: UpdateCallScheduleAvailabilityAvailableFieldsDto
-}
-
-export class DeleteCallScheduleAvailabilityDto implements DeleteCallScheduleAvailabilityModel {
-  @ApiProperty({
-    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
-  })
-  @IsBoolean()
-  available: boolean
-
-  @ApiProperty({
-    description:
-      'Доступны ли пользователю для удаления все расписания звонков. Если стоит true, то доступны все. Если стоит false, то нужно опираться на список в поле availableCallSchedules',
-  })
-  @IsBoolean()
-  all: boolean
-
-  @ApiProperty({
-    description: 'Список расписаний звонков, доступных для удаления. Имеет смысл только если в all стоит false',
-    type: MongoIdType,
-    isArray: true,
-    example: [MongoIdExample],
-  })
-  @IsMongoIdWithTransform({ each: true })
-  @CheckExists(CallScheduleModel, true)
-  availableCallSchedules: Types.ObjectId[]
-}
-
 export class AppVersionAvailabilityDto implements AppVersionAvailabilityModel {
-  @ApiProperty({
-    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
-  })
-  @IsBoolean()
-  available: boolean
-}
-
-export class LearningStageAvailabilityDto implements LearningStageAvailabilityModel {
   @ApiProperty({
     description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
   })
@@ -983,39 +882,6 @@ export class AvailabilitiesDto implements Partial<AvailabilitiesModel> {
   deleteFaculty?: DeleteFacultyAvailabilityDto
 
   @ApiProperty({
-    description: 'Может ли пользователь создавать расписания звонков',
-    type: CreateCallScheduleAvailabilityDto,
-    required: false,
-  })
-  @IsUndefinable()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => CreateCallScheduleAvailabilityDto)
-  createCallSchedule?: CreateCallScheduleAvailabilityDto
-
-  @ApiProperty({
-    description: 'Может ли пользователь обновлять расписания звонков',
-    type: UpdateCallScheduleAvailabilityDto,
-    required: false,
-  })
-  @IsUndefinable()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => UpdateCallScheduleAvailabilityDto)
-  updateCallSchedule?: UpdateCallScheduleAvailabilityDto
-
-  @ApiProperty({
-    description: 'Может ли пользователь удалять расписания звонков',
-    type: DeleteCallScheduleAvailabilityDto,
-    required: false,
-  })
-  @IsUndefinable()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => DeleteCallScheduleAvailabilityDto)
-  deleteCallSchedule?: DeleteCallScheduleAvailabilityDto
-
-  @ApiProperty({
     description: 'Может ли пользователь обращаться к эндпоинтам работы с версиями приложений',
     type: AppVersionAvailabilityDto,
     required: false,
@@ -1025,17 +891,6 @@ export class AvailabilitiesDto implements Partial<AvailabilitiesModel> {
   @ValidateNested()
   @Type(() => AppVersionAvailabilityDto)
   appVersion?: AppVersionAvailabilityDto
-
-  @ApiProperty({
-    description: 'Может ли пользователь обращаться к эндпоинтам работы с стадиями обучения',
-    type: LearningStageAvailabilityDto,
-    required: false,
-  })
-  @IsUndefinable()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => LearningStageAvailabilityDto)
-  learningStage?: LearningStageAvailabilityDto
 
   @ApiProperty({
     description: 'Может ли пользователь создавать других пользоватей',

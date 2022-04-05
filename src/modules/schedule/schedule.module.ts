@@ -4,7 +4,6 @@ import { ScheduleController } from './schedule.controller'
 import { ScheduleService } from './schedule.service'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { LessonModel } from './lesson.model'
-import { CallScheduleModule } from '../callSchedule/callSchedule.module'
 import { NoteModule } from '../note/note.module'
 import { FacultyModule } from '../faculty/faculty.module'
 
@@ -13,7 +12,6 @@ import { FacultyModule } from '../faculty/faculty.module'
   providers: [ScheduleService],
   imports: [
     GroupModule,
-    CallScheduleModule,
     NoteModule,
     FacultyModule,
     TypegooseModule.forFeature([

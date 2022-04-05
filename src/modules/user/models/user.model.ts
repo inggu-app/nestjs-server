@@ -8,8 +8,6 @@ import { GroupModel } from '../../group/group.model'
 import { Types } from 'mongoose'
 import { UpdateGroupDto } from '../../group/dto/group/updateGroup.dto'
 import { UpdateFacultyDto } from '../../faculty/dto/updateFaculty.dto'
-import { UpdateCallScheduleDto } from '../../callSchedule/dto/updateCallSchedule.dto'
-import { CallScheduleModel } from '../../callSchedule/callSchedule.model'
 import { UpdateUserDto } from '../dto/user/updateUser.dto'
 import { UpdateRoleDto } from '../dto/role/updateRole.dto'
 
@@ -185,60 +183,7 @@ export class DeleteFacultyAvailabilityModel {
   availableFaculties: (Types.ObjectId | FacultyModel)[]
 }
 
-export class CreateCallScheduleAvailabilityModel {
-  @prop({ default: false })
-  available: boolean
-}
-
-export class UpdateCallScheduleAvailabilityAvailableFieldsModel implements Record<keyof Omit<UpdateCallScheduleDto, 'id'>, boolean> {
-  @prop({ default: false })
-  schedule: boolean
-
-  @prop({ default: false })
-  name: boolean
-
-  @prop({ default: false })
-  isDefault: boolean
-}
-
-export class UpdateCallScheduleAvailabilityModel {
-  @prop({ default: false })
-  available: boolean
-
-  @prop({ default: false })
-  all: boolean
-
-  @prop({ ref: CallScheduleModel, default: [] })
-  availableCallSchedules: (Types.ObjectId | CallScheduleModel)[]
-
-  @prop({
-    type: UpdateCallScheduleAvailabilityAvailableFieldsModel,
-    default: <UpdateCallScheduleAvailabilityAvailableFieldsModel>{
-      schedule: false,
-      name: false,
-    },
-    _id: false,
-  })
-  availableFields: UpdateCallScheduleAvailabilityAvailableFieldsModel
-}
-
-export class DeleteCallScheduleAvailabilityModel {
-  @prop({ default: false })
-  available: boolean
-
-  @prop({ default: false })
-  all: boolean
-
-  @prop({ ref: CallScheduleModel, default: [] })
-  availableCallSchedules: (Types.ObjectId | CallScheduleModel)[]
-}
-
 export class AppVersionAvailabilityModel {
-  @prop({ default: false })
-  available: boolean
-}
-
-export class LearningStageAvailabilityModel {
   @prop({ default: false })
   available: boolean
 }
@@ -562,42 +507,6 @@ export class AvailabilitiesModel {
   deleteFaculty: DeleteFacultyAvailabilityModel
 
   @prop({
-    type: CreateCallScheduleAvailabilityModel,
-    default: <CreateCallScheduleAvailabilityModel>{
-      available: false,
-    },
-    _id: false,
-  })
-  createCallSchedule: CreateCallScheduleAvailabilityModel
-
-  @prop({
-    type: UpdateCallScheduleAvailabilityModel,
-    default: <UpdateCallScheduleAvailabilityModel>{
-      available: false,
-      all: false,
-      availableCallSchedules: [],
-      availableFields: {
-        schedule: false,
-        name: false,
-        isDefault: false,
-      },
-    },
-    _id: false,
-  })
-  updateCallSchedule: UpdateCallScheduleAvailabilityModel
-
-  @prop({
-    type: DeleteCallScheduleAvailabilityModel,
-    default: <DeleteCallScheduleAvailabilityModel>{
-      available: false,
-      all: false,
-      availableCallSchedules: [],
-    },
-    _id: false,
-  })
-  deleteCallSchedule: DeleteCallScheduleAvailabilityModel
-
-  @prop({
     type: AppVersionAvailabilityModel,
     default: <AppVersionAvailabilityModel>{
       available: false,
@@ -605,15 +514,6 @@ export class AvailabilitiesModel {
     _id: false,
   })
   appVersion: AppVersionAvailabilityModel
-
-  @prop({
-    type: LearningStageAvailabilityModel,
-    default: <LearningStageAvailabilityModel>{
-      available: false,
-    },
-    _id: false,
-  })
-  learningStage: LearningStageAvailabilityModel
 
   @prop({
     type: CreateUserAvailabilityModel,
