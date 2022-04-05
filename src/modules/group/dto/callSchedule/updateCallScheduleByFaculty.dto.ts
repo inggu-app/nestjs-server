@@ -5,6 +5,7 @@ import { CallScheduleItemModel } from '../../group.model'
 import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { Types } from 'mongoose'
 import { Type } from 'class-transformer'
+import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
 export class CallScheduleItemDto implements CallScheduleItemModel {
   @ApiProperty({
@@ -36,9 +37,19 @@ export class CallScheduleItemDto implements CallScheduleItemModel {
 }
 
 export class UpdateCallScheduleByFacultyDto {
+  @ApiProperty({
+    description: 'id факультета',
+    type: MongoIdType,
+    example: MongoIdExample,
+  })
   @IsMongoIdWithTransform()
   facultyId: Types.ObjectId
 
+  @ApiProperty({
+    description: 'Само расписание звонков',
+    type: CallScheduleItemDto,
+    isArray: true,
+  })
   @IsObject({ each: true })
   @ValidateNested({ each: true })
   @Type(() => CallScheduleItemDto)
