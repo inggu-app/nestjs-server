@@ -4,10 +4,10 @@ import { Types } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
 import { GroupModel } from '../../group.model'
-import { LearningStage } from '../../../learningStage/learningStage.constants'
 import { Type } from 'class-transformer'
 import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 import { CallScheduleItemDto } from '../callSchedule/updateByFaculty.dto'
+import { LearningStage } from '../../constants/learningStage.constants'
 
 export class UpdateGroupDto implements Partial<GroupModel> {
   @ApiProperty({

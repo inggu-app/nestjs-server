@@ -7,8 +7,7 @@ import { GROUP_WITH_ID_NOT_FOUND } from '../../../global/constants/errors.consta
 import { Types } from 'mongoose'
 import { mergeOptionsWithDefaultOptions } from '../../../global/utils/serviceMethodOptions'
 import { FacultyService } from '../../faculty/faculty.service'
-import { LearningStage } from '../../learningStage/learningStage.constants'
-import { learningStageMethodDefaultOptions } from '../constants/learningStage.constants'
+import { LearningStage, learningStageMethodDefaultOptions } from '../constants/learningStage.constants'
 
 @Injectable()
 export class LearningStageService extends CheckExistenceService<GroupModel> {

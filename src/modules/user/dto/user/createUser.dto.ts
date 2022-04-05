@@ -138,7 +138,7 @@ class UpdateGroupAvailabilityAvailableFieldsDto implements UpdateGroupAvailabili
     description: 'Может ли пользователь обновлять стадии обучения групп',
   })
   @IsBoolean()
-  learningStages: boolean
+  learningStage: boolean
 }
 
 export class UpdateGroupAvailabilityDto implements UpdateGroupAvailabilityModel {

@@ -13,9 +13,7 @@ import getJWTConfig from '../../configs/jwt.config'
 import { FacultyModule } from '../faculty/faculty.module'
 import { GroupModule } from '../group/group.module'
 import { UserModule } from '../user/user.module'
-import { CallScheduleModule } from '../callSchedule/callSchedule.module'
 import { AppVersionModule } from '../appVersion/appVersion.module'
-import { LearningStageModule } from '../learningStage/learningStage.module'
 import { CheckExistsValidator } from '../../global/decorators/CheckExists.decorator'
 
 @Module({
@@ -27,9 +25,7 @@ import { CheckExistsValidator } from '../../global/decorators/CheckExists.decora
     GroupModule,
     RouterModule.forRoutes(routesConfig),
     UserModule,
-    CallScheduleModule,
     AppVersionModule,
-    LearningStageModule,
     ConfigModule.forRoot({ isGlobal: true }),
     {
       ...JwtModule.registerAsync({

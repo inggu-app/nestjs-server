@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator'
-import { LearningStage } from '../../../learningStage/learningStage.constants'
+import { LearningStage } from '../../constants/learningStage.constants'
 
 export class UpdateLearningStageForAllDto {
   @IsEnum(LearningStage)

@@ -3,8 +3,8 @@ import { modelOptions, prop, Ref } from '@typegoose/typegoose'
 import { Types } from 'mongoose'
 import { FacultyModel } from '../faculty/faculty.model'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
-import { LearningStage } from '../learningStage/learningStage.constants'
 import { timeRegExp } from '../../global/regex'
+import { LearningStage } from './constants/learningStage.constants'
 
 export class CallScheduleItemModel {
   @prop()

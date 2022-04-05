@@ -6,7 +6,7 @@ import { MongoIdExample, MongoIdType } from '../../../../global/constants/consta
 import { GroupModel } from '../../group.model'
 import { CallScheduleItemDto } from '../callSchedule/updateByFaculty.dto'
 import { Type } from 'class-transformer'
-import { LearningStage } from '../../../learningStage/learningStage.constants'
+import { LearningStage } from '../../constants/learningStage.constants'
 
 export class CreateGroupDto implements Partial<GroupModel> {
   @ApiProperty({

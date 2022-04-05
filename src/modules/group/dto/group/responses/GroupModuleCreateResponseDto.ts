@@ -3,7 +3,7 @@ import { Types } from 'mongoose'
 import { GroupModel } from '../../../group.model'
 import { MongoIdType, MongoIdExample } from '../../../../../global/constants/constants'
 import { CallScheduleItemDto } from '../../callSchedule/updateByFaculty.dto'
-import { LearningStage } from '../../../../learningStage/learningStage.constants'
+import { LearningStage } from '../../../constants/learningStage.constants'
 
 export class GroupModuleResponseGroup implements Partial<GroupModel> {
   @ApiProperty({

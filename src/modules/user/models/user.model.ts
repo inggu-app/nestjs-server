@@ -55,7 +55,7 @@ export class UpdateGroupAvailabilityAvailableFieldsModel implements Record<keyof
   callSchedule: boolean
 
   @prop({ default: false })
-  learningStages: boolean
+  learningStage: boolean
 }
 
 // работа с обновлением групп
@@ -69,7 +69,7 @@ export class UpdateGroupAvailabilityModel {
       title: false,
       faculty: false,
       callSchedule: false,
-      learningStages: false,
+      learningStage: false,
     },
     _id: false,
   })
@@ -499,7 +499,7 @@ export class AvailabilitiesModel {
         title: false,
         faculty: false,
         callSchedule: false,
-        learningStages: false,
+        learningStage: false,
       },
       allForUpdate: false,
       availableForUpdateFaculties: [],

@@ -9,7 +9,6 @@ import { NoteModule } from '../modules/note/note.module'
 import { ModuleRoutesEnum } from '../global/enums/moduleRoutes.enum'
 import { UserModule } from '../modules/user/user.module'
 import { AppVersionModule } from '../modules/appVersion/appVersion.module'
-import { LearningStageModule } from '../modules/learningStage/learningStage.module'
 
 export const routesConfig: Routes = [
   {
@@ -39,10 +38,6 @@ export const routesConfig: Routes = [
   {
     path: ModuleRoutesEnum.APP_VERSION_MODULE,
     module: AppVersionModule,
-  },
-  {
-    path: ModuleRoutesEnum.LEARNING_STAGE_MODULE,
-    module: LearningStageModule,
   },
   {
     path: ModuleRoutesEnum.SETTINGS_MODULE,

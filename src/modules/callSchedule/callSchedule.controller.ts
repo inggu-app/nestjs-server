@@ -102,10 +102,6 @@ export class CallScheduleController {
       { projection: { callSchedule: 1 } },
       { checkExistence: { faculty: false } }
     )
-    if (faculty.callSchedule)
-      return {
-        callSchedule: await this.callScheduleService.getById(faculty.callSchedule as Types.ObjectId, queryOptions),
-      }
     return {
       callSchedule: await this.callScheduleService.getDefaultSchedule(queryOptions),
     }
@@ -131,11 +127,6 @@ export class CallScheduleController {
   })
   @Get('/by-faculty-id')
   async getByFacultyId(@MongoId('facultyId') facultyId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
-    const faculty = await this.facultyService.getById(facultyId, { projection: { callSchedule: 1 } })
-    if (faculty.callSchedule)
-      return {
-        callSchedule: await this.callScheduleService.getById(faculty.callSchedule as Types.ObjectId, queryOptions),
-      }
     return {
       callSchedule: await this.callScheduleService.getDefaultSchedule(queryOptions),
     }

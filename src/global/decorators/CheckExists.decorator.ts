@@ -12,8 +12,6 @@ import { FacultyModel } from '../../modules/faculty/faculty.model'
 import { customIsMongoId } from './IsMongoIdWithTransform.decorator'
 import { GroupModel } from '../../modules/group/group.model'
 import { GroupService } from '../../modules/group/services/group.service'
-import { CallScheduleService } from '../../modules/callSchedule/callSchedule.service'
-import { CallScheduleModel } from '../../modules/callSchedule/callSchedule.model'
 import { RoleModel } from '../../modules/user/models/role.model'
 import { RoleService } from '../../modules/user/services/role.service'
 import { UserService } from '../../modules/user/services/user.service'
@@ -38,7 +36,6 @@ export class CheckExistsValidator implements ValidatorConstraintInterface {
   constructor(
     private readonly facultyService: FacultyService,
     private readonly groupService: GroupService,
-    private readonly callScheduleService: CallScheduleService,
     private readonly roleService: RoleService,
     private readonly userService: UserService
   ) {}
@@ -58,9 +55,6 @@ export class CheckExistsValidator implements ValidatorConstraintInterface {
         break
       case GroupModel.name:
         await this.groupService.throwIfNotExists(value)
-        break
-      case CallScheduleModel.name:
-        await this.callScheduleService.throwIfNotExists(value)
         break
       case RoleModel.name:
         await this.roleService.throwIfNotExists(value)
