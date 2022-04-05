@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
+import { IsArray, IsEnum, IsNotEmpty, IsObject, IsString, MaxLength, ValidateNested } from 'class-validator'
 import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { Types } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
@@ -33,6 +33,7 @@ export class CreateGroupDto implements Partial<GroupModel> {
     type: CallScheduleItemDto,
     isArray: true,
   })
+  @IsArray()
   @IsObject({ each: true })
   @ValidateNested({ each: true })
   @Type(() => CallScheduleItemDto)

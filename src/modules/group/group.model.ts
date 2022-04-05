@@ -6,20 +6,6 @@ import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config
 import { LearningStage } from '../learningStage/learningStage.constants'
 import { timeRegExp } from '../../global/regex'
 
-export class GroupLearningStageModel {
-  @prop({ enum: LearningStage })
-  stage: LearningStage
-
-  @prop({ required: true })
-  start: Date
-
-  @prop({ required: true })
-  end: Date
-
-  @prop({ required: true })
-  label: string
-}
-
 export class CallScheduleItemModel {
   @prop()
   lessonNumber: number
