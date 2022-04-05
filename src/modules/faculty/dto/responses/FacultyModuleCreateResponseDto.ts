@@ -19,16 +19,6 @@ export class FacultyModuleResponseFaculty {
   title: string
 
   @ApiProperty({
-    title: 'id расписания звонков',
-    description: 'Если значение равно null, то расписанием будет глобальное расписание звонков',
-    type: MongoIdType,
-    example: MongoIdExample,
-    nullable: true,
-    required: false,
-  })
-  callSchedule: Types.ObjectId | null
-
-  @ApiProperty({
     title: 'Дата создания факультета',
     required: false,
   })

@@ -11,7 +11,6 @@ import { CheckExistenceService } from '../../global/classes/CheckExistenceServic
 import { GroupService } from '../group/services/group.service'
 import { facultyServiceMethodDefaultOptions } from './faculty.constants'
 import { mergeOptionsWithDefaultOptions } from '../../global/utils/serviceMethodOptions'
-import { CallScheduleService } from '../callSchedule/callSchedule.service'
 import { UserService } from '../user/services/user.service'
 
 @Injectable()
@@ -19,7 +18,6 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
   constructor(
     @InjectModel(FacultyModel) private readonly facultyModel: ModelType<FacultyModel>,
     @Inject(forwardRef(() => GroupService)) private readonly groupService: GroupService,
-    private readonly callScheduleService: CallScheduleService,
     private readonly userService: UserService
   ) {
     super(facultyModel, undefined, arg => FACULTY_WITH_ID_NOT_FOUND(arg._id))
@@ -28,7 +26,6 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
   async create(dto: CreateFacultyDto, options = facultyServiceMethodDefaultOptions.create) {
     options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.create)
     if (options.checkExistence.faculty) await this.throwIfExists({ title: dto.title }, { error: FACULTY_WITH_TITLE_EXISTS(dto.title) })
-    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
     return this.facultyModel.create(dto)
   }
 
@@ -44,7 +41,7 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
     return this.facultyModel.find({ _id: { $in: facultyIds } }, undefined, queryOptions)
   }
 
-  getAll(page: number, count: number, title?: string, queryOptions?: QueryOptions, options = facultyServiceMethodDefaultOptions.getAll) {
+  getAll(page: number, count: number, title?: string, queryOptions?: QueryOptions) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
 
@@ -54,7 +51,7 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
       .limit(count)
   }
 
-  countAll(title?: string, options = facultyServiceMethodDefaultOptions.countAll) {
+  countAll(title?: string) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
     return this.facultyModel.countDocuments(filter)
@@ -64,7 +61,6 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
     options = mergeOptionsWithDefaultOptions(options, facultyServiceMethodDefaultOptions.update)
     const { id, ...fields } = dto
     if (options.checkExistence.faculty) await this.throwIfNotExists({ _id: dto.id })
-    if (dto.callSchedule && options.checkExistence.callSchedule) await this.callScheduleService.throwIfNotExists({ _id: dto.callSchedule })
     return this.facultyModel.updateOne({ _id: id }, { $set: fields })
   }
 
