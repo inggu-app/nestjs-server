@@ -106,6 +106,17 @@ export class UpdateGroupAvailabilityModel {
   availableForInstallationFaculties: (Types.ObjectId | FacultyModel)[]
 }
 
+export class UpdateGroupCallScheduleForFacultiesAvailabilityModel {
+  @prop({ default: false })
+  available: boolean
+
+  @prop({ default: false })
+  all: boolean
+
+  @prop({ ref: () => FacultyModel, default: [] })
+  availableFaculties: (Types.ObjectId | FacultyModel)[]
+}
+
 // работа с удалением групп
 export class DeleteGroupAvailabilityModel {
   @prop({ default: false })
@@ -200,6 +211,9 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
 
   @prop({ default: false })
   updateGroup: boolean
+
+  @prop({ default: false })
+  updateGroupCallScheduleForFaculties: boolean
 
   @prop({ default: false })
   deleteGroup: boolean
@@ -458,6 +472,17 @@ export class AvailabilitiesModel {
   updateGroup: UpdateGroupAvailabilityModel
 
   @prop({
+    type: UpdateGroupCallScheduleForFacultiesAvailabilityModel,
+    default: <UpdateGroupCallScheduleForFacultiesAvailabilityModel>{
+      available: false,
+      all: false,
+      availableFaculties: [],
+    },
+    _id: false,
+  })
+  updateGroupCallScheduleForFaculties: UpdateGroupCallScheduleForFacultiesAvailabilityModel
+
+  @prop({
     type: DeleteGroupAvailabilityModel,
     default: <DeleteGroupAvailabilityModel>{
       available: false,
@@ -524,6 +549,7 @@ export class AvailabilitiesModel {
         createSchedule: false,
         createGroup: false,
         updateGroup: false,
+        updateGroupCallScheduleForFaculties: false,
         deleteGroup: false,
         createFaculty: false,
         updateFaculty: false,
@@ -604,6 +630,7 @@ export class AvailabilitiesModel {
         createSchedule: false,
         createGroup: false,
         updateGroup: false,
+        updateGroupCallScheduleForFaculties: false,
         deleteGroup: false,
         createFaculty: false,
         updateFaculty: false,

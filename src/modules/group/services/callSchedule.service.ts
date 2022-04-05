@@ -27,8 +27,4 @@ export class CallScheduleService extends CheckExistenceService<GroupModel> {
     if (options.checkExistence.faculty) await this.facultyService.throwIfNotExists({ _id: facultyId })
     return this.groupModel.updateMany({ faculty: facultyId }, { $set: { callSchedule } })
   }
-
-  updateForAllGroups(callSchedule: CallScheduleItemModel[]) {
-    return this.groupModel.updateMany({}, { $set: { callSchedule } })
-  }
 }

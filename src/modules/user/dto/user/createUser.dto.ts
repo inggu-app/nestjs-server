@@ -16,6 +16,7 @@ import {
   UpdateFacultyAvailabilityModel,
   UpdateGroupAvailabilityAvailableFieldsModel,
   UpdateGroupAvailabilityModel,
+  UpdateGroupCallScheduleForFacultiesAvailabilityModel,
   UpdateRoleAvailabilityAvailableFieldsModel,
   UpdateRoleAvailabilityModel,
   UpdateUserAvailabilitiesAvailabilityModel,
@@ -212,6 +213,28 @@ export class UpdateGroupAvailabilityDto implements UpdateGroupAvailabilityModel 
   availableForInstallationFaculties: Types.ObjectId[]
 }
 
+export class UpdateGroupCallScheduleForFacultiesAvailabilityDto implements UpdateGroupCallScheduleForFacultiesAvailabilityModel {
+  @ApiProperty({
+    description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
+  })
+  @IsBoolean()
+  available: boolean
+
+  @ApiProperty({
+    description:
+      'Доступны ли пользователю обновления расписания звонков для групп всех факультетов. Если стоит true, то можно обновлять расписание звонков для всех факультетов. Если стоит false, то следует обращать внимание на поле availableFaculties',
+  })
+  @IsBoolean()
+  all: boolean
+
+  @ApiProperty({
+    description: 'Доступные для обновления расписания звонков факультеты. Имеет смысл только если в all стоит false',
+  })
+  @IsMongoIdWithTransform({ each: true })
+  @CheckExists(FacultyModel, true)
+  availableFaculties: Types.ObjectId[]
+}
+
 export class DeleteGroupAvailabilityDto implements DeleteGroupAvailabilityModel {
   @ApiProperty({
     description: 'Разрешено ли пользователю обращаться к этому эндпоинту',
@@ -370,6 +393,12 @@ export class CreateUserAvailableForInstallationAvailabilitiesDto implements Crea
   })
   @IsBoolean()
   updateGroup: boolean
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять расписание звонков для групп, принадлежащих факультетам',
+  })
+  @IsBoolean()
+  updateGroupCallScheduleForFaculties: boolean
 
   @ApiProperty({
     description: 'Может ли пользователь удалять группы',
@@ -836,6 +865,17 @@ export class AvailabilitiesDto implements Partial<AvailabilitiesModel> {
   @ValidateNested()
   @Type(() => UpdateGroupAvailabilityDto)
   updateGroup?: UpdateGroupAvailabilityDto
+
+  @ApiProperty({
+    description: 'Может ли пользователь обновлять расписание звонков групп, принадлежащих факультетам',
+    type: UpdateGroupCallScheduleForFacultiesAvailabilityDto,
+    required: false,
+  })
+  @IsUndefinable()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => UpdateGroupCallScheduleForFacultiesAvailabilityDto)
+  updateGroupCallScheduleForFaculties?: UpdateGroupCallScheduleForFacultiesAvailabilityDto
 
   @ApiProperty({
     description: 'Может ли пользователь удалять группы',
