@@ -1,5 +1,5 @@
-import { BadRequestException, Body, Controller, HttpStatus } from '@nestjs/common'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { BadRequestException, Body, Controller, HttpStatus, Patch } from '@nestjs/common'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiResponseException } from '../../../global/decorators/ApiResponseException.decorator'
 import { LearningStageService } from '../services/learningStage.service'
 import { UpdateLearningStageByFacultyDto } from '../dto/learningStage/updateLearningStageByFaculty.dto'
@@ -7,7 +7,8 @@ import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
 import { UpdateGroupLearningStageForFacultiesAvailabilityModel } from '../../user/models/user.model'
 
-@Controller()
+@ApiTags('Группы')
+@Controller('/learning-stage')
 export class LearningStageController {
   constructor(private readonly learningStageService: LearningStageService) {}
 
@@ -22,6 +23,7 @@ export class LearningStageController {
     status: HttpStatus.OK,
   })
   @ApiResponseException()
+  @Patch('/')
   async updateByFacultyId(
     @Body() dto: UpdateLearningStageByFacultyDto,
     @RequestUser() user: RequestUser<UpdateGroupLearningStageForFacultiesAvailabilityModel>

@@ -1,13 +1,14 @@
-import { BadRequestException, Body, Controller, HttpStatus } from '@nestjs/common'
+import { BadRequestException, Body, Controller, HttpStatus, Patch } from '@nestjs/common'
 import { CallScheduleService } from '../services/callSchedule.service'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ApiResponseException } from '../../../global/decorators/ApiResponseException.decorator'
 import { UpdateCallScheduleByFacultyDto } from '../dto/callSchedule/updateCallScheduleByFaculty.dto'
 import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
 import { UpdateGroupCallScheduleForFacultiesAvailabilityModel } from '../../user/models/user.model'
 
-@Controller()
+@ApiTags('Группы')
+@Controller('/call-schedule')
 export class CallScheduleController {
   constructor(private readonly callScheduleService: CallScheduleService) {}
 
@@ -22,6 +23,7 @@ export class CallScheduleController {
     status: HttpStatus.OK,
   })
   @ApiResponseException()
+  @Patch('/')
   async updateByFacultyId(
     @Body() dto: UpdateCallScheduleByFacultyDto,
     @RequestUser() user: RequestUser<UpdateGroupCallScheduleForFacultiesAvailabilityModel>
