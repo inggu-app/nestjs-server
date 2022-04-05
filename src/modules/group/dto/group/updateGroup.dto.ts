@@ -6,7 +6,7 @@ import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decor
 import { GroupModel } from '../../group.model'
 import { Type } from 'class-transformer'
 import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
-import { CallScheduleItemDto } from '../callSchedule/updateByFaculty.dto'
+import { CallScheduleItemDto } from '../callSchedule/updateCallScheduleByFaculty.dto'
 import { LearningStage } from '../../constants/learningStage.constants'
 
 export class UpdateGroupDto implements Partial<GroupModel> {

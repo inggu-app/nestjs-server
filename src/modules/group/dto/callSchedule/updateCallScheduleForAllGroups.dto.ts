@@ -1,8 +1,8 @@
 import { IsObject, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
-import { CallScheduleItemDto } from './updateByFaculty.dto'
+import { CallScheduleItemDto } from './updateCallScheduleByFaculty.dto'
 
-export class UpdateForAllGroupsDto {
+export class UpdateCallScheduleForAllGroupsDto {
   @IsObject({ each: true })
   @ValidateNested({ each: true })
   @Type(() => CallScheduleItemDto)

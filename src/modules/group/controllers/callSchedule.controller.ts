@@ -2,8 +2,8 @@ import { Body, Controller, HttpStatus } from '@nestjs/common'
 import { CallScheduleService } from '../services/callSchedule.service'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { ApiResponseException } from '../../../global/decorators/ApiResponseException.decorator'
-import { UpdateCallScheduleByFacultyDto } from '../dto/callSchedule/updateByFaculty.dto'
-import { UpdateForAllGroupsDto } from '../dto/callSchedule/updateForAllGroups.dto'
+import { UpdateCallScheduleByFacultyDto } from '../dto/callSchedule/updateCallScheduleByFaculty.dto'
+import { UpdateCallScheduleForAllGroupsDto } from '../dto/callSchedule/updateCallScheduleForAllGroups.dto'
 
 @Controller()
 export class CallScheduleController {
@@ -27,7 +27,7 @@ export class CallScheduleController {
     status: HttpStatus.OK,
   })
   @ApiResponseException()
-  async updateForAllGroups(@Body() dto: UpdateForAllGroupsDto) {
+  async updateForAllGroups(@Body() dto: UpdateCallScheduleForAllGroupsDto) {
     await this.callScheduleService.updateForAllGroups(dto.callSchedule)
   }
 }

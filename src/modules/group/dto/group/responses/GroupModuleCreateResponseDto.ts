@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { GroupModel } from '../../../group.model'
 import { MongoIdType, MongoIdExample } from '../../../../../global/constants/constants'
-import { CallScheduleItemDto } from '../../callSchedule/updateByFaculty.dto'
+import { CallScheduleItemDto } from '../../callSchedule/updateCallScheduleByFaculty.dto'
 import { LearningStage } from '../../../constants/learningStage.constants'
 
 export class GroupModuleResponseGroup implements Partial<GroupModel> {
