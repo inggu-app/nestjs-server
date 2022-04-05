@@ -8,4 +8,7 @@ export const envVariables = {
   tokenJwtSecretKey: 'TOKEN_JWT_SECRET_KEY', //
   passwordsHashSecretKey: 'PASSWORDS_HASH_SECRET_KEY',
   adminSecretKey: 'ADMIN_SECRET_KEY', //
+
+  swaggerUserLogin: 'SWAGGER_USER_LOGIN',
+  swaggerUserPassword: 'SWAGGER_USER_PASSWORD',
 }
