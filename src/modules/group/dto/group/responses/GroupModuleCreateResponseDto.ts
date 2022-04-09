@@ -1,11 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { GroupModel } from '../../../group.model'
 import { MongoIdType, MongoIdExample } from '../../../../../global/constants/constants'
 import { CallScheduleItemDto } from '../../callSchedule/updateCallScheduleByFaculty.dto'
 import { LearningStage } from '../../../constants/learningStage.constants'
+import { FacultyModuleResponseFaculty } from '../../../../faculty/dto/responses/FacultyModuleCreateResponseDto'
 
-export class GroupModuleResponseGroup implements Partial<GroupModel> {
+export class GroupModuleResponseGroup implements Partial<Record<keyof GroupModel, GroupModel[keyof GroupModel] | any>> {
   @ApiProperty({
     title: 'id группы',
     type: MongoIdType,
@@ -22,12 +23,20 @@ export class GroupModuleResponseGroup implements Partial<GroupModel> {
   title: string
 
   @ApiProperty({
-    title: 'id факультета, к которому привязана группа',
-    type: MongoIdType,
-    example: MongoIdExample,
+    title: 'id факультета, к которому привязана группа или сущность факультета',
+    type: [],
+    oneOf: [
+      {
+        type: MongoIdType,
+        example: MongoIdExample,
+      },
+      {
+        $ref: getSchemaPath(FacultyModuleResponseFaculty),
+      },
+    ],
     required: false,
   })
-  faculty: Types.ObjectId
+  faculty: Types.ObjectId | FacultyModuleResponseFaculty
 
   @ApiProperty({
     title: 'Дата последнего обновления расписания',

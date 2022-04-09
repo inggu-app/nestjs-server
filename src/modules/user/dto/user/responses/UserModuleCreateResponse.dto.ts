@@ -1,8 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import { MongoIdExample, MongoIdType } from '../../../../../global/constants/constants'
 import { Types } from 'mongoose'
 import { ClientInterfacesEnum } from '../../../../../global/enums/ClientInterfaces.enum'
 import { AvailabilitiesDto } from '../createUser.dto'
+import { UserModuleResponseRole } from '../../role/responses/UserModuleCreateRoleResponse.dto'
 
 export class UserModuleResponseUser {
   @ApiProperty({
@@ -23,12 +24,22 @@ export class UserModuleResponseUser {
 
   @ApiProperty({
     description: 'Роли пользователя',
-    type: MongoIdType,
-    example: [MongoIdExample],
     isArray: true,
     required: false,
+    oneOf: [
+      {
+        type: MongoIdType,
+        example: [MongoIdExample],
+      },
+      {
+        type: 'array',
+        items: {
+          $ref: getSchemaPath(UserModuleResponseRole),
+        },
+      },
+    ],
   })
-  roles: Types.ObjectId[]
+  roles: (Types.ObjectId | UserModuleResponseRole)[]
 
   @ApiProperty({
     description: 'Имя пользователя',

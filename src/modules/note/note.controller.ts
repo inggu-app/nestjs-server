@@ -16,7 +16,6 @@ import { MongoIdExample, MongoIdType } from '../../global/constants/constants'
 import { ApiMongoQueryOptions } from '../../global/decorators/ApiMongoQueryOptions.decorator'
 import { NoteModuleGetByIdResponseDto } from './dto/responses/NoteModuleGetByIdResponse.dto'
 import { NoteModuleGetByLessonIdResponseDto } from './dto/responses/NoteModuleGetByLessonIdResponse.dto'
-import { NoteModel } from './note.model'
 
 @ApiTags('Заметки')
 @Controller()
@@ -55,7 +54,7 @@ export class NoteController {
     status: HttpStatus.OK,
   })
   @Get('/by-id')
-  async getById(@MongoId('noteId') noteId: Types.ObjectId, @MongoQueryOptions<NoteModel>(['lesson']) queryOptions?: QueryOptions) {
+  async getById(@MongoId('noteId') noteId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return {
       note: await this.noteService.getById(noteId, queryOptions),
     }
@@ -86,7 +85,7 @@ export class NoteController {
   async getByLessonId(
     @MongoId('lessonId') lessonId: Types.ObjectId,
     @IntQueryParam('week', { intType: 'positive' }) week: number,
-    @MongoQueryOptions<NoteModel>(['lesson']) queryOptions?: QueryOptions
+    @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
       notes: await this.noteService.get(lessonId, week, queryOptions),
