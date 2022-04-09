@@ -122,7 +122,7 @@ export class UserController {
     status: HttpStatus.OK,
   })
   @Get('/by-id')
-  async getById(@MongoId('userId') userId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getById(@MongoId('userId') userId: Types.ObjectId, @MongoQueryOptions<UserModel>(['roles']) queryOptions?: QueryOptions) {
     return {
       user: removeUserFields(await this.userService.getById(userId, queryOptions), ['tokens', 'hashedPassword']),
     }
@@ -143,7 +143,10 @@ export class UserController {
     status: HttpStatus.OK,
   })
   @Get('/by-ids')
-  async getByIds(@MongoId('userIds', { multiple: true }) userIds: Types.ObjectId[], @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getByIds(
+    @MongoId('userIds', { multiple: true }) userIds: Types.ObjectId[],
+    @MongoQueryOptions<UserModel>(['roles']) queryOptions?: QueryOptions
+  ) {
     return {
       users: removeUserFields(await this.userService.getByIds(userIds, queryOptions), ['tokens', 'hashedPassword']),
     }
@@ -178,7 +181,7 @@ export class UserController {
     @IntQueryParam('page', { intType: 'positive' }) page: number,
     @IntQueryParam('count', { intType: 'positive' }) count: number,
     @StringQueryParam('name', { required: false }) name?: string,
-    @MongoQueryOptions() queryOptions?: QueryOptions
+    @MongoQueryOptions<UserModel>(['roles']) queryOptions?: QueryOptions
   ) {
     return {
       users: removeUserFields(await this.userService.getMany(page, count, name, queryOptions), ['tokens', 'hashedPassword']),

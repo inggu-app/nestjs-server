@@ -2,7 +2,7 @@ import { QueryOptions } from 'mongoose'
 import { MongoModelProjection } from '../decorators/MongoModelProjection.decorator'
 import { IsUndefinable } from '../decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsString, ValidateNested } from 'class-validator'
+import { IsArray, IsNotIn, IsString, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
 interface IPopulateOptions {
@@ -38,6 +38,7 @@ class Populate implements IPopulate {
     description: 'Название поля, которое нужно заменить',
   })
   @IsString()
+  @IsNotIn(['_id', 'id'])
   path: string
 
   @ApiProperty({

@@ -21,6 +21,7 @@ import { GroupModuleGetManyResponseDto } from '../dto/group/responses/GroupModul
 import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
 import { CreateGroupAvailabilityModel, DeleteGroupAvailabilityModel, UpdateGroupAvailabilityModel } from '../../user/models/user.model'
 import { objectKeys } from '../../../global/utils/objectKeys'
+import { GroupModel } from '../group.model'
 
 @ApiTags('Группы')
 @Controller()
@@ -70,7 +71,7 @@ export class GroupController {
     status: HttpStatus.OK,
   })
   @Get('/by-id')
-  async getById(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getById(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions<GroupModel>(['faculty']) queryOptions?: QueryOptions) {
     return this.groupService.getById(groupId, queryOptions)
   }
 
@@ -93,7 +94,10 @@ export class GroupController {
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
   })
   @Get('/by-ids')
-  async getByIds(@MongoId('groupIds', { multiple: true }) groupIds: Types.ObjectId[], @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getByIds(
+    @MongoId('groupIds', { multiple: true }) groupIds: Types.ObjectId[],
+    @MongoQueryOptions<GroupModel>(['faculty']) queryOptions?: QueryOptions
+  ) {
     return {
       groups: await this.groupService.getByGroupIds(groupIds, queryOptions),
     }
@@ -117,7 +121,10 @@ export class GroupController {
       'Возвращаемые поля зависят от переданного параметра projection в query-параметре queryOptions. Если параметр не передаётся, то возвращаются все поля',
   })
   @Get('/by-faculty-id')
-  private async getByFacultyId(@MongoId('facultyId') facultyId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  private async getByFacultyId(
+    @MongoId('facultyId') facultyId: Types.ObjectId,
+    @MongoQueryOptions<GroupModel>(['faculty']) queryOptions?: QueryOptions
+  ) {
     return {
       groups: await this.groupService.getByFacultyId(facultyId, queryOptions),
     }
@@ -157,7 +164,7 @@ export class GroupController {
     @IntQueryParam('page', { intType: 'positive' }) page: number,
     @IntQueryParam('count', { intType: 'positive' }) count: number,
     @StringQueryParam('title', { required: false }) title?: string,
-    @MongoQueryOptions() queryOptions?: QueryOptions
+    @MongoQueryOptions<GroupModel>(['faculty']) queryOptions?: QueryOptions
   ) {
     return {
       groups: await this.groupService.getMany(page, count, title, queryOptions),
