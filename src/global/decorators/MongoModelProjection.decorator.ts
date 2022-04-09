@@ -14,15 +14,19 @@ interface Projection {
 
 @ValidatorConstraint({ name: 'mongoModelProjection', async: false })
 class MongoModelProjectionConstraint implements ValidatorConstraintInterface {
-  validate(value: Record<string, any>): Promise<boolean> | boolean {
+  validate(value: Record<string, any>, validationArguments?: ValidationArguments): Promise<boolean> | boolean {
     if (!isObject(value)) return false
-    return typeof this.recursiveValidator(value as Projection) === 'boolean'
+    return typeof this.recursiveValidator(value as Projection, 'projection', !validationArguments?.constraints[0] as boolean) === 'boolean'
   }
 
   defaultMessage(validationArguments?: ValidationArguments): string {
     if (!isObject(validationArguments?.value)) return `${validationArguments?.property} должно быть объектом`
 
-    const validationResult = this.recursiveValidator(validationArguments?.value as Projection, validationArguments?.property)
+    const validationResult = this.recursiveValidator(
+      validationArguments?.value as Projection,
+      validationArguments?.property,
+      !validationArguments?.constraints[0]
+    )
     if (typeof validationResult === 'string') return `В объекте ${validationResult} содержится ошибка`
 
     return 'Неизвестная ошибка'
@@ -68,13 +72,13 @@ class MongoModelProjectionConstraint implements ValidatorConstraintInterface {
   }
 }
 
-export function MongoModelProjection(property?: string, validationOptions?: ValidationOptions) {
+export function MongoModelProjection(firstLevelId = true, validationOptions?: ValidationOptions) {
   return (object: Record<string, any>, propertyName: string) => {
     registerDecorator({
       name: 'mongoModelProjection',
       target: object.constructor,
       propertyName,
-      constraints: [property],
+      constraints: [firstLevelId],
       options: validationOptions,
       validator: MongoModelProjectionConstraint,
     })

@@ -1,4 +1,4 @@
-import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common'
+import { PipeTransform, Injectable, BadRequestException, ValidationError } from '@nestjs/common'
 import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
 import { deleteNested, getNested, setNested } from '../utils/nestedObject'
@@ -50,7 +50,7 @@ export class ObjectValidationPipe implements PipeTransform {
       const object = plainToClass(this.options.dto, param, { exposeDefaultValues: true })
       const errorsList = await validate(object, { whitelist: true, forbidNonWhitelisted: true })
       if (errorsList.length > 0) {
-        throw new BadRequestException(errorsList.map(error => (error.constraints ? Object.values(error.constraints) : [])).flat())
+        throw new BadRequestException(this.getErrors(errorsList))
       }
 
       if (this.options.replaceableKeys && Object.keys(this.options.replaceableKeys).length) {
@@ -68,5 +68,19 @@ export class ObjectValidationPipe implements PipeTransform {
     } else {
       return objects[0]
     }
+  }
+
+  getErrors(errors: ValidationError[]) {
+    return errors
+      .map(error => {
+        const childrenErrors = (error.children ? this.getErrors(error.children) : []) as string[]
+
+        if (error.constraints) {
+          return [...childrenErrors, ...Object.values(error.constraints)]
+        }
+
+        return childrenErrors
+      })
+      .flat()
   }
 }
