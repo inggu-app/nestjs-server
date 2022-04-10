@@ -230,6 +230,8 @@ export class UpdateGroupCallScheduleForFacultiesAvailabilityDto implements Updat
 
   @ApiProperty({
     description: 'Доступные для обновления расписания звонков факультеты. Имеет смысл только если в all стоит false',
+    type: MongoIdType,
+    example: [MongoIdExample],
   })
   @IsMongoIdWithTransform({ each: true })
   @CheckExists(FacultyModel, true)
