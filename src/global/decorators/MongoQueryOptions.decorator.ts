@@ -22,7 +22,7 @@ class AvailableToPopulateFields implements PipeTransform {
   }
 
   transform(value: MongoQueryOptionsDto): any {
-    if (value.populate) {
+    if (value?.populate) {
       value.populate.map(field => {
         if (!this.availableFields.includes(field.path)) throw new BadRequestException(`Для поля ${field.path} нельзя делать замену`)
       })

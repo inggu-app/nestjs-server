@@ -52,6 +52,7 @@ import { MongoIdExample, MongoIdType } from '../../../global/constants/constants
 import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
 import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
 import { objectKeys } from '../../../global/utils/objectKeys'
+import { UserModuleGetAuthorizedUserResponseDto } from '../dto/user/responses/UserModuleGetAuthorizedUserResponse.dto'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -214,6 +215,30 @@ export class UserController {
       })
       response.cookie('access_token', generatedToken, { httpOnly: true, expires: tokenExpiresDate }).json()
     } else throw new BadRequestException(INCORRECT_CREDENTIALS)
+  }
+
+  @ApiOperation({
+    description: 'Эндпоинт позволяет получить пользователя, в случае если он авторизован',
+  })
+  @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleGetAuthorizedUserResponseDto,
+    status: HttpStatus.OK,
+  })
+  @Get('/get-authorized-user')
+  async getAuthorizedUser(@Req() request: Request, @MongoQueryOptions() queryOptions?: QueryOptions) {
+    const token = request.cookies['access_token']
+
+    if (token) {
+      const tokenData = this.jwtService.decode(token) as ITokenData
+
+      return {
+        user: removeUserFields(await this.userService.getById(Types.ObjectId(tokenData.id), queryOptions), ['tokens', 'hashedPassword']),
+      }
+    } else {
+      throw new BadRequestException('Пользователь не авторизован')
+    }
   }
 
   @ApiOperation({
