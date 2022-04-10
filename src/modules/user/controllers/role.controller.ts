@@ -19,6 +19,7 @@ import { UserAuth } from '../../../global/decorators/UserAuth.decorator'
 import { objectKeys } from '../../../global/utils/objectKeys'
 import { RequestUser } from '../../../global/decorators/RequestUser.decorator'
 import { UpdateRoleAvailabilityModel } from '../models/user.model'
+import { UserModuleGetRolesByIdsResponseDto } from '../dto/role/responses/UserModuleGetRolesByIdsResponse.dto'
 
 @ApiTags('Роли')
 @Controller('/roles')
@@ -64,6 +65,32 @@ export class RoleController {
   async getRoleById(@MongoId('roleId') roleId: Types.ObjectId, @MongoQueryOptions() queryOptions?: QueryOptions) {
     return {
       role: await this.roleService.getById(roleId, queryOptions),
+    }
+  }
+
+  @ApiOperation({
+    description: 'Эндпоинт позволяет получить роли по списку id',
+  })
+  @ApiQuery({
+    name: 'rolesIds',
+    description: 'Список id ролей, которых нужно получить. id нужно перечислять через запятую',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
+  })
+  @ApiMongoQueryOptions()
+  @ApiResponseException()
+  @ApiResponse({
+    type: UserModuleGetRolesByIdsResponseDto,
+    status: HttpStatus.OK,
+  })
+  @Get('/by-ids')
+  async getRolesByIds(
+    @MongoId('rolesIds', { multiple: true }) rolesIds: Types.ObjectId[],
+    @MongoQueryOptions() queryOptions?: QueryOptions
+  ) {
+    return {
+      roles: await this.roleService.getByIds(rolesIds, queryOptions),
     }
   }
 
@@ -128,8 +155,8 @@ export class RoleController {
 
     // проверяем пытается ли пользователь редактировать недоступные ему роли
     if (!user.availability.all) {
-      if (!user.availability.availableRoles.includes(dto.id))
-        throw new BadRequestException(`Пользователь не может редактировать роль с id ${dto.id}`)
+      if (!user.availability.availableRoles.includes(id))
+        throw new BadRequestException(`Пользователь не может редактировать роль с id ${id}`)
     }
 
     await this.roleService.update(dto)

@@ -35,6 +35,13 @@ export class RoleService extends CheckExistenceService<RoleModel> {
     return this.roleModel.findById(roleId, queryOptions).exec()
   }
 
+  async getByIds(rolesIds: Types.ObjectId[], queryOptions?: QueryOptions, options = roleServiceMethodDefaultOptions.getByIds) {
+    options = mergeOptionsWithDefaultOptions(options, roleServiceMethodDefaultOptions.getByIds)
+    if (options.checkExistence.role) await this.throwIfNotExists(rolesIds.map(id => ({ _id: id })))
+
+    return this.roleModel.find({ _id: { $in: rolesIds } }, queryOptions).exec()
+  }
+
   async getMany(
     page: number,
     count: number,

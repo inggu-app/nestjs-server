@@ -10,6 +10,11 @@ export const roleServiceMethodDefaultOptions = {
       role: true,
     },
   },
+  getByIds: {
+    checkExistence: {
+      role: true,
+    },
+  },
   getMany: {
     checkExistence: {},
   },
