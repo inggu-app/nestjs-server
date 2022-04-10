@@ -198,7 +198,7 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.OK,
   })
-  @Get('/login')
+  @Post('/login')
   async login(@Body() dto: LoginDto, @Res() response: Response) {
     const user = await this.userService.getByLogin(dto.login, { projection: { _id: 1, hashedPassword: 1, interfaces: 1 } })
 
