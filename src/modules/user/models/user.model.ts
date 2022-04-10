@@ -285,7 +285,7 @@ export class CreateUserAvailabilityModel {
   @prop({ default: false })
   available: boolean
 
-  @prop({ default: [], type: [String] })
+  @prop({ default: Object.values(ClientInterfacesEnum), type: [String] })
   availableForInstallationInterfaces: ClientInterfacesEnum[]
 
   @prop({
@@ -569,7 +569,7 @@ export class AvailabilitiesModel {
     type: CreateUserAvailabilityModel,
     default: <CreateUserAvailabilityModel>{
       available: false,
-      availableForInstallationInterfaces: [],
+      availableForInstallationInterfaces: Object.values(ClientInterfacesEnum),
       availableForInstallationAvailabilities: {
         createSchedule: false,
         createGroup: false,
