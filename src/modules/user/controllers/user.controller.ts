@@ -131,11 +131,11 @@ export class UserController {
 
   @ApiOperation({ description: 'Эндпоинт позволяет получить список пользователей по списку их id' })
   @ApiQuery({
-    name: 'userIds',
+    name: 'usersIds',
     description: 'Список id пользователей, которых нужно получить. id нужно перечислять через запятую',
     type: MongoIdType,
     isArray: true,
-    example: '6203ce8cff1a854919f38314,6203ce8cff1a854919f38314',
+    example: [MongoIdExample],
   })
   @ApiMongoQueryOptions()
   @ApiResponseException()
@@ -145,11 +145,11 @@ export class UserController {
   })
   @Get('/by-ids')
   async getByIds(
-    @MongoId('userIds', { multiple: true }) userIds: Types.ObjectId[],
+    @MongoId('usersIds', { multiple: true }) usersIds: Types.ObjectId[],
     @MongoQueryOptions<UserModel>(['roles']) queryOptions?: QueryOptions
   ) {
     return {
-      users: removeUserFields(await this.userService.getByIds(userIds, queryOptions), ['tokens', 'hashedPassword']),
+      users: removeUserFields(await this.userService.getByIds(usersIds, queryOptions), ['tokens', 'hashedPassword']),
     }
   }
 
