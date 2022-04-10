@@ -573,6 +573,9 @@ export class CreateUserAvailabilityDto implements CreateUserAvailabilityModel {
 
   @ApiProperty({
     description: 'Список ролей, которые пользователь может назначать новосоздаваемому пользователю',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
   })
   @IsMongoIdWithTransform({ each: true })
   @CheckExists(RoleModel, true)
