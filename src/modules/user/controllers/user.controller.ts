@@ -213,7 +213,7 @@ export class UserController {
       await this.userService.addToken(user.id, new TokenDataModel(generatedToken, tokenExpiresDate), {
         checkExistence: { user: false },
       })
-      response.cookie('access_token', generatedToken, { httpOnly: true, expires: tokenExpiresDate }).json()
+      response.cookie('access_token', generatedToken, { httpOnly: true, expires: tokenExpiresDate, secure: true }).json()
     } else throw new BadRequestException(INCORRECT_CREDENTIALS)
   }
 

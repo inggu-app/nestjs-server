@@ -11,7 +11,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
   if (process.env.NODE_ENV === 'development') {
-    app.enableCors({ origin: ['http://localhost:3001', 'http://localhost:5000'] })
+    app.enableCors({ origin: 'http://localhost:3001', credentials: true })
+  } else {
+    app.enableCors()
   }
 
   if (process.env.NODE_ENV === 'production')
