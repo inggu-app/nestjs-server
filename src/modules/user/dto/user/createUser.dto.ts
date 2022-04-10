@@ -231,6 +231,7 @@ export class UpdateGroupCallScheduleForFacultiesAvailabilityDto implements Updat
   @ApiProperty({
     description: 'Доступные для обновления расписания звонков факультеты. Имеет смысл только если в all стоит false',
     type: MongoIdType,
+    isArray: true,
     example: [MongoIdExample],
   })
   @IsMongoIdWithTransform({ each: true })
@@ -254,6 +255,9 @@ export class UpdateGroupLearningStageForFacultiesAvailabilityDto implements Upda
 
   @ApiProperty({
     description: 'Доступные для обновления стадии обучения факультеты. Имеет смысл только если в all стоит false',
+    type: MongoIdType,
+    isArray: true,
+    example: [MongoIdExample],
   })
   @IsMongoIdWithTransform({ each: true })
   @CheckExists(FacultyModel, true)
