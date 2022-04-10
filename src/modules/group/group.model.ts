@@ -36,7 +36,7 @@ export class GroupModel extends TimeStamps {
   @prop({ default: false })
   isHaveSchedule: boolean
 
-  @prop({ type: CallScheduleItemModel, default: [] })
+  @prop({ type: CallScheduleItemModel, default: [], _id: false })
   callSchedule: CallScheduleItemModel[]
 
   @prop({ required: true, enum: LearningStage })
