@@ -323,18 +323,6 @@ export class UpdateFacultyAvailabilityAvailableFieldsDto implements UpdateFacult
   })
   @IsBoolean()
   title: boolean
-
-  @ApiProperty({
-    description: 'Может ли пользователь редактировать расписания звонков факультета',
-  })
-  @IsBoolean()
-  callSchedule: boolean
-
-  @ApiProperty({
-    description: 'Может ли пользователь редактировать стадии обучения факультета',
-  })
-  @IsBoolean()
-  learningStages: boolean
 }
 
 export class UpdateFacultyAvailabilityDto implements UpdateFacultyAvailabilityModel {

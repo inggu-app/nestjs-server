@@ -164,12 +164,6 @@ export class CreateFacultyAvailabilityModel {
 export class UpdateFacultyAvailabilityAvailableFieldsModel implements Record<keyof Omit<UpdateFacultyDto, 'id'>, boolean> {
   @prop({ default: false })
   title: boolean
-
-  @prop({ default: false })
-  callSchedule: boolean
-
-  @prop({ default: false })
-  learningStages: boolean
 }
 
 // работа с обновлением факультетов
@@ -187,7 +181,6 @@ export class UpdateFacultyAvailabilityModel {
     type: UpdateFacultyAvailabilityAvailableFieldsModel,
     default: <UpdateFacultyAvailabilityAvailableFieldsModel>{
       title: false,
-      callSchedule: false,
     },
     _id: false,
   })
@@ -537,8 +530,6 @@ export class AvailabilitiesModel {
       availableFaculties: [],
       availableFields: {
         title: false,
-        callSchedule: false,
-        learningStages: false,
       },
     },
     _id: false,
