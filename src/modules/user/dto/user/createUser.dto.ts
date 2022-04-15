@@ -448,34 +448,10 @@ export class CreateUserAvailableForInstallationAvailabilitiesDto implements Crea
   deleteFaculty: boolean
 
   @ApiProperty({
-    description: 'Может ли пользователь создавать расписания звонков',
-  })
-  @IsBoolean()
-  createCallSchedule: boolean
-
-  @ApiProperty({
-    description: 'Может ли пользователь обновлять расписания звонков',
-  })
-  @IsBoolean()
-  updateCallSchedule: boolean
-
-  @ApiProperty({
-    description: 'Может ли пользователь удалять расписания звонков',
-  })
-  @IsBoolean()
-  deleteCallSchedule: boolean
-
-  @ApiProperty({
     description: 'Может ли пользователь работать с версиями приложений',
   })
   @IsBoolean()
   appVersion: boolean
-
-  @ApiProperty({
-    description: 'Может ли пользователь работать со стадиями обучения',
-  })
-  @IsBoolean()
-  learningStage: boolean
 
   @ApiProperty({
     description: 'Может ли пользователь создавать пользователей',

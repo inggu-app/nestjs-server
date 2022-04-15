@@ -235,19 +235,7 @@ export class CreateUserAvailableForInstallationAvailabilitiesModel implements Re
   deleteFaculty: boolean
 
   @prop({ default: false })
-  createCallSchedule: boolean
-
-  @prop({ default: false })
-  updateCallSchedule: boolean
-
-  @prop({ default: false })
-  deleteCallSchedule: boolean
-
-  @prop({ default: false })
   appVersion: boolean
-
-  @prop({ default: false })
-  learningStage: boolean
 
   @prop({ default: false })
   createUser: boolean
@@ -571,7 +559,7 @@ export class AvailabilitiesModel {
         createFaculty: false,
         updateFaculty: false,
         deleteFaculty: false,
-        createCallSchedule: false,
+
         updateCallSchedule: false,
         deleteCallSchedule: false,
         appVersion: false,
@@ -653,11 +641,7 @@ export class AvailabilitiesModel {
         createFaculty: false,
         updateFaculty: false,
         deleteFaculty: false,
-        createCallSchedule: false,
-        updateCallSchedule: false,
-        deleteCallSchedule: false,
         appVersion: false,
-        learningStage: false,
         createUser: false,
         updateUser: false,
         deleteUser: false,
