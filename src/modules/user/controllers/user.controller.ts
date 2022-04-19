@@ -227,7 +227,7 @@ export class UserController {
     status: HttpStatus.OK,
   })
   @Get('/get-authorized-user')
-  async getAuthorizedUser(@Req() request: Request, @MongoQueryOptions() queryOptions?: QueryOptions) {
+  async getAuthorizedUser(@Req() request: Request, @MongoQueryOptions<UserModel>(['roles']) queryOptions?: QueryOptions) {
     const token = request.cookies['access_token']
 
     if (token) {
