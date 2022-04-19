@@ -74,7 +74,7 @@ export class FacultyController {
     description: 'Эндпоинт позволяет получить список факультетов по переданному списку id',
   })
   @ApiQuery({
-    name: 'facultyIds',
+    name: 'facultiesIds',
     type: MongoIdType,
     example: [MongoIdExample, MongoIdExample].join(),
     isArray: true,
@@ -90,7 +90,7 @@ export class FacultyController {
   })
   @Get('/by-ids')
   async getByIds(
-    @MongoId('facultyIds', { multiple: true }) facultyIds: Types.ObjectId[],
+    @MongoId('facultiesIds', { multiple: true }) facultyIds: Types.ObjectId[],
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
