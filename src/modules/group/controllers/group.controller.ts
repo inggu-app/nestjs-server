@@ -79,7 +79,7 @@ export class GroupController {
     description: 'Эндпоинт позволяет получить список групп по переданному списку id',
   })
   @ApiQuery({
-    name: 'groupIds',
+    name: 'groupsIds',
     description: 'Список id групп, которые нужно получить',
     type: MongoIdType,
     example: [MongoIdExample, MongoIdExample].join(),
@@ -95,7 +95,7 @@ export class GroupController {
   })
   @Get('/by-ids')
   async getByIds(
-    @MongoId('groupIds', { multiple: true }) groupIds: Types.ObjectId[],
+    @MongoId('groupsIds', { multiple: true }) groupIds: Types.ObjectId[],
     @MongoQueryOptions<GroupModel>(['faculty']) queryOptions?: QueryOptions
   ) {
     return {
