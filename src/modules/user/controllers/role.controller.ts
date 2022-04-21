@@ -112,6 +112,13 @@ export class RoleController {
       'Строка, которая содержится в названии роли. Если параметр передан, то возвращается список только тех ролей, у которых в названии содержится переданная строка. Параметр не чувствителен к регистру(Мин = мин).',
     example: 'Мин',
   })
+  @ApiQuery({
+    name: 'in',
+    description: 'Если передать этот параметр, то в ответ придут только те роли, id которых находятся в переданном списке',
+    type: MongoIdType,
+    example: [MongoIdExample],
+    required: false,
+  })
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
@@ -123,11 +130,12 @@ export class RoleController {
     @IntQueryParam('page', { intType: 'positive' }) page: number,
     @IntQueryParam('count', { intType: 'positive' }) count: number,
     @StringQueryParam('label', { required: false }) label?: string,
+    @MongoId('in', { multiple: true, required: false }) in_?: Types.ObjectId[],
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      roles: await this.roleService.getMany(page, count, label, queryOptions),
-      count: await this.roleService.countMany(label),
+      roles: await this.roleService.getMany(page, count, label, queryOptions, in_),
+      count: await this.roleService.countMany(label, in_),
     }
   }
 

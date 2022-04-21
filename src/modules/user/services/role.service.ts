@@ -21,8 +21,7 @@ export class RoleService extends CheckExistenceService<RoleModel> {
     super(roleModel, undefined, arg => ROLE_WITH_ID_NOT_FOUND(arg._id))
   }
 
-  async create(dto: CreateRoleDto, options = roleServiceMethodDefaultOptions.create) {
-    options = mergeOptionsWithDefaultOptions(options, roleServiceMethodDefaultOptions.create)
+  async create(dto: CreateRoleDto) {
     await this.throwIfExists({ label: dto.label }, { error: ROLE_WITH_LABEL_EXISTS(dto.label) })
 
     return this.roleModel.create(dto)
@@ -43,15 +42,10 @@ export class RoleService extends CheckExistenceService<RoleModel> {
     return this.roleModel.find({ _id: { $in: rolesIds } }, undefined, queryOptions).exec()
   }
 
-  async getMany(
-    page: number,
-    count: number,
-    label?: string,
-    queryOptions?: QueryOptions,
-    options = roleServiceMethodDefaultOptions.getMany
-  ) {
+  async getMany(page: number, count: number, label?: string, queryOptions?: QueryOptions, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<RoleModel>> = {}
     if (label) filter.label = { $regex: label, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
 
     return this.roleModel
       .find(filter, undefined, queryOptions)
@@ -60,9 +54,10 @@ export class RoleService extends CheckExistenceService<RoleModel> {
       .exec()
   }
 
-  async countMany(label?: string, options = roleServiceMethodDefaultOptions.countMany) {
+  async countMany(label?: string, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<RoleModel>> = {}
     if (label) filter.label = { $regex: label, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
 
     return this.roleModel.countDocuments(filter).exec()
   }
