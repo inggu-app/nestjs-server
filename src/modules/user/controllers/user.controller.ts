@@ -171,6 +171,13 @@ export class UserController {
       'Строка, которая содержится в ФИО пользователя. Если параметр передан, то возвращается список только тех пользователей, у которых в ФИО содержится переданная строка. Параметр не чувствителен к регистру(Исл = исл).',
     example: 'Исл',
   })
+  @ApiQuery({
+    name: 'in',
+    description: 'Если передать этот параметр, то в ответ придут только те пользователи, id которых находятся в переданном списке',
+    type: MongoIdType,
+    example: [MongoIdExample],
+    required: false,
+  })
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
@@ -182,11 +189,12 @@ export class UserController {
     @IntQueryParam('page', { intType: 'positive' }) page: number,
     @IntQueryParam('count', { intType: 'positive' }) count: number,
     @StringQueryParam('name', { required: false }) name?: string,
+    @MongoId('in', { multiple: true, required: false }) in_?: Types.ObjectId[],
     @MongoQueryOptions<UserModel>(['roles']) queryOptions?: QueryOptions
   ) {
     return {
-      users: removeUserFields(await this.userService.getMany(page, count, name, queryOptions), ['tokens', 'hashedPassword']),
-      count: await this.userService.countMany(name),
+      users: removeUserFields(await this.userService.getMany(page, count, name, queryOptions, in_), ['tokens', 'hashedPassword']),
+      count: await this.userService.countMany(name, in_),
     }
   }
 

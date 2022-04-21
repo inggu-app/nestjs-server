@@ -50,15 +50,10 @@ export class UserService extends CheckExistenceService<UserModel> {
     return this.userModel.find({ _id: { $in: ids } }, undefined, queryOptions)
   }
 
-  async getMany(
-    page: number,
-    count: number,
-    name?: string,
-    queryOptions?: QueryOptions,
-    options = userServiceMethodDefaultOptions.getMany
-  ) {
+  async getMany(page: number, count: number, name?: string, queryOptions?: QueryOptions, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<UserModel>> = {}
     if (name) filter.title = { $regex: name, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
 
     return this.userModel
       .find(filter, undefined, queryOptions)
@@ -67,9 +62,10 @@ export class UserService extends CheckExistenceService<UserModel> {
       .exec()
   }
 
-  async countMany(name?: string, options = userServiceMethodDefaultOptions.countMany) {
+  async countMany(name?: string, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<UserModel>> = {}
     if (name) filter.name = { $regex: name, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
 
     return this.userModel.countDocuments(filter).exec()
   }
@@ -121,7 +117,7 @@ export class UserService extends CheckExistenceService<UserModel> {
     return this.userModel.exists({ _id: id, 'tokens.token': token })
   }
 
-  deleteExpiredTokens(options = userServiceMethodDefaultOptions.deleteExpiredTokens) {
+  deleteExpiredTokens() {
     return this.userModel.updateMany({ 'tokens.expiresIn': { $lt: new Date() } }, { $pull: { tokens: { expiresIn: { $lt: new Date() } } } })
   }
 
