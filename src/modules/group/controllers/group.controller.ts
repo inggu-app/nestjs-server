@@ -153,6 +153,13 @@ export class GroupController {
     example: 'гру',
     required: false,
   })
+  @ApiQuery({
+    name: 'in',
+    description: 'Если передать этот параметр, то в ответ придут только те группы, id которых находятся в переданном списке',
+    type: MongoIdType,
+    example: [MongoIdExample],
+    required: false,
+  })
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
@@ -164,11 +171,12 @@ export class GroupController {
     @IntQueryParam('page', { intType: 'positive' }) page: number,
     @IntQueryParam('count', { intType: 'positive' }) count: number,
     @StringQueryParam('title', { required: false }) title?: string,
+    @MongoId('in', { multiple: true, required: false }) in_?: Types.ObjectId[],
     @MongoQueryOptions<GroupModel>(['faculty']) queryOptions?: QueryOptions
   ) {
     return {
-      groups: await this.groupService.getMany(page, count, title, queryOptions),
-      count: await this.groupService.countMany(title),
+      groups: await this.groupService.getMany(page, count, title, queryOptions, in_),
+      count: await this.groupService.countMany(title, in_),
     }
   }
 

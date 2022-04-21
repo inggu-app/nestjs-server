@@ -46,9 +46,11 @@ export class GroupService extends CheckExistenceService<GroupModel> {
     return this.groupModel.find(filter, undefined, queryOptions)
   }
 
-  getMany(page: number, count: number, title?: string, queryOptions?: QueryOptions) {
+  getMany(page: number, count: number, title?: string, queryOptions?: QueryOptions, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<GroupModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
+
     return this.groupModel
       .find(filter, undefined, queryOptions)
       .skip((page - 1) * count)
@@ -56,9 +58,11 @@ export class GroupService extends CheckExistenceService<GroupModel> {
       .exec()
   }
 
-  countMany(title?: string) {
+  countMany(title?: string, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<GroupModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
+
     return this.groupModel.countDocuments(filter).exec()
   }
 
