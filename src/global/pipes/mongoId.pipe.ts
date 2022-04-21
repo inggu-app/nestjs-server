@@ -6,7 +6,7 @@ import {
   QUERY_PARAMETER_IS_EMPTY,
   QUERY_PARAMETER_IS_REQUIRED,
 } from '../constants/errors.constants'
-import { isMongoId } from 'class-validator'
+import { isMongoId, isString } from 'class-validator'
 
 export interface ParseMongoIdPipeOptions {
   parameter: string
@@ -32,6 +32,8 @@ export class ParseMongoIdPipe implements PipeTransform<any, Types.ObjectId | Typ
     if (!this.options.required && value === undefined) return value
     if (this.options.required && value === undefined) throw new BadRequestException(QUERY_PARAMETER_IS_REQUIRED(this.options.parameter))
     if (this.options.required && value === '') throw new BadRequestException(QUERY_PARAMETER_IS_EMPTY(this.options.parameter))
+
+    if (!isString(value)) throw new BadRequestException(`Значение параметра ${this.options.parameter} должно быть строкой`)
 
     const ids = (value as string).split(',')
     if (!this.options.multiple && ids.length > 1)
