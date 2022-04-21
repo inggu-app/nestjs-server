@@ -41,9 +41,10 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
     return this.facultyModel.find({ _id: { $in: facultyIds } }, undefined, queryOptions)
   }
 
-  getAll(page: number, count: number, title?: string, queryOptions?: QueryOptions) {
+  getMany(page: number, count: number, title?: string, queryOptions?: QueryOptions, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
 
     return this.facultyModel
       .find(filter, undefined, queryOptions)
@@ -51,9 +52,11 @@ export class FacultyService extends CheckExistenceService<FacultyModel> {
       .limit(count)
   }
 
-  countAll(title?: string) {
+  countMany(title?: string, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<FacultyModel>> = {}
     if (title) filter.title = { $regex: title, $options: 'i' }
+    if (in_) filter._id = { $in: in_ }
+
     return this.facultyModel.countDocuments(filter)
   }
 

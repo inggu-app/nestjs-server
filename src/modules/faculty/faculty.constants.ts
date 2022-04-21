@@ -17,10 +17,10 @@ export const facultyServiceMethodDefaultOptions = {
       faculty: true,
     },
   },
-  getAll: {
+  getMany: {
     checkExistence: {},
   },
-  countAll: {
+  countMany: {
     checkExistence: {},
   },
   update: {

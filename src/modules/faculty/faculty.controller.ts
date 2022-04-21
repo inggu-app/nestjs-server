@@ -121,6 +121,13 @@ export class FacultyController {
     example: 'Факульт',
     required: false,
   })
+  @ApiQuery({
+    name: 'in',
+    description: 'Если передать этот параметр, то в ответ придут только те факультеты, id которых находятся в переданном списке',
+    type: MongoIdType,
+    example: [MongoIdExample],
+    required: false,
+  })
   @ApiMongoQueryOptions()
   @ApiResponseException()
   @ApiResponse({
@@ -134,11 +141,12 @@ export class FacultyController {
     @IntQueryParam('page', { intType: 'positive' }) page: number,
     @IntQueryParam('count', { intType: 'positive' }) count: number,
     @StringQueryParam('title', { required: false }) title?: string,
+    @MongoId('in', { multiple: true, required: false }) in_?: Types.ObjectId[],
     @MongoQueryOptions() queryOptions?: QueryOptions
   ) {
     return {
-      faculties: await this.facultyService.getAll(page, count, title, queryOptions),
-      count: await this.facultyService.countAll(title),
+      faculties: await this.facultyService.getMany(page, count, title, queryOptions, in_),
+      count: await this.facultyService.countMany(title, in_),
     }
   }
 
