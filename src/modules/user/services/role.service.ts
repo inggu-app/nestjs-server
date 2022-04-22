@@ -38,7 +38,6 @@ export class RoleService extends CheckExistenceService<RoleModel> {
     options = mergeOptionsWithDefaultOptions(options, roleServiceMethodDefaultOptions.getByIds)
     if (options.checkExistence.role) await this.throwIfNotExists(rolesIds.map(id => ({ _id: id })))
 
-    console.log(queryOptions?.projection.label)
     return this.roleModel.find({ _id: { $in: rolesIds } }, undefined, queryOptions).exec()
   }
 
