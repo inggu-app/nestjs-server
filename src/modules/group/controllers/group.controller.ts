@@ -72,7 +72,9 @@ export class GroupController {
   })
   @Get('/by-id')
   async getById(@MongoId('groupId') groupId: Types.ObjectId, @MongoQueryOptions<GroupModel>(['faculty']) queryOptions?: QueryOptions) {
-    return this.groupService.getById(groupId, queryOptions)
+    return {
+      group: await this.groupService.getById(groupId, queryOptions),
+    }
   }
 
   @ApiOperation({
