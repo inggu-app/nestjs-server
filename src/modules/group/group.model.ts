@@ -30,7 +30,7 @@ export class GroupModel extends TimeStamps {
   @prop({ ref: () => FacultyModel, type: Types.ObjectId })
   faculty: Ref<FacultyModel, Types.ObjectId>
 
-  @prop({ default: new Date() })
+  @prop({ default: () => new Date() })
   lastScheduleUpdate: Date
 
   @prop({ default: false })
