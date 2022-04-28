@@ -1,7 +1,7 @@
 import { LessonModel } from '../../lesson.model'
 import { ApiProperty } from '@nestjs/swagger'
 import { WeekDaysEnum } from '../../../../global/enums/WeekDays.enum'
-import { WeeksTypeEnum } from '../../schedule.constants'
+import { SubgroupEnum, WeeksTypeEnum } from '../../schedule.constants'
 import { Types } from 'mongoose'
 import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
 
@@ -39,12 +39,16 @@ export class ScheduleModuleResponseLesson implements Partial<LessonModel> {
 
   @ApiProperty({
     title: 'Подгруппа',
-    type: Number,
-    example: null,
+    description: `
+    ${SubgroupEnum.NULL} - занятие не разбито на подгруппы
+    ${SubgroupEnum.FIRST} - занятие привязано к первой подгруппе
+    ${WeeksTypeEnum.SECOND} - занятие привязано ко второй подгруппе
+    `,
+    enum: SubgroupEnum,
+    example: SubgroupEnum.NULL,
     required: false,
-    nullable: true,
   })
-  subgroup: number | null
+  subgroup: SubgroupEnum
 
   @ApiProperty({
     title: 'Номер занятия',

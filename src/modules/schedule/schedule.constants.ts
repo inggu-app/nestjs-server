@@ -8,8 +8,14 @@ export enum WeeksTypeEnum {
   SECOND = 'SECOND',
   ALL = 'ALL',
 }
-
 enumKeyValuesMatch(WeeksTypeEnum)
+
+export enum SubgroupEnum {
+  FIRST = 'FIRST',
+  SECOND = 'SECOND',
+  NULL = 'NULL',
+}
+enumKeyValuesMatch(SubgroupEnum)
 
 export const scheduleServiceMethodDefaultOptions = {
   create: {

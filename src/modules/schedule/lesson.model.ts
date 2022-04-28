@@ -2,7 +2,7 @@ import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions, prop, Ref } from '@typegoose/typegoose'
 import { getModelDefaultOptions } from '../../configs/modelDefaultOptions.config'
 import { Types } from 'mongoose'
-import { WeeksTypeEnum } from './schedule.constants'
+import { SubgroupEnum, WeeksTypeEnum } from './schedule.constants'
 import { WeekDaysEnum } from '../../global/enums/WeekDays.enum'
 import { GroupModel } from '../group/group.model'
 
@@ -42,6 +42,6 @@ export class LessonModel extends TimeStamps {
   @prop({ ref: () => GroupModel })
   group: Ref<GroupModel, Types.ObjectId>
 
-  @prop({ default: null, type: Number })
-  subgroup: number | null
+  @prop({ default: SubgroupEnum.NULL, enum: SubgroupEnum })
+  subgroup: SubgroupEnum
 }

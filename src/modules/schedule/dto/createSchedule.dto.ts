@@ -1,24 +1,11 @@
-import {
-  ArrayMaxSize,
-  IsArray,
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsPositive,
-  IsString,
-  Max,
-  MaxLength,
-  Min,
-  ValidateNested,
-} from 'class-validator'
+import { ArrayMaxSize, IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { WeekDaysEnum } from '../../../global/enums/WeekDays.enum'
-import { WeeksTypeEnum } from '../schedule.constants'
+import { SubgroupEnum, WeeksTypeEnum } from '../schedule.constants'
 import { Types } from 'mongoose'
 import { IsMongoIdWithTransform } from '../../../global/decorators/IsMongoIdWithTransform.decorator'
 import { IsUndefinable } from '../../../global/decorators/isUndefinable.decorator'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNullable } from '../../../global/decorators/IsNullable.decorator'
 import { MongoIdExample, MongoIdType } from '../../../global/constants/constants'
 
 export class Lesson {
@@ -117,15 +104,16 @@ export class Lesson {
   type: string
 
   @ApiProperty({
-    required: false,
     title: 'Подгруппа, к которой привязано занятие',
-    example: 3,
-    nullable: true,
+    enum: SubgroupEnum,
+    description: `
+    ${SubgroupEnum.NULL} - занятие не разбито на подгруппы
+    ${SubgroupEnum.FIRST} - занятие привязано к первой подгруппе
+    ${WeeksTypeEnum.SECOND} - занятие привязано ко второй подгруппе
+    `,
   })
-  @IsNullable()
-  @IsUndefinable()
-  @IsPositive()
-  subgroup?: number
+  @IsEnum(SubgroupEnum)
+  subgroup: SubgroupEnum
 }
 
 export class CreateScheduleDto {
