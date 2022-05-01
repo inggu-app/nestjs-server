@@ -61,7 +61,9 @@ export class ScheduleController {
 
     // Удаляем ненужные занятия и прикреплённые к ним заметки
     const groupSchedule = await this.scheduleService.getByGroupId(dto.group, { projection: { _id: 1 } })
-    const extraLessonIds = groupSchedule.filter(lesson => !existLessons.find(l => l.id === lesson.id)).map(l => l.id as Types.ObjectId)
+    const extraLessonIds = groupSchedule
+      .filter(lesson => !existLessons.find(l => (l.id as Types.ObjectId).toString() === lesson.id.toString()))
+      .map(l => l.id as Types.ObjectId)
     await this.noteService.deleteAllByLessonIds(extraLessonIds, { checkExistence: { lessons: false } })
     await this.scheduleService.deleteMany(extraLessonIds, { checkExistence: { schedule: false } })
 
