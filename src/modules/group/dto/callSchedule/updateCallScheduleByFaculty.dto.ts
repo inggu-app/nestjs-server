@@ -6,6 +6,7 @@ import { IsMongoIdWithTransform } from '../../../../global/decorators/IsMongoIdW
 import { Types } from 'mongoose'
 import { Type } from 'class-transformer'
 import { MongoIdExample, MongoIdType } from '../../../../global/constants/constants'
+import { IsUndefinable } from '../../../../global/decorators/isUndefinable.decorator'
 
 export class CallScheduleItemDto implements CallScheduleItemModel {
   @ApiProperty({
@@ -38,12 +39,14 @@ export class CallScheduleItemDto implements CallScheduleItemModel {
 
 export class UpdateCallScheduleByFacultyDto {
   @ApiProperty({
-    description: 'id факультета',
+    description: 'id факультета. Если поле facultyId не передаётся, то расписание звонков обновляется для всех групп',
     type: MongoIdType,
     example: MongoIdExample,
+    required: false,
   })
+  @IsUndefinable()
   @IsMongoIdWithTransform()
-  facultyId: Types.ObjectId
+  facultyId?: Types.ObjectId
 
   @ApiProperty({
     description: 'Само расписание звонков',

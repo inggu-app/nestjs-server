@@ -30,12 +30,16 @@ export class CallScheduleController {
   ) {
     // проверяем пытается ли пользователь редактировать недоступные ему факультеты
     if (!user.availability.all) {
-      if (!user.availability.availableFaculties.includes(dto.facultyId))
-        throw new BadRequestException(
-          `Пользователь не может редактировать расписание звонков для групп, принадлежащих факультету с id ${dto.facultyId}`
-        )
+      if (dto.facultyId)
+        if (!user.availability.availableFaculties.includes(dto.facultyId))
+          throw new BadRequestException(
+            `Пользователь не может редактировать расписание звонков для групп, принадлежащих факультету с id ${dto.facultyId}`
+          )
+
+      throw new BadRequestException('Пользователь не может редактировать расписание звонков для всех групп')
     }
 
-    await this.callScheduleService.updateByFacultyId(dto.facultyId, dto.callSchedule)
+    if (dto.facultyId) await this.callScheduleService.updateByFacultyId(dto.facultyId, dto.callSchedule)
+    else await this.callScheduleService.updateForAllGroups(dto.callSchedule)
   }
 }
