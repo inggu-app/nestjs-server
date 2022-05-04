@@ -30,12 +30,16 @@ export class LearningStageController {
   ) {
     // проверяем пытается ли пользователь редактировать недоступные ему факультеты
     if (!user.availability.all) {
-      if (!user.availability.availableFaculties.includes(dto.facultyId))
-        throw new BadRequestException(
-          `Пользователь не может редактировать стадию обучения для групп, принадлежащих факультету с id ${dto.facultyId}`
-        )
+      if (dto.facultyId)
+        if (!user.availability.availableFaculties.includes(dto.facultyId))
+          throw new BadRequestException(
+            `Пользователь не может редактировать стадию обучения для групп, принадлежащих факультету с id ${dto.facultyId}`
+          )
+
+      throw new BadRequestException('Пользователь не может редактировать стадию обучения для всех групп')
     }
 
-    await this.learningStageService.updateByFacultyId(dto.facultyId, dto.learningStage)
+    if (dto.facultyId) await this.learningStageService.updateByFacultyId(dto.facultyId, dto.learningStage)
+    else await this.learningStageService.updateForAllGroups(dto.learningStage)
   }
 }
