@@ -52,7 +52,7 @@ export class UserService extends CheckExistenceService<UserModel> {
 
   async getMany(page: number, count: number, name?: string, queryOptions?: QueryOptions, in_?: Types.ObjectId[]) {
     const filter: FilterQuery<DocumentType<UserModel>> = {}
-    if (name) filter.title = { $regex: name, $options: 'i' }
+    if (name) filter.name = { $regex: name, $options: 'i' }
     if (in_) filter._id = { $in: in_ }
 
     return this.userModel
